@@ -1,5 +1,7 @@
 import os
+import sys
 from configparser import ConfigParser
+
 def closest_scrapy_cfg(path='.', prevpath=None):
     """Return the path to the closest scrapy.cfg file by traversing the current
     directory and its parents
@@ -19,6 +21,7 @@ def init_env(project='default', set_syspath=True):
     be able to locate the project module.
     """
     cfg = get_config()
+
     if cfg.has_option('settings', project):
         os.environ['SCRAPY_SETTINGS_MODULE'] = cfg.get('settings', project)
     closest = closest_scrapy_cfg()
@@ -26,6 +29,8 @@ def init_env(project='default', set_syspath=True):
         projdir = os.path.dirname(closest)
         if set_syspath and projdir not in sys.path:
             sys.path.append(projdir)
+    else:
+        print('scrapy.cfg is not found.')
 
 def get_config(use_closet=True):
     """Get Scrapy config file as a ConfigParser"""

@@ -1,4 +1,5 @@
 from collections.abc import MutableMapping
+from importlib import import_module
 
 from settings import default_settings
 
@@ -36,8 +37,20 @@ class SettingsAttribute:
         else:
             self.priority = priority
     
-    def set():
-        print('BaseSettings.set()')    
+    def set(self, value, priority):
+        """Sets value if priority is higher or equal than current priority."""
+        if priority >= self.priority:
+            if isinstance(self.value, BaseSettings):
+                value = BaseSettings(value, priority=priority)
+            self.value = value
+            self.priority = priority
+
+    def __str__(self):
+        return "<SettingsAttribute value={self.value!r} " \
+               "priority={self.priority}>".format(self=self)
+
+    __repr__ = __str__  
+
 class BaseSettings(MutableMapping):
     """
     Instances of this class behave like dictionaries, but store priorities
@@ -132,13 +145,14 @@ class BaseSettings(MutableMapping):
         """
         self._assert_mutability()
         priority = get_settings_priority(priority)
+
         if name not in self:
             if isinstance(value, SettingsAttribute):
                 print('value is SettingsAttribute')
             else:
                 self.attributes[name] = SettingsAttribute(value, priority)
         else:
-            print('name is in self')
+            self.attributes[name].set(value, priority)
 
     def setdict(self, values, priority='project'):
         self.update(values, priority)
@@ -160,7 +174,7 @@ class BaseSettings(MutableMapping):
         """
         self._assert_mutability()
         if isinstance(module, str):
-            print('setmodule')
+            module = import_module(module)
         for key in dir(module):
             if key.isupper():
                 self.set(key, getattr(module, key), priority)
@@ -195,7 +209,7 @@ class BaseSettings(MutableMapping):
                 print('values is BaseSettings')
             else:
                 for name, value in values.items():
-                    print('update1', name, value)
+                    self.set(name, value, priority)
 
     def delete(self):
         print('delete')
@@ -217,7 +231,7 @@ class BaseSettings(MutableMapping):
         print('frozencopy')
 
     def __iter__(self):
-        print('__iter__')
+        return iter(self.attributes)
 
     def __len__():
         print('__len__')
@@ -238,3 +252,10 @@ class Settings(BaseSettings):
         # values given by the user
         super(Settings, self).__init__()
         self.setmodule(default_settings, 'default')
+        # Promote default dictionaries to BaseSettings instances for per-key
+        # priorities
+        for name, val in self.items():
+            if isinstance(val, dict):
+                self.set(name, BaseSettings(val, 'default'), 'default')
+        self.update(values, priority)
+

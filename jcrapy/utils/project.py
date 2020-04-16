@@ -1,5 +1,7 @@
 import os
 
+from importlib import import_module
+
 from utils.conf import closest_scrapy_cfg, init_env
 from settings import Settings
 
@@ -10,17 +12,23 @@ DATADIR_CFG_SECTION = 'datadir'
 def inside_project():
     scrapy_module = os.environ.get('SCRAPY_SETTINGS_MODULE')
     if scrapy_module is not None:
-        print('scrapy_module is not None')
+        try:
+            import_module(scrapy_module)
+        except ImportError as exc:
+            warnings.warn("Cannot import scrapy settings module %s: %s" % (scrapy_module, exc))
+        else:
+            return True
     return bool(closest_scrapy_cfg())
+
 def get_project_settings():
     if ENVVAR not in os.environ:
         project = os.environ.get('SCRAPY_PROJECT', 'default')
-        init_env(project)
+        init_env(project) #modify system environment
 
     settings = Settings()
     settings_module_path = os.environ.get(ENVVAR)
     if settings_module_path:
-        print('settings_module_path is true')
+        settings.setmodule(settings_module_path, priority='project')
 
     pickled_settings = os.environ.get("SCRAPY_PICKLED_SETTINGS_TO_OVERRIDE")
     if pickled_settings:

@@ -19,10 +19,12 @@ def _iter_command_classes(module_name):
                     not obj == ScrapyCommand:
                 yield obj
 
+
 def _get_commands_from_module(module, inproject):
     d = {}
+    print('_get_commands_from_module',module)
     for cmd in _iter_command_classes(module):
-        print('_get_commands_from_module', cmd)
+        print('_get_commands_from_module', inproject)
     return d
 
 def _get_commands_from_entry_points(inproject, group='commands'):
@@ -42,7 +44,10 @@ def _get_commands_dict(settings, inproject):
 def _pop_command_name(argv):
     i = 0
     for arg in argv[1:]:
-        print('_pop_command_name', arg)
+        if not arg.startswith('-'):
+            del argv[i]
+            return arg
+        i += 1
 
 def _print_header(settings, inproject):
     if inproject:
@@ -65,22 +70,28 @@ def _print_commands(settings, inproject):
     print()
     print('Use "scrapy <command> -h" to see more info about a command')
 
+def _print_unknown_command(settings, cmdname, inproject):
+    _print_header(settings, inproject)
+    print("Unknown command: %s\n" % cmdname)
+    print('Use "scrapy" to see available commands')
+
 def execute(argv=None, settings=None):
     if argv is None:
         argv = sys.argv
- 
+
     if settings is None:
         settings = get_project_settings()
-
     inproject = inside_project()
     cmds = _get_commands_dict(settings, inproject)
     cmdname = _pop_command_name(argv)
     parser = optparse.OptionParser(formatter=optparse.TitledHelpFormatter(), conflict_handler='resolve')
-
-    if not cmdname:
+    print('execute', cmdname not in cmds)
+    # if not cmdname:
+    #     print('not cmdname')
         # _print_commands(settings, inproject)
-        sys.exit(0)
-    elif cmdname not in cmds:
-        print('cmdline.execute',cmdname)
+        # sys.exit(0)
+    # elif cmdname not in cmds:
+        # _print_unknown_command(settings, cmdname, inproject)
+        # print('cmdline.execute')
 
-    print('cmdline.execute',cmdname)
+    # print('cmdline.execute',cmdname)
