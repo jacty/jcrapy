@@ -96,7 +96,7 @@ class BaseSettings(MutableMapping):
         :param default: the value to return if no setting is found
         :type default: any
         """
-        print('get')  
+        return self[name] if self[name] is not None else default  
     
     def getbool(self, name, default=False):
         print('getbool')  

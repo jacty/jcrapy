@@ -2,6 +2,12 @@ import os
 import sys
 from configparser import ConfigParser
 
+def arglist_to_dict(arglist):
+    """Convert a list of arguments like ['arg1=val1', 'arg2=val2', ...] to a
+    dict
+    """
+    return dict(x.split('=', 1) for x in arglist)    
+
 def closest_scrapy_cfg(path='.', prevpath=None):
     """Return the path to the closest scrapy.cfg file by traversing the current
     directory and its parents
@@ -25,6 +31,7 @@ def init_env(project='default', set_syspath=True):
     if cfg.has_option('settings', project):
         os.environ['SCRAPY_SETTINGS_MODULE'] = cfg.get('settings', project)
     closest = closest_scrapy_cfg()
+
     if closest:
         projdir = os.path.dirname(closest)
         if set_syspath and projdir not in sys.path:

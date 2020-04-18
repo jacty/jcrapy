@@ -4,6 +4,7 @@ import optparse
 import inspect
 import pkg_resources
 
+from crawler import CrawlerProcess
 from commands import ScrapyCommand
 from utils.misc import walk_modules
 from utils.project import inside_project,get_project_settings
@@ -20,11 +21,13 @@ def _iter_command_classes(module_name):
                 yield obj
 
 
+
 def _get_commands_from_module(module, inproject):
     d = {}
-    print('_get_commands_from_module',module)
     for cmd in _iter_command_classes(module):
-        print('_get_commands_from_module', inproject)
+        if inproject or not cmd.requires_project:
+            cmdname = cmd.__module__.split('.')[-1]
+            d[cmdname] = cmd()
     return d
 
 def _get_commands_from_entry_points(inproject, group='commands'):
@@ -51,7 +54,7 @@ def _pop_command_name(argv):
 
 def _print_header(settings, inproject):
     if inproject:
-        print('_print_header', settings, inproject)
+        print('In project')
     else:
         print("Scrapy %s - no active project\n" % '0.0.1')
 
@@ -63,7 +66,7 @@ def _print_commands(settings, inproject):
     print("Available commands:")
     cmds = _get_commands_dict(settings, inproject)
     for cmdname, cmdclass in sorted(cmds.items()):
-        print('_print_commands',cmds.items())
+        print('Available cmds',cmds.items())
     if not inproject:
         print()
         print("  [ more ]      More commands available when run from project directory")
@@ -75,6 +78,12 @@ def _print_unknown_command(settings, cmdname, inproject):
     print("Unknown command: %s\n" % cmdname)
     print('Use "scrapy" to see available commands')
 
+def _run_print_help(parser, func, *a, **kw):
+    try:
+        func(*a, **kw)
+    except UsageError as e:
+        print('_run_print_help', func, *a, **kw)
+
 def execute(argv=None, settings=None):
     if argv is None:
         argv = sys.argv
@@ -85,13 +94,20 @@ def execute(argv=None, settings=None):
     cmds = _get_commands_dict(settings, inproject)
     cmdname = _pop_command_name(argv)
     parser = optparse.OptionParser(formatter=optparse.TitledHelpFormatter(), conflict_handler='resolve')
-    print('execute', cmdname not in cmds)
-    # if not cmdname:
-    #     print('not cmdname')
-        # _print_commands(settings, inproject)
-        # sys.exit(0)
-    # elif cmdname not in cmds:
-        # _print_unknown_command(settings, cmdname, inproject)
-        # print('cmdline.execute')
+    if not cmdname:
+        _print_commands(settings, inproject)
+        sys.exit(0)
+    elif cmdname not in cmds:
+        _print_unknown_command(settings, cmdname, inproject)
+        sys.exit(2)
 
-    # print('cmdline.execute',cmdname)
+    cmd = cmds[cmdname]
+    parser.usage = "scrapy %s %s" % (cmdname, cmd.syntax())
+    parser.description = cmd.long_desc()
+    settings.setdict(cmd.default_settings, priority='command')
+    cmd.settings = settings
+    cmd.add_options(parser)
+    opts, args = parser.parse_args(args=argv[1:])
+    _run_print_help(parser, cmd.process_options, args, opts)
+    cmd.crawler_process = CrawlerProcess(settings)
+    print('cmdline.execute',cmd.crawler_process)
