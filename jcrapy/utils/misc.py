@@ -10,7 +10,20 @@ def load_object(path):
     object can be the import path of a class, function, variable or an
     instance, e.g. 'scrapy.downloadermiddlewares.redirect.RedirectMiddleware'
     """
-    print('load_object', path)    
+    try:
+        dot = path.rindex('.')
+    except ValueError:
+        raise ValueError("Error loading object '%s': not a full path" % path)
+
+    module, name = path[:dot], path[dot + 1:]
+    mod = import_module(module) 
+
+    try:
+        obj = getattr(mod, name)
+    except AttributeError:
+        raise NameError("Module '%s' doesn't define any object named '%s'" % (module, name))
+
+    return obj
 
 def walk_modules(path):
     """Loads a module and all its submodules from the given module path and

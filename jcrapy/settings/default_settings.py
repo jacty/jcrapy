@@ -255,7 +255,7 @@ DEFAULT_REQUEST_HEADERS = {
 # SCRAPER_SLOT_MAX_ACTIVE_SIZE = 5000000
 
 SPIDER_LOADER_CLASS = 'spiderloader.SpiderLoader'
-# SPIDER_LOADER_WARN_ONLY = False
+SPIDER_LOADER_WARN_ONLY = False
 
 # SPIDER_MIDDLEWARES = {}
 
@@ -269,7 +269,7 @@ SPIDER_LOADER_CLASS = 'spiderloader.SpiderLoader'
 #     # Spider side
 # }
 
-# SPIDER_MODULES = []
+SPIDER_MODULES = []
 
 # STATS_CLASS = 'scrapy.statscollectors.MemoryStatsCollector'
 # STATS_DUMP = True
@@ -288,7 +288,7 @@ SPIDER_LOADER_CLASS = 'spiderloader.SpiderLoader'
 # TELNETCONSOLE_USERNAME = 'scrapy'
 # TELNETCONSOLE_PASSWORD = None
 
-# TWISTED_REACTOR = None
+TWISTED_REACTOR = None
 
 # SPIDER_CONTRACTS = {}
 # SPIDER_CONTRACTS_BASE = {

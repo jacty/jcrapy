@@ -1,3 +1,4 @@
+import copy
 from collections.abc import MutableMapping
 from importlib import import_module
 
@@ -99,8 +100,32 @@ class BaseSettings(MutableMapping):
         return self[name] if self[name] is not None else default  
     
     def getbool(self, name, default=False):
-        print('getbool')  
+        """
+        Get a setting value as a boolean.
 
+        ``1``, ``'1'``, `True`` and ``'True'`` return ``True``,
+        while ``0``, ``'0'``, ``False``, ``'False'`` and ``None`` return ``False``.
+
+        For example, settings populated through environment variables set to
+        ``'0'`` will return ``False`` when using this method.
+
+        :param name: the setting name
+        :type name: string
+
+        :param default: the value to return if no setting is found
+        :type default: any
+        """
+        got = self.get(name, default)
+        try:
+            return bool(int(got))
+        except ValueError:
+            if got in ("True", "true"):
+                return True
+            if got in ("False", "false"):
+                return False
+            raise ValueError("Supported values for boolean settings "
+                             "are 0/1, True/False, '0'/'1', "
+                             "'True'/'False' and 'true'/'false'")
     def getinit(self, name, default=0):
         print('getint')
 
@@ -108,7 +133,23 @@ class BaseSettings(MutableMapping):
         print('getfloat')  
 
     def getlist(self, name, default=None):
-        print('getlist')  
+        """
+        Get a setting value as a list. If the setting original type is a list, a
+        copy of it will be returned. If it's a string it will be split by ",".
+
+        For example, settings populated through environment variables set to
+        ``'one,two'`` will return a list ['one', 'two'] when using this method.
+
+        :param name: the setting name
+        :type name: string
+
+        :param default: the value to return if no setting is found
+        :type default: any
+        """
+        value = self.get(name, default or [])
+        if isinstance(value, str):
+            value = value.split(',')
+        return list(value) 
 
     def getdict(self, name, default=None):
         print('getdict')
@@ -221,14 +262,37 @@ class BaseSettings(MutableMapping):
         if self.frozen:
             raise TypeError("Trying to modify an immutable Settings object")
 
-    def copy():
-        print('copy')
+    def copy(self):
+        """
+        Make a deep copy of current settings.
+
+        This method returns a new instance of the :class:`Settings` class,
+        populated with the same values and their priorities.
+
+        Modifications to the new object won't be reflected on the original
+        settings.
+        """
+        return copy.deepcopy(self)
 
     def freeze(self):
-        print('freeze')
+        """
+        Disable further changes to the current settings.
 
+        After calling this method, the present state of the settings will become
+        immutable. Trying to change values through the :meth:`~set` method and
+        its variants won't be possible and will be alerted.
+        """
+        self.frozen = True
+        
     def frozencopy(self):
-        print('frozencopy')
+        """
+        Return an immutable copy of the current settings.
+
+        Alias for a :meth:`~freeze` call in the object returned by :meth:`copy`.
+        """
+        copy = self.copy()
+        copy.freeze()
+        return copy
 
     def __iter__(self):
         return iter(self.attributes)

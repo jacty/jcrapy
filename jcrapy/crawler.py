@@ -1,7 +1,17 @@
 import logging
 
 from twisted.internet import defer
+from zope.interface.exceptions import DoesNotImplement
 
+try:
+    # zope >= 5.0 only supports MultipleInvalid
+    from zope.interface.exceptions import MultipleInvalid
+except ImportError:
+    MultipleInvalid = None
+
+from zope.interface.verify import verifyClass
+
+from interfaces import ISpiderLoader
 from utils.misc import load_object
 
 logger = logging.getLogger(__name__)
@@ -29,14 +39,28 @@ class CrawlerRunner:
         """ Get SpiderLoader instance from settings """
         cls_path = settings.get('SPIDER_LOADER_CLASS')
         loader_cls = load_object(cls_path)
-        print('CrawlerRunner._get_spider_loader', loader_cls)
+        excs = (DoesNotImplement, MultipleInvalid) if MultipleInvalid else DoesNotImplement
+        try:
+            verifyClass(ISpiderLoader, loader_cls)
+        except excs:
+            warnings.warn(
+                'SPIDER_LOADER_CLASS (previously named SPIDER_MANAGER_CLASS) does '
+                'not fully implement scrapy.interfaces.ISpiderLoader interface. '
+                'Please add all missing methods to avoid unexpected runtime errors.',
+                category=ScrapyDeprecationWarning, stacklevel=2
+            )
+
+        return loader_cls.from_settings(settings.frozencopy())
 
     def __init__(self, settings=None):
         if isinstance(settings, dict) or settings is None:
             print('CrawlerRunner', isinstance(settings, dict))
         self.settings = settings
         self.spider_loader = self._get_spider_loader(settings)
-        print('CrawlerRunner.__init__')
+        self._crawlers = set()
+        self._active = set()
+        self.bootstrap_failed = False
+        self._handle_twisted_reactor()
 
     @property
     def spider(self):
@@ -110,4 +134,6 @@ class CrawlerProcess(CrawlerRunner):
         print('CrawlerProcess._stop_reactor')
 
     def _handle_twisted_reactor(self):
-        print('CrawlerProcess._handle_twisted_reactor')
+        if self.settings.get("TWISTED_REACTOR"):
+            print('CrawlerProcess._handle_twisted_reactor')
+        super()._handle_twisted_reactor()
