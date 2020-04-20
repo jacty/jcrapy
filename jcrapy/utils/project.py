@@ -2,8 +2,8 @@ import os
 
 from importlib import import_module
 
-from utils.conf import closest_scrapy_cfg, init_env
-from settings import Settings
+from jcrapy.utils.conf import closest_scrapy_cfg, init_env
+from jcrapy.settings import Settings
 
 ENVVAR = 'SCRAPY_SETTINGS_MODULE'
 DATADIR_CFG_SECTION = 'datadir'
@@ -21,6 +21,7 @@ def inside_project():
     return bool(closest_scrapy_cfg())
 
 def get_project_settings():
+
     if ENVVAR not in os.environ:
         project = os.environ.get('SCRAPY_PROJECT', 'default')
         init_env(project)

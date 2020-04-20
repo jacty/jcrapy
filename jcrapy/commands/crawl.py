@@ -1,5 +1,5 @@
-from commands import ScrapyCommand
-from utils.conf import arglist_to_dict
+from jcrapy.commands import ScrapyCommand
+from jcrapy.utils.conf import arglist_to_dict
 # from scrapy.exceptions import UsageError
 
 

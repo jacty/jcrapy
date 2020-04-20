@@ -22,7 +22,7 @@ def load_object(path):
         obj = getattr(mod, name)
     except AttributeError:
         raise NameError("Module '%s' doesn't define any object named '%s'" % (module, name))
-
+        
     return obj
 
 def walk_modules(path):
@@ -43,5 +43,5 @@ def walk_modules(path):
                 # mods += walk_modules(fullpath)
             else:
                 submod = import_module(fullpath)
-                mods.append(submod)    
+                mods.append(submod)   
     return mods

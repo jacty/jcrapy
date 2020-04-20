@@ -5,12 +5,11 @@ import optparse
 import inspect
 import pkg_resources
 
-import jcrapy
-from crawler import CrawlerProcess
-from commands import ScrapyCommand
-from exceptions import UsageError
-from utils.misc import walk_modules
-from utils.project import inside_project,get_project_settings
+from jcrapy.crawler import CrawlerProcess
+from jcrapy.commands import ScrapyCommand
+from jcrapy.exceptions import UsageError
+from jcrapy.utils.misc import walk_modules
+from jcrapy.utils.project import inside_project,get_project_settings
 
 def _iter_command_classes(module_name):
     # TODO: add `name` attribute to commands and and merge this function with
@@ -21,11 +20,13 @@ def _iter_command_classes(module_name):
                     issubclass(obj, ScrapyCommand) and \
                     obj.__module__ == module.__name__ and \
                     not obj == ScrapyCommand:
+                
                 yield obj
 
 
 def _get_commands_from_module(module, inproject):
     d = {}
+    
     for cmd in _iter_command_classes(module):
         if inproject or not cmd.requires_project:
             cmdname = cmd.__module__.split('.')[-1]
@@ -91,35 +92,35 @@ def _run_print_help(parser, func, *a, **kw):
         sys.exit(2)
 
 def execute(argv=None, settings=None):
-    print('execute')
-    # if argv is None:
-    #     argv = sys.argv
+    if argv is None:
+        argv = sys.argv
 
-    # if settings is None:
-    #     settings = get_project_settings()
-    # inproject = inside_project()
-    # cmds = _get_commands_dict(settings, inproject)
-    # cmdname = _pop_command_name(argv)
-    # parser = optparse.OptionParser(formatter=optparse.TitledHelpFormatter(), conflict_handler='resolve')
-    # if not cmdname:
-    #     _print_commands(settings, inproject)
-    #     sys.exit(0)
-    # elif cmdname not in cmds:
-    #     _print_unknown_command(settings, cmdname, inproject)
-    #     sys.exit(2)
+    if settings is None:
+        settings = get_project_settings()
 
-    # cmd = cmds[cmdname]
-    # parser.usage = "scrapy %s %s" % (cmdname, cmd.syntax())
-    # parser.description = cmd.long_desc()
-    # settings.setdict(cmd.default_settings, priority='command')
-    # cmd.settings = settings
-    # cmd.add_options(parser)
-    # opts, args = parser.parse_args(args=argv[1:])
-    # _run_print_help(parser, cmd.process_options, args, opts)
+    inproject = inside_project()
+    cmds = _get_commands_dict(settings, inproject)
+    cmdname = _pop_command_name(argv)
+    parser = optparse.OptionParser(formatter=optparse.TitledHelpFormatter(), conflict_handler='resolve')
+    if not cmdname:
+        _print_commands(settings, inproject)
+        sys.exit(0)
+    elif cmdname not in cmds:
+        _print_unknown_command(settings, cmdname, inproject)
+        sys.exit(2)
+
+    cmd = cmds[cmdname]
+    parser.usage = "scrapy %s %s" % (cmdname, cmd.syntax())
+    parser.description = cmd.long_desc()
+    settings.setdict(cmd.default_settings, priority='command')
+    cmd.settings = settings
+    cmd.add_options(parser)
+    opts, args = parser.parse_args(args=argv[1:])
+    _run_print_help(parser, cmd.process_options, args, opts)
     
-    # cmd.crawler_process = CrawlerProcess(settings)
-    # _run_print_help(parser, _run_command, cmd, args, opts)
-    # sys.exit(cmd.exitcode)
+    cmd.crawler_process = CrawlerProcess(settings)
+    _run_print_help(parser, _run_command, cmd, args, opts)
+    sys.exit(cmd.exitcode)
 
 def _run_command(cmd, args, opts):
     if opts.profile:

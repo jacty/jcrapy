@@ -10,7 +10,7 @@ except ImportError:
     MultipleInvalid = None
 
 from zope.interface.verify import verifyClass
-# from jcrapy import Spider
+from jcrapy import Spider
 from interfaces import ISpiderLoader
 from utils.log import(
     configure_logging,
@@ -20,6 +20,11 @@ from utils.misc import load_object
 from utils.ossignal import install_shutdown_handlers
 
 logger = logging.getLogger(__name__)
+
+class Crawler:
+    
+    def __init__(self, spidercls, settings=None):
+        print('Crawler.__init__')
 
 class CrawlerRunner:
     """
@@ -93,7 +98,12 @@ class CrawlerRunner:
 
         :param dict kwargs: keyword arguments to initialize the spider
         """
-        print('CrawlerRunner.crawl', Spider)
+        if isinstance(crawler_or_spidercls, Spider):
+            raise ValueError(
+                'The crawler_or_spidercls argument cannot be a spider object, '
+                'it must be a spider class (or a Crawler object)')
+        crawler = self.create_crawler(crawler_or_spidercls)
+        print('CrawlerRunner.crawl', crawler)
 
     def _crawl(self, crawler, *args, **kwargs):
         print('CrawlerRunner._crawl')
@@ -101,10 +111,28 @@ class CrawlerRunner:
             print('CrawlerRunner._crawl._done')
 
     def create_crawler(self, crawler_or_spidercls):
-        print('CrawlerRunner.create_crawler')
+        """
+        Return a :class:`~scrapy.crawler.Crawler` object.
+
+        * If ``crawler_or_spidercls`` is a Crawler, it is returned as-is.
+        * If ``crawler_or_spidercls`` is a Spider subclass, a new Crawler
+          is constructed for it.
+        * If ``crawler_or_spidercls`` is a string, this function finds
+          a spider with this name in a Scrapy project (using spider loader),
+          then creates a Crawler instance for it.
+        """
+        if isinstance(crawler_or_spidercls, Spider):
+            raise ValueError(
+                'The crawler_or_spidercls argument cannot be a spider object, '
+                'it must be a spider class (or a Crawler object)')        
+        if isinstance(crawler_or_spidercls, Crawler):
+            print('CrawlerRunner.create_crawler')
+        return self._create_crawler(crawler_or_spidercls)
 
     def _create_crawler(self, spidercls):
-        print('CrawlerRunner._create_crawler')
+        if isinstance(spidercls, str):
+            # spidercls1 = self.spider_loader.load(spidercls)
+            print('CrawlerRunner._create_crawler',self.spider_loader)
 
     def stop(self):
         print('CrawlerRunner.stop')
