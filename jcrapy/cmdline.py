@@ -1,11 +1,14 @@
+
 import sys
 import os
 import optparse
 import inspect
 import pkg_resources
 
+import jcrapy
 from crawler import CrawlerProcess
 from commands import ScrapyCommand
+from exceptions import UsageError
 from utils.misc import walk_modules
 from utils.project import inside_project,get_project_settings
 
@@ -19,7 +22,6 @@ def _iter_command_classes(module_name):
                     obj.__module__ == module.__name__ and \
                     not obj == ScrapyCommand:
                 yield obj
-
 
 
 def _get_commands_from_module(module, inproject):
@@ -82,32 +84,53 @@ def _run_print_help(parser, func, *a, **kw):
     try:
         func(*a, **kw)
     except UsageError as e:
-        print('_run_print_help', func, *a, **kw)
-
-def execute(argv=None, settings=None):
-    if argv is None:
-        argv = sys.argv
-
-    if settings is None:
-        settings = get_project_settings()
-    inproject = inside_project()
-    cmds = _get_commands_dict(settings, inproject)
-    cmdname = _pop_command_name(argv)
-    parser = optparse.OptionParser(formatter=optparse.TitledHelpFormatter(), conflict_handler='resolve')
-    if not cmdname:
-        _print_commands(settings, inproject)
-        sys.exit(0)
-    elif cmdname not in cmds:
-        _print_unknown_command(settings, cmdname, inproject)
+        if str(e):
+            parser.error(str(e))
+        if e.print_help:
+            parser.print_help()
         sys.exit(2)
 
-    cmd = cmds[cmdname]
-    parser.usage = "scrapy %s %s" % (cmdname, cmd.syntax())
-    parser.description = cmd.long_desc()
-    settings.setdict(cmd.default_settings, priority='command')
-    cmd.settings = settings
-    cmd.add_options(parser)
-    opts, args = parser.parse_args(args=argv[1:])
-    _run_print_help(parser, cmd.process_options, args, opts)
-    cmd.crawler_process = CrawlerProcess(settings)
-    print('cmdline.execute',cmd.crawler_process)
+def execute(argv=None, settings=None):
+    print('execute')
+    # if argv is None:
+    #     argv = sys.argv
+
+    # if settings is None:
+    #     settings = get_project_settings()
+    # inproject = inside_project()
+    # cmds = _get_commands_dict(settings, inproject)
+    # cmdname = _pop_command_name(argv)
+    # parser = optparse.OptionParser(formatter=optparse.TitledHelpFormatter(), conflict_handler='resolve')
+    # if not cmdname:
+    #     _print_commands(settings, inproject)
+    #     sys.exit(0)
+    # elif cmdname not in cmds:
+    #     _print_unknown_command(settings, cmdname, inproject)
+    #     sys.exit(2)
+
+    # cmd = cmds[cmdname]
+    # parser.usage = "scrapy %s %s" % (cmdname, cmd.syntax())
+    # parser.description = cmd.long_desc()
+    # settings.setdict(cmd.default_settings, priority='command')
+    # cmd.settings = settings
+    # cmd.add_options(parser)
+    # opts, args = parser.parse_args(args=argv[1:])
+    # _run_print_help(parser, cmd.process_options, args, opts)
+    
+    # cmd.crawler_process = CrawlerProcess(settings)
+    # _run_print_help(parser, _run_command, cmd, args, opts)
+    # sys.exit(cmd.exitcode)
+
+def _run_command(cmd, args, opts):
+    if opts.profile:
+        _run_command_profiled(cmd, args, opts)
+    else:
+        cmd.run(args, opts)
+
+if __name__ == '__main__':
+    try:
+        execute()
+    finally:
+        # Twisted prints errors in DebugInfo.__del__, but PyPy does not run gc.collect()
+        # on exit: http://doc.pypy.org/en/latest/cpython_differences.html?highlight=gc.collect#differences-related-to-garbage-collection-strategies
+        garbage_collect()

@@ -10,9 +10,14 @@ except ImportError:
     MultipleInvalid = None
 
 from zope.interface.verify import verifyClass
-
+# from jcrapy import Spider
 from interfaces import ISpiderLoader
+from utils.log import(
+    configure_logging,
+    log_scrapy_info
+)
 from utils.misc import load_object
+from utils.ossignal import install_shutdown_handlers
 
 logger = logging.getLogger(__name__)
 
@@ -67,7 +72,28 @@ class CrawlerRunner:
         print('CrawlerRunner.spider')
 
     def crawl(self, crawler_or_spidercls, *args, **kwargs):
-        print('CrawlerRunner.crawl')
+        """
+        Run a crawler with the provided arguments.
+
+        It will call the given Crawler's :meth:`~Crawler.crawl` method, while
+        keeping track of it so it can be stopped later.
+
+        If ``crawler_or_spidercls`` isn't a :class:`~scrapy.crawler.Crawler`
+        instance, this method will try to create one using this parameter as
+        the spider class given to it.
+
+        Returns a deferred that is fired when the crawling is finished.
+
+        :param crawler_or_spidercls: already created crawler, or a spider class
+            or spider's name inside the project to create it
+        :type crawler_or_spidercls: :class:`~scrapy.crawler.Crawler` instance,
+            :class:`~scrapy.spiders.Spider` subclass or string
+
+        :param list args: arguments to initialize the spider
+
+        :param dict kwargs: keyword arguments to initialize the spider
+        """
+        print('CrawlerRunner.crawl', Spider)
 
     def _crawl(self, crawler, *args, **kwargs):
         print('CrawlerRunner._crawl')
@@ -88,7 +114,8 @@ class CrawlerRunner:
         print('CrawlerRunner.join')
 
     def _handle_twisted_reactor(self):
-        print('CrawlerRunner._handle_twisted_reactor')
+        if self.settings.get("TWISTED_REACTOR"):
+            print('CrawlerRunner._handle_twisted_reactor')
 
 
 class CrawlerProcess(CrawlerRunner):
@@ -117,7 +144,10 @@ class CrawlerProcess(CrawlerRunner):
 
     def __init__(self, settings=None, install_root_handler=True):
         super(CrawlerProcess, self).__init__(settings)
-        print('CrawlerProcess.__init__')
+        install_shutdown_handlers(self._signal_shutdown)
+        configure_logging(self.settings, install_root_handler)
+        # log_scrapy_info(self.settings)
+        
     def _signal_shutdown(self, signum, _):
         print('CrawlerProcess._signal_shutdown')
 

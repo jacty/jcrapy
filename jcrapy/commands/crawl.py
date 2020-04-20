@@ -33,15 +33,15 @@ class Command(ScrapyCommand):
         #     self.settings.set('FEEDS', feeds, priority='cmdline')
 
     def run(self, args, opts):
-        print('crawl.run')
-        # if len(args) < 1:
-        #     raise UsageError()
-        # elif len(args) > 1:
-        #     raise UsageError("running 'scrapy crawl' with more than one spider is no longer supported")
-        # spname = args[0]
 
-        # crawl_defer = self.crawler_process.crawl(spname, **opts.spargs)
+        if len(args) < 1:
+            raise UsageError()
+        elif len(args) > 1:
+            raise UsageError("running 'scrapy crawl' with more than one spider is no longer supported")
+        spname = args[0]
 
+        crawl_defer = self.crawler_process.crawl(spname, **opts.spargs)
+        print('crawl.run', crawl_defer)
         # if getattr(crawl_defer, 'result', None) is not None and issubclass(crawl_defer.result.type, Exception):
         #     self.exitcode = 1
         # else:

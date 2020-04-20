@@ -25,7 +25,7 @@ AJAXCRAWL_ENABLED = False
 # AUTOTHROTTLE_START_DELAY = 5.0
 # AUTOTHROTTLE_TARGET_CONCURRENCY = 1.0
 
-# BOT_NAME = 'scrapybot'
+BOT_NAME = 'Jackie'
 
 # CLOSESPIDER_TIMEOUT = 0
 # CLOSESPIDER_PAGECOUNT = 0
@@ -192,15 +192,15 @@ DEFAULT_REQUEST_HEADERS = {
 # ITEM_PIPELINES = {}
 # ITEM_PIPELINES_BASE = {}
 
-# LOG_ENABLED = True
+LOG_ENABLED = True
 # LOG_ENCODING = 'utf-8'
-# LOG_FORMATTER = 'scrapy.logformatter.LogFormatter'
-# LOG_FORMAT = '%(asctime)s [%(name)s] %(levelname)s: %(message)s'
+LOG_FORMATTER = 'scrapy.logformatter.LogFormatter'
+LOG_FORMAT = '%(asctime)s [%(name)s] %(levelname)s: %(message)s'
 # LOG_DATEFORMAT = '%Y-%m-%d %H:%M:%S'
-# LOG_STDOUT = False
-# LOG_LEVEL = 'DEBUG'
-# LOG_FILE = None
-# LOG_SHORT_NAMES = False
+LOG_STDOUT = False
+LOG_LEVEL = 'DEBUG'
+LOG_FILE = None
+LOG_SHORT_NAMES = False
 
 # SCHEDULER_DEBUG = False
 

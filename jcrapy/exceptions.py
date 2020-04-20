@@ -60,6 +60,7 @@ class NotSupported(Exception):
 class UsageError(Exception):
     """To indicate a command-line usage error"""
     def __init__(self, *a, **kw):
+        print(111,kw)
         self.print_help = kw.pop('print_help', True)
         super(UsageError, self).__init__(*a, **kw)
 
