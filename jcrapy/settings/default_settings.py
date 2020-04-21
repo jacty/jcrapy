@@ -276,7 +276,7 @@ SPIDER_MODULES = []
 
 # STATSMAILER_RCPTS = []
 
-# TEMPLATES_DIR = abspath(join(dirname(__file__), '..', 'templates'))
+TEMPLATES_DIR = abspath(join(dirname(__file__), '..', 'templates'))
 
 # URLLENGTH_LIMIT = 2083
 

@@ -14,13 +14,14 @@ from jcrapy.utils.project import inside_project,get_project_settings
 def _iter_command_classes(module_name):
     # TODO: add `name` attribute to commands and and merge this function with
     # scrapy.utils.spider.iter_spider_classes
+
     for module in walk_modules(module_name):
         for obj in vars(module).values():
             if inspect.isclass(obj) and \
                     issubclass(obj, ScrapyCommand) and \
                     obj.__module__ == module.__name__ and \
                     not obj == ScrapyCommand:
-                
+
                 yield obj
 
 
@@ -102,6 +103,7 @@ def execute(argv=None, settings=None):
     cmds = _get_commands_dict(settings, inproject)
     cmdname = _pop_command_name(argv)
     parser = optparse.OptionParser(formatter=optparse.TitledHelpFormatter(), conflict_handler='resolve')
+
     if not cmdname:
         _print_commands(settings, inproject)
         sys.exit(0)
