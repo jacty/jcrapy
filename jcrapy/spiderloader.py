@@ -3,6 +3,8 @@ from collections import defaultdict
 
 from zope.interface import implementer
 from jcrapy.interfaces import ISpiderLoader
+from jcrapy.utils.misc import walk_modules
+from jcrapy.utils.spider import iter_spider_classes
 
 @implementer(ISpiderLoader)
 class SpiderLoader:
@@ -18,15 +20,35 @@ class SpiderLoader:
         self._load_all_spiders()
 
     def _check_name_duplicates(self):
-        for name, locations in self._found.items():
-            print('SpiderLoader._check_name_duplicates', name, locations)
+        dupes = ["\n".join("  {cls} named {name!r} (in {module})".format(
+                                module=mod, cls=cls, name=name)
+                           for (mod, cls) in locations)
+                 for name, locations in self._found.items()
+                 if len(locations) > 1]
+        if dupes:
+            msg = ("There are several spiders with the same name:\n\n"
+                   "{}\n\n  This can cause unexpected behavior.".format(
+                        "\n\n".join(dupes)))
+            warnings.warn(msg, UserWarning)
 
     def _load_spiders(self, module):
-        print('SpiderLoader._load_spiders')
+        for spcls in iter_spider_classes(module):
+            self._found[spcls.name].append((module.__name__, spcls.__name__))
+            self._spiders[spcls.name] = spcls
 
     def _load_all_spiders(self):
         for name in self.spider_modules:
-            print('SpiderLoader._load_all_spiders', name)
+            try:
+                for module in walk_modules(name):
+                    self._load_spiders(module)
+            except ImportError as e:
+                if self.warn_only:
+                    msg = ("\n{tb}Could not load spiders from module '{modname}'. "
+                           "See above traceback for details.".format(
+                                modname=name, tb=traceback.format_exc()))
+                    warnings.warn(msg, RuntimeWarning)
+                else:
+                    raise
         self._check_name_duplicates()
 
     @classmethod

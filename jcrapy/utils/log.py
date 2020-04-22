@@ -8,7 +8,7 @@ from logging.config import dictConfig
 from twisted.python import log as twisted_log
 # from twisted.python.failure import Failure
 
-# import scrapy
+import jcrapy
 # from scrapy.exceptions import ScrapyDeprecationWarning
 # from scrapy.settings import Settings
 from utils.versions import scrapy_components_versions
@@ -105,22 +105,18 @@ def configure_logging(settings=None, install_root_handler=True):
         install_scrapy_root_handler(settings)
 
 
-def install_scrapy_root_handler(settings):
-    
+def install_scrapy_root_handler(settings):    
     global _scrapy_root_handler
     
     if (_scrapy_root_handler is not None
             and _scrapy_root_handler in logging.root.handlers):
-        print('install_scrapy_root_handler', _scrapy_root_handler in logging.root.handlers)
-        # logging.root.removeHandler(_scrapy_root_handler)
-
+        logging.root.removeHandler(_scrapy_root_handler)
     logging.root.setLevel(logging.NOTSET)
     _scrapy_root_handler = _get_handler(settings)
     logging.root.addHandler(_scrapy_root_handler)
 
 def get_scrapy_root_handler():
-    print('get_scrapy_root_handler')
-    # return _scrapy_root_handler
+    return _scrapy_root_handler
 
 
 _scrapy_root_handler = None
@@ -152,8 +148,8 @@ def _get_handler(settings):
 
 def log_scrapy_info(settings):
 
-    logger.info("Scrapy %(version)s started (bot: %(bot)s)",
-                {'version': 1, 'bot': settings['BOT_NAME']})
+    logger.info("Jcrapy %(version)s started (bot: %(bot)s)",
+                {'version': jcrapy.__version__, 'bot': settings['BOT_NAME']})
 
     logger.info("Versions: %(versions)s",
                 {'versions': ", ".join("%s %s" % (name, version)
@@ -189,9 +185,8 @@ class LogCounterHandler(logging.Handler):
     """Record log levels count into a crawler stats"""
 
     def __init__(self, crawler, *args, **kwargs):
-        print('LogCounterHandler.__init__')
-        # super(LogCounterHandler, self).__init__(*args, **kwargs)
-        # self.crawler = crawler
+        super(LogCounterHandler, self).__init__(*args, **kwargs)
+        self.crawler = crawler
 
     def emit(self, record):
         print('LogCounterHandler.emit')

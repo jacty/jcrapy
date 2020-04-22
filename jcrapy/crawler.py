@@ -13,12 +13,19 @@ except ImportError:
     MultipleInvalid = None
 
 from zope.interface.verify import verifyClass
-from jcrapy import Spider
+
+from jcrapy import signals, Spider
+from jcrapy.core.engine import ExecutionEngine
 from jcrapy.exceptions import ScrapyDeprecationWarning
 from jcrapy.interfaces import ISpiderLoader
+from jcrapy.settings import overridden_settings
+from jcrapy.signalmanager import SignalManager
 from jcrapy.utils.log import(
     configure_logging,
-    log_scrapy_info
+    get_scrapy_root_handler,
+    install_scrapy_root_handler,
+    log_scrapy_info,
+    LogCounterHandler,
 )
 from jcrapy.utils.misc import load_object
 from jcrapy.utils.ossignal import install_shutdown_handlers
@@ -28,8 +35,58 @@ logger = logging.getLogger(__name__)
 class Crawler:
     
     def __init__(self, spidercls, settings=None):
-        print('Crawler.__init__')
+        if isinstance(spidercls, Spider):
+            raise ValueError('The spidercls argument must be a class, not an object')
 
+        if isinstance(settings, dict) or settings is None:
+            settings = Settings(settings)
+
+        self.spidercls = spidercls
+        self.settings = settings.copy()
+        self.spidercls.update_settings(self.settings)
+
+        self.signals = SignalManager(self)
+        self.stats = load_object(self.settings['STATS_CLASS'])(self)
+
+        handler = LogCounterHandler(self, level=self.settings.get('LOG_LEVEL'))
+        logging.root.addHandler(handler)
+
+        d = dict(overridden_settings(self.settings))
+        # logger.info("Overridden settings:\n%(settings)s",
+        #             {'settings': pprint.pformat(d)})
+        if get_scrapy_root_handler() is not None:
+            # scrapy root handler already installed: update it with new settings
+            install_scrapy_root_handler(self.settings)
+        # lambda is assigned to Crawler attribute because this way it is not
+        # garbage collected after leaving __init__ scope
+        self.__remove_handler = lambda: logging.root.removeHandler(handler)
+        self.signals.connect(self.__remove_handler, signals.engine_stopped)
+
+        # lf_cls = load_object(self.settings['LOG_FORMATTER'])
+        # self.logformatter = lf_cls.from_crawler(self)
+        # self.extensions = ExtensionManager.from_crawler(self)
+
+        self.settings.freeze()
+        self.crawling = False
+        self.spider = None
+        self.engine = None
+
+    # @defer.inlineCallbacks
+    def crawl(self, *args, **kwargs):
+        assert not self.crawling, 'Crawling already taking place'
+        self.crawling = True
+
+        self.spider = self._create_spider(*args, **kwargs)
+        self.engine = self._create_engine()
+        print('crawl', *args, kwargs)
+
+    def _create_spider(self, *args, **kwargs):
+        return self.spidercls.from_crawler(self, *args, **kwargs)
+
+    def _create_engine(self):
+        return ExecutionEngine(self, lambda _: self.stop())
+
+     
 class CrawlerRunner:
     """
     This is a convenient helper class that keeps track of, manages and runs
@@ -72,8 +129,6 @@ class CrawlerRunner:
             print('CrawlerRunner', isinstance(settings, dict))
         self.settings = settings
         self.spider_loader = self._get_spider_loader(settings)
-        print('CrawlerRunner', self.spider_loader)
-        return
         self._crawlers = set()
         self._active = set()
         self.bootstrap_failed = False
@@ -110,10 +165,12 @@ class CrawlerRunner:
                 'The crawler_or_spidercls argument cannot be a spider object, '
                 'it must be a spider class (or a Crawler object)')
         crawler = self.create_crawler(crawler_or_spidercls)
-        print('CrawlerRunner.crawl', crawler)
+        return self._crawl(crawler, *args, **kwargs)
 
     def _crawl(self, crawler, *args, **kwargs):
-        print('CrawlerRunner._crawl')
+        self.crawlers.add(crawler)
+        d = crawler.crawl(*args, **kwargs)
+        print('CrawlerRunner._crawl', crawler)
         def _done(result):
             print('CrawlerRunner._crawl._done')
 
@@ -138,8 +195,8 @@ class CrawlerRunner:
 
     def _create_crawler(self, spidercls):
         if isinstance(spidercls, str):
-            # spidercls1 = self.spider_loader.load(spidercls)
-            print('CrawlerRunner._create_crawler',self.spider_loader)
+            spidercls = self.spider_loader.load(spidercls)
+        return Crawler(spidercls, self.settings)
 
     def stop(self):
         print('CrawlerRunner.stop')
@@ -179,8 +236,6 @@ class CrawlerProcess(CrawlerRunner):
 
     def __init__(self, settings=None, install_root_handler=True):
         super(CrawlerProcess, self).__init__(settings)
-        print('CrawlerProcess')
-        return
         install_shutdown_handlers(self._signal_shutdown)
         configure_logging(self.settings, install_root_handler)
         # log_scrapy_info(self.settings)

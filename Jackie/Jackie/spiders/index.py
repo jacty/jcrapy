@@ -1,8 +1,8 @@
 # -*- coding: UTF-8 -*-
 
 import jcrapy
-from jspider.itemLoader import PostLoader
-from jspider.items import PostItem
+# from jackie.itemLoader import PostLoader
+# from jspider.items import PostItem
 
 class JSpider(jcrapy.Spider):
     name='Jackie'
@@ -47,7 +47,9 @@ class JSpider(jcrapy.Spider):
 
         loader.add_css('content', '.entry')
         return loader.load_item()
-
-
+    def update_settings(self):
+        pass
+    def from_crawler(self):
+        pass
         
         

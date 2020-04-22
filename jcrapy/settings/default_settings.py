@@ -80,7 +80,7 @@ DEFAULT_REQUEST_HEADERS = {
 
 # DOWNLOAD_FAIL_ON_DATALOSS = True
 
-# DOWNLOADER = 'scrapy.core.downloader.Downloader'
+DOWNLOADER = 'jcrapy.core.downloader.Downloader'
 
 # DOWNLOADER_HTTPCLIENTFACTORY = 'scrapy.core.downloader.webclient.ScrapyHTTPClientFactory'
 # DOWNLOADER_CLIENTCONTEXTFACTORY = 'scrapy.core.downloader.contextfactory.ScrapyClientContextFactory'
@@ -194,7 +194,7 @@ DEFAULT_REQUEST_HEADERS = {
 
 LOG_ENABLED = True
 # LOG_ENCODING = 'utf-8'
-LOG_FORMATTER = 'scrapy.logformatter.LogFormatter'
+LOG_FORMATTER = 'jcrapy.logformatter.LogFormatter'
 LOG_FORMAT = '%(asctime)s [%(name)s] %(levelname)s: %(message)s'
 # LOG_DATEFORMAT = '%Y-%m-%d %H:%M:%S'
 LOG_STDOUT = False
@@ -247,7 +247,7 @@ LOG_SHORT_NAMES = False
 # ROBOTSTXT_PARSER = 'scrapy.robotstxt.ProtegoRobotParser'
 # ROBOTSTXT_USER_AGENT = None
 
-# SCHEDULER = 'scrapy.core.scheduler.Scheduler'
+SCHEDULER = 'jcrapy.core.scheduler.Scheduler'
 # SCHEDULER_DISK_QUEUE = 'scrapy.squeues.PickleLifoDiskQueue'
 # SCHEDULER_MEMORY_QUEUE = 'scrapy.squeues.LifoMemoryQueue'
 # SCHEDULER_PRIORITY_QUEUE = 'scrapy.pqueues.ScrapyPriorityQueue'
@@ -271,8 +271,8 @@ SPIDER_LOADER_WARN_ONLY = False
 
 SPIDER_MODULES = []
 
-# STATS_CLASS = 'scrapy.statscollectors.MemoryStatsCollector'
-# STATS_DUMP = True
+STATS_CLASS = 'jcrapy.statscollectors.MemoryStatsCollector'
+STATS_DUMP = True
 
 # STATSMAILER_RCPTS = []
 
