@@ -43,7 +43,9 @@ def _get_commands_from_entry_points(inproject, group='commands'):
 def _get_commands_dict(settings, inproject):
     cmds = _get_commands_from_module('commands', inproject)
     cmds.update(_get_commands_from_entry_points(inproject))
+
     cmds_module = settings['COMMANDS_MODULE']
+
     if cmds_module:
         print('_get_commands_dict', cmds_module)
     return cmds
@@ -98,7 +100,7 @@ def execute(argv=None, settings=None):
 
     if settings is None:
         settings = get_project_settings()
-
+ 
     inproject = inside_project()
     cmds = _get_commands_dict(settings, inproject)
     cmdname = _pop_command_name(argv)
@@ -119,8 +121,9 @@ def execute(argv=None, settings=None):
     cmd.add_options(parser)
     opts, args = parser.parse_args(args=argv[1:])
     _run_print_help(parser, cmd.process_options, args, opts)
-    
     cmd.crawler_process = CrawlerProcess(settings)
+    print('execute', cmd.crawler_process)
+    return
     _run_print_help(parser, _run_command, cmd, args, opts)
     sys.exit(cmd.exitcode)
 

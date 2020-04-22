@@ -50,6 +50,7 @@ def get_sources(use_closet=True):
         os.path.expanduser('~/.config')
     sources = ['/etc/scrapy.cfg', xdg_config_home+'/scrapy.cfg',
                 os.path.expanduser('~/.scrapy.cfg')]
+
     if use_closet:
         sources.append(closest_scrapy_cfg())
     return sources

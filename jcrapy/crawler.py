@@ -1,4 +1,7 @@
 import logging
+import pprint
+import signal
+import warnings
 
 from twisted.internet import defer
 from zope.interface.exceptions import DoesNotImplement
@@ -11,13 +14,14 @@ except ImportError:
 
 from zope.interface.verify import verifyClass
 from jcrapy import Spider
-from interfaces import ISpiderLoader
-from utils.log import(
+from jcrapy.exceptions import ScrapyDeprecationWarning
+from jcrapy.interfaces import ISpiderLoader
+from jcrapy.utils.log import(
     configure_logging,
     log_scrapy_info
 )
-from utils.misc import load_object
-from utils.ossignal import install_shutdown_handlers
+from jcrapy.utils.misc import load_object
+from jcrapy.utils.ossignal import install_shutdown_handlers
 
 logger = logging.getLogger(__name__)
 
@@ -50,6 +54,7 @@ class CrawlerRunner:
         cls_path = settings.get('SPIDER_LOADER_CLASS')
         loader_cls = load_object(cls_path)
         excs = (DoesNotImplement, MultipleInvalid) if MultipleInvalid else DoesNotImplement
+
         try:
             verifyClass(ISpiderLoader, loader_cls)
         except excs:
@@ -67,6 +72,8 @@ class CrawlerRunner:
             print('CrawlerRunner', isinstance(settings, dict))
         self.settings = settings
         self.spider_loader = self._get_spider_loader(settings)
+        print('CrawlerRunner', self.spider_loader)
+        return
         self._crawlers = set()
         self._active = set()
         self.bootstrap_failed = False
@@ -172,6 +179,8 @@ class CrawlerProcess(CrawlerRunner):
 
     def __init__(self, settings=None, install_root_handler=True):
         super(CrawlerProcess, self).__init__(settings)
+        print('CrawlerProcess')
+        return
         install_shutdown_handlers(self._signal_shutdown)
         configure_logging(self.settings, install_root_handler)
         # log_scrapy_info(self.settings)

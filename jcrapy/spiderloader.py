@@ -2,7 +2,7 @@
 from collections import defaultdict
 
 from zope.interface import implementer
-from interfaces import ISpiderLoader
+from jcrapy.interfaces import ISpiderLoader
 
 @implementer(ISpiderLoader)
 class SpiderLoader:

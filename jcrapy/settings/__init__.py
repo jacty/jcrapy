@@ -12,7 +12,6 @@ SETTINGS_PRIORITIES = {
     'cmdline': 40,
 }
 
-
 def get_settings_priority(priority):
     """
     Small helper function that looks up a given string priority in the
@@ -77,7 +76,6 @@ class BaseSettings(MutableMapping):
         self.frozen = False
         self.attributes = {}
         self.update(values, priority)
-
 
     def __getitem__(self, opt_name):
         if opt_name not in self:
@@ -186,7 +184,6 @@ class BaseSettings(MutableMapping):
         """
         self._assert_mutability()
         priority = get_settings_priority(priority)
-
         if name not in self:
             if isinstance(value, SettingsAttribute):
                 print('value is SettingsAttribute')
@@ -194,7 +191,7 @@ class BaseSettings(MutableMapping):
                 self.attributes[name] = SettingsAttribute(value, priority)
         else:
             self.attributes[name].set(value, priority)
-
+        
     def setdict(self, values, priority='project'):
         self.update(values, priority)
 
@@ -214,6 +211,7 @@ class BaseSettings(MutableMapping):
         :type priority: string or int
         """
         self._assert_mutability()
+
         if isinstance(module, str):
             module = import_module(module)
         for key in dir(module):
@@ -316,10 +314,13 @@ class Settings(BaseSettings):
         # values given by the user
         super(Settings, self).__init__()
         self.setmodule(default_settings, 'default')
+        
+
         # Promote default dictionaries to BaseSettings instances for per-key
         # priorities
         for name, val in self.items():
             if isinstance(val, dict):
                 self.set(name, BaseSettings(val, 'default'), 'default')
+
         self.update(values, priority)
 

@@ -254,7 +254,7 @@ LOG_SHORT_NAMES = False
 
 # SCRAPER_SLOT_MAX_ACTIVE_SIZE = 5000000
 
-SPIDER_LOADER_CLASS = 'spiderloader.SpiderLoader'
+SPIDER_LOADER_CLASS = 'jcrapy.spiderloader.SpiderLoader'
 SPIDER_LOADER_WARN_ONLY = False
 
 # SPIDER_MIDDLEWARES = {}

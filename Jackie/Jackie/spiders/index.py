@@ -1,10 +1,10 @@
 # -*- coding: UTF-8 -*-
 
-import scrapy
-from Jspider.itemLoader import PostLoader
-from Jspider.items import PostItem
+import jcrapy
+from jspider.itemLoader import PostLoader
+from jspider.items import PostItem
 
-class JSpider(scrapy.Spider):
+class JSpider(jcrapy.Spider):
     name='Jackie'
     start_urls = [
                 'http://www.jackiechan.com/news/',

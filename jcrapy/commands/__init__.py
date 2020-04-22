@@ -3,7 +3,7 @@ Base class for Scrapy commands
 """
 from optparse import OptionGroup
 
-from utils.conf import arglist_to_dict
+from jcrapy.utils.conf import arglist_to_dict
 
 class ScrapyCommand:
 

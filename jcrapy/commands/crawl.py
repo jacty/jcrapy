@@ -41,7 +41,7 @@ class Command(ScrapyCommand):
         spname = args[0]
 
         crawl_defer = self.crawler_process.crawl(spname, **opts.spargs)
-        print('crawl.run', crawl_defer)
+        print('crawl.run', self.crawler_process)
         # if getattr(crawl_defer, 'result', None) is not None and issubclass(crawl_defer.result.type, Exception):
         #     self.exitcode = 1
         # else:
