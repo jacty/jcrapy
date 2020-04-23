@@ -63,15 +63,15 @@ DEFAULT_REQUEST_HEADERS = {
 
 # DOWNLOAD_DELAY = 0
 
-# DOWNLOAD_HANDLERS = {}
-# DOWNLOAD_HANDLERS_BASE = {
-#     'data': 'scrapy.core.downloader.handlers.datauri.DataURIDownloadHandler',
-#     'file': 'scrapy.core.downloader.handlers.file.FileDownloadHandler',
-#     'http': 'scrapy.core.downloader.handlers.http.HTTPDownloadHandler',
-#     'https': 'scrapy.core.downloader.handlers.http.HTTPDownloadHandler',
-#     's3': 'scrapy.core.downloader.handlers.s3.S3DownloadHandler',
-#     'ftp': 'scrapy.core.downloader.handlers.ftp.FTPDownloadHandler',
-# }
+DOWNLOAD_HANDLERS = {}
+DOWNLOAD_HANDLERS_BASE = {
+    #'data': 'jcrapy.core.downloader.handlers.datauri.DataURIDownloadHandler',
+    # 'file': 'jcrapy.core.downloader.handlers.file.FileDownloadHandler',
+    'http': 'jcrapy.core.downloader.handlers.http.HTTPDownloadHandler',
+    # 'https': 'jcrapy.core.downloader.handlers.http.HTTPDownloadHandler',
+    # 's3': 'jcrapy.core.downloader.handlers.s3.S3DownloadHandler',
+    # 'ftp': 'jcrapy.core.downloader.handlers.ftp.FTPDownloadHandler',
+}
 
 # DOWNLOAD_TIMEOUT = 180      # 3mins
 

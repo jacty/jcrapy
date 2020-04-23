@@ -5,12 +5,12 @@ This module contains essential stuff that should've come with Python itself ;)
 # import gc
 # import inspect
 # import re
-# import sys
+import sys
 # import weakref
 # from functools import partial, wraps
 # from itertools import chain
 
-# from scrapy.utils.decorators import deprecated
+# from jcrapy.utils.decorators import deprecated
 
 
 def flatten(x):
@@ -113,11 +113,11 @@ def to_bytes(text, encoding=None, errors='strict'):
     print('utils.python.to_bytes')
 
 
-@deprecated('to_unicode')
-def to_native_str(text, encoding=None, errors='strict'):
-    """ Return str representation of ``text``. """
-    # return to_unicode(text, encoding, errors)
-    print('utils.python.to_native_str')
+# @deprecated('to_unicode')
+# def to_native_str(text, encoding=None, errors='strict'):
+#     """ Return str representation of ``text``. """
+#     # return to_unicode(text, encoding, errors)
+#     print('utils.python.to_native_str')
 
 
 def re_rsearch(pattern, text, chunk_size=1024):
@@ -314,11 +314,11 @@ def without_none_values(iterable):
     If ``iterable`` is a mapping, return a dictionary where all pairs that have
     value ``None`` have been removed.
     """
-    # try:
-    #     return {k: v for k, v in iterable.items() if v is not None}
-    # except AttributeError:
-    #     return type(iterable)((v for v in iterable if v is not None))
-    print('utils.python.without_none_values')
+    
+    try:
+        return {k: v for k, v in iterable.items() if v is not None}
+    except AttributeError:
+        return type(iterable)((v for v in iterable if v is not None))
 
 
 def global_object_name(obj):
@@ -361,7 +361,7 @@ class MutableChain:
         # return next(self.data)
         print('utils.python.MutableChain.__next__')
 
-    @deprecated("scrapy.utils.python.MutableChain.__next__")
-    def next(self):
-        # return self.__next__()
-        print('utils.python.MutableChain.next')
+    # @deprecated("scrapy.utils.python.MutableChain.__next__")
+    # def next(self):
+    #     # return self.__next__()
+    #     print('utils.python.MutableChain.next')

@@ -153,10 +153,29 @@ class BaseSettings(MutableMapping):
         print('getdict')
 
     def getwithbase(self, name):
-        print('getwithbase')
+        """Get a composition of a dictionary-like setting and its `_BASE`
+        counterpart.
+
+        :param name: name of the dictionary-like setting
+        :type name: string
+        """
+        compbs = BaseSettings()
+        compbs.update(self[name + '_BASE'])
+        compbs.update(self[name])
+        return compbs
 
     def getpriority(self, name):
-        print('getpriority')
+        """
+        Return the current numerical priority value of a setting, or ``None`` if
+        the given ``name`` does not exist.
+
+        :param name: the setting name
+        :type name: string
+        """
+        if name not in self:
+            return None
+        return self.attributes[name].priority
+
 
     def maxpriority(self):
         print('maxpriority')
@@ -245,7 +264,8 @@ class BaseSettings(MutableMapping):
             print('update')
         if values is not None:
             if isinstance(values, BaseSettings):
-                print('values is BaseSettings')
+                for name, value in values.items():
+                    self.set(name, value, values.getpriority(name))
             else:
                 for name, value in values.items():
                     self.set(name, value, priority)
