@@ -26,25 +26,17 @@ def init_env(project='default', set_syspath=True):
     dir. This sets the Jcrapy settings module and modifies the Python path to
     be able to locate the project module.
     """
-    #TD:project maybe have different values
-    cfg = get_config()
-    print('init_env', cfg)
-    return
-    if cfg.has_option('settings', project):
-        os.environ['SCRAPY_SETTINGS_MODULE'] = cfg.get('settings', project)
-    closest = closest_scrapy_cfg()
 
-    if closest:
-        projdir = os.path.dirname(closest)
-        if set_syspath and projdir not in sys.path:
-            sys.path.append(projdir)
-    else:
-        print('scrapy.cfg is not found.')
+    cfg = get_config()
+
+    if cfg.has_option('settings', project):
+        os.environ['JCRAPY_SETTINGS_MODULE'] = cfg.get('settings', project)
+
 
 def get_config(use_closet=True):
     """Get Jcrapy config file as a ConfigParser"""
 
-    #TD: Warning need to be prettied to be more catchy.
+    #TD: Error is needed to be prettied to be more catchy.
     sources = closest_scrapy_cfg()
     if sources == "":
         print('Jcrapy config file is missing!')
