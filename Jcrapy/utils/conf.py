@@ -9,13 +9,13 @@ def arglist_to_dict(arglist):
     return dict(x.split('=', 1) for x in arglist)    
 
 def closest_scrapy_cfg(path='.', prevpath=None):
-    """Return the path to the closest scrapy.cfg file by traversing the current
+    """Return the path of the closest jcrapy.cfg file by traversing the current
     directory and its parents
     """
     if path == prevpath:
         return ''
     path = os.path.abspath(path)
-    cfgfile = os.path.join(path, 'scrapy.cfg')
+    cfgfile = os.path.join(path, 'Jcrapy.cfg')
     if os.path.exists(cfgfile):
         return cfgfile
     return closest_scrapy_cfg(os.path.dirname(path), path)
@@ -23,10 +23,13 @@ def closest_scrapy_cfg(path='.', prevpath=None):
 
 def init_env(project='default', set_syspath=True):
     """Initialize environment to use command-line tool from inside a project
-    dir. This sets the Scrapy settings module and modifies the Python path to
+    dir. This sets the Jcrapy settings module and modifies the Python path to
     be able to locate the project module.
     """
+    #TD:project maybe have different values
     cfg = get_config()
+    print('init_env', cfg)
+    return
     if cfg.has_option('settings', project):
         os.environ['SCRAPY_SETTINGS_MODULE'] = cfg.get('settings', project)
     closest = closest_scrapy_cfg()
@@ -39,18 +42,14 @@ def init_env(project='default', set_syspath=True):
         print('scrapy.cfg is not found.')
 
 def get_config(use_closet=True):
-    """Get Scrapy config file as a ConfigParser"""
-    sources = get_sources(use_closet)
+    """Get Jcrapy config file as a ConfigParser"""
+
+    #TD: Warning need to be prettied to be more catchy.
+    sources = closest_scrapy_cfg()
+    if sources == "":
+        print('Jcrapy config file is missing!')
+        return
     cfg = ConfigParser()
     cfg.read(sources)
     return cfg
 
-def get_sources(use_closet=True):
-    xdg_config_home = os.environ.get('XDG_CONFIG_HOME') or \
-        os.path.expanduser('~/.config')
-    sources = ['/etc/scrapy.cfg', xdg_config_home+'/scrapy.cfg',
-                os.path.expanduser('~/.scrapy.cfg')]
-
-    if use_closet:
-        sources.append(closest_scrapy_cfg())
-    return sources

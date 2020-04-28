@@ -5,11 +5,12 @@ import optparse
 import inspect
 import pkg_resources
 
-from jcrapy.crawler import CrawlerProcess
-from jcrapy.commands import ScrapyCommand
-from jcrapy.exceptions import UsageError
-from jcrapy.utils.misc import walk_modules
-from jcrapy.utils.project import inside_project,get_project_settings
+# from Jcrapy.crawler import CrawlerProcess
+# from Jcrapy.commands import ScrapyCommand
+# from Jcrapy.exceptions import UsageError
+# from Jcrapy.utils.misc import walk_modules
+from Jcrapy.utils.project import get_project_settings
+#,inside_project
 
 def _iter_command_classes(module_name):
     # TODO: add `name` attribute to commands and and merge this function with
@@ -100,6 +101,9 @@ def execute(argv=None, settings=None):
 
     if settings is None:
         settings = get_project_settings()
+
+    print('execute', settings)
+    return
  
     inproject = inside_project()
     cmds = _get_commands_dict(settings, inproject)
