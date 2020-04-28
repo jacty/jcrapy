@@ -15,7 +15,7 @@ SETTINGS_PRIORITIES = {
 def get_settings_priority(priority):
     """
     Small helper function that looks up a given string priority in the
-    :attr:`~scrapy.settings.SETTINGS_PRIORITIES` dictionary and returns its
+    :attr:`~Jcrapy.settings.SETTINGS_PRIORITIES` dictionary and returns its
     numerical value, or directly returns a given numerical priority.
     """
     if isinstance(priority, str):
@@ -36,11 +36,14 @@ class SettingsAttribute:
             print('self.value is BaseSettings')
         else:
             self.priority = priority
-    
+
     def set(self, value, priority):
         """Sets value if priority is higher or equal than current priority."""
+
         if priority >= self.priority:
             if isinstance(self.value, BaseSettings):
+                print('SettingsAttribute.set()', self.value, value)
+                return
                 value = BaseSettings(value, priority=priority)
             self.value = value
             self.priority = priority
@@ -59,16 +62,16 @@ class BaseSettings(MutableMapping):
 
     Key-value entries can be passed on initialization with the ``values``
     argument, and they would take the ``priority`` level (unless ``values`` is
-    already an instance of :class:`~scrapy.settings.BaseSettings`, in which
+    already an instance of :class:`~Jcrapy.settings.BaseSettings`, in which
     case the existing priority levels will be kept).  If the ``priority``
     argument is a string, the priority name will be looked up in
-    :attr:`~scrapy.settings.SETTINGS_PRIORITIES`. Otherwise, a specific integer
+    :attr:`~Jcrapy.settings.SETTINGS_PRIORITIES`. Otherwise, a specific integer
     should be provided.
 
     Once the object is created, new settings can be loaded or updated with the
-    :meth:`~scrapy.settings.BaseSettings.set` method, and can be accessed with
+    :meth:`~Jcrapy.settings.BaseSettings.set` method, and can be accessed with
     the square bracket notation of dictionaries, or with the
-    :meth:`~scrapy.settings.BaseSettings.get` method of the instance and its
+    :meth:`~Jcrapy.settings.BaseSettings.get` method of the instance and its
     value conversion variants. When requesting a stored key, the value with the
     highest priority will be retrieved.
     """
@@ -95,6 +98,7 @@ class BaseSettings(MutableMapping):
         :param default: the value to return if no setting is found
         :type default: any
         """
+        print('BaseSettings.get')
         return self[name] if self[name] is not None else default  
     
     def getbool(self, name, default=False):
@@ -113,6 +117,7 @@ class BaseSettings(MutableMapping):
         :param default: the value to return if no setting is found
         :type default: any
         """
+        print('BaseSettings.getbool')
         got = self.get(name, default)
         try:
             return bool(int(got))
@@ -125,10 +130,10 @@ class BaseSettings(MutableMapping):
                              "are 0/1, True/False, '0'/'1', "
                              "'True'/'False' and 'true'/'false'")
     def getinit(self, name, default=0):
-        print('getint')
+        print('BaseSettings.getint')
 
     def getfloat(self, name, default=0.0):
-        print('getfloat')  
+        print('BaseSettings.getfloat')  
 
     def getlist(self, name, default=None):
         """
@@ -144,13 +149,14 @@ class BaseSettings(MutableMapping):
         :param default: the value to return if no setting is found
         :type default: any
         """
+        print('BaseSettings.getlist')
         value = self.get(name, default or [])
         if isinstance(value, str):
             value = value.split(',')
         return list(value) 
 
     def getdict(self, name, default=None):
-        print('getdict')
+        print('BaseSettings.getdict')
 
     def getwithbase(self, name):
         """Get a composition of a dictionary-like setting and its `_BASE`
@@ -159,6 +165,7 @@ class BaseSettings(MutableMapping):
         :param name: name of the dictionary-like setting
         :type name: string
         """
+        print('BaseSettings.getwithbase')
         compbs = BaseSettings()
         compbs.update(self[name + '_BASE'])
         compbs.update(self[name])
@@ -172,23 +179,24 @@ class BaseSettings(MutableMapping):
         :param name: the setting name
         :type name: string
         """
+        print('BaseSettings.getpriority')
         if name not in self:
             return None
         return self.attributes[name].priority
 
 
     def maxpriority(self):
-        print('maxpriority')
+        print('BaseSettings.maxpriority')
 
     def __setitem__(self, name, value):
-        print('__setitem__')
+        print('BaseSettings.__setitem__')
 
     def set(self, name, value, priority='project'):
         """
         Store a key/value attribute with a given priority.
 
         Settings should be populated *before* configuring the Crawler object
-        (through the :meth:`~scrapy.crawler.Crawler.configure` method),
+        (through the :meth:`~Jcrapy.crawler.Crawler.configure` method),
         otherwise they won't have any effect.
 
         :param name: the setting name
@@ -198,11 +206,13 @@ class BaseSettings(MutableMapping):
         :type value: any
 
         :param priority: the priority of the setting. Should be a key of
-            :attr:`~scrapy.settings.SETTINGS_PRIORITIES` or an integer
+            :attr:`~Jcrapy.settings.SETTINGS_PRIORITIES` or an integer
         :type priority: string or int
         """
+
         self._assert_mutability()
         priority = get_settings_priority(priority)
+
         if name not in self:
             if isinstance(value, SettingsAttribute):
                 print('value is SettingsAttribute')
@@ -210,8 +220,10 @@ class BaseSettings(MutableMapping):
                 self.attributes[name] = SettingsAttribute(value, priority)
         else:
             self.attributes[name].set(value, priority)
+
         
     def setdict(self, values, priority='project'):
+        print('BaseSettings.setdict')
         self.update(values, priority)
 
     def setmodule(self, module, priority='project'):
@@ -219,19 +231,21 @@ class BaseSettings(MutableMapping):
         Store settings from a module with a given priority.
 
         This is a helper function that calls
-        :meth:`~scrapy.settings.BaseSettings.set` for every globally declared
+        :meth:`~Jcrapy.settings.BaseSettings.set` for every globally declared
         uppercase variable of ``module`` with the provided ``priority``.
 
         :param module: the module or the path of the module
         :type module: module object or string
 
         :param priority: the priority of the settings. Should be a key of
-            :attr:`~scrapy.settings.SETTINGS_PRIORITIES` or an integer
+            :attr:`~Jcrapy.settings.SETTINGS_PRIORITIES` or an integer
         :type priority: string or int
         """
         self._assert_mutability()
 
         if isinstance(module, str):
+            print('BaseSettings.setmodule')
+            return
             module = import_module(module)
         for key in dir(module):
             if key.isupper():
@@ -242,28 +256,29 @@ class BaseSettings(MutableMapping):
         Store key/value pairs with a given priority.
 
         This is a helper function that calls
-        :meth:`~scrapy.settings.BaseSettings.set` for every item of ``values``
+        :meth:`~Jcrapy.settings.BaseSettings.set` for every item of ``values``
         with the provided ``priority``.
 
         If ``values`` is a string, it is assumed to be JSON-encoded and parsed
         into a dict with ``json.loads()`` first. If it is a
-        :class:`~scrapy.settings.BaseSettings` instance, the per-key priorities
+        :class:`~Jcrapy.settings.BaseSettings` instance, the per-key priorities
         will be used and the ``priority`` parameter ignored. This allows
         inserting/updating settings with different priorities with a single
         command.
 
         :param values: the settings names and values
-        :type values: dict or string or :class:`~scrapy.settings.BaseSettings`
+        :type values: dict or string or :class:`~Jcrapy.settings.BaseSettings`
 
         :param priority: the priority of the settings. Should be a key of
-            :attr:`~scrapy.settings.SETTINGS_PRIORITIES` or an integer
+            :attr:`~Jcrapy.settings.SETTINGS_PRIORITIES` or an integer
         :type priority: string or int
         """
         self._assert_mutability()
         if isinstance(values, str):
-            print('update')
+            print('BaseSettings.update')
         if values is not None:
             if isinstance(values, BaseSettings):
+                print('BaseSettings.update')
                 for name, value in values.items():
                     self.set(name, value, values.getpriority(name))
             else:
@@ -271,10 +286,10 @@ class BaseSettings(MutableMapping):
                     self.set(name, value, priority)
 
     def delete(self):
-        print('delete')
+        print('BaseSettings.delete')
 
     def __delitem__(self):
-        print('__delitem__')
+        print('BaseSettings.__delitem__')
 
     def _assert_mutability(self):
         if self.frozen:
@@ -290,6 +305,7 @@ class BaseSettings(MutableMapping):
         Modifications to the new object won't be reflected on the original
         settings.
         """
+        print('BaseSettings.copy')
         return copy.deepcopy(self)
 
     def freeze(self):
@@ -316,14 +332,16 @@ class BaseSettings(MutableMapping):
         return iter(self.attributes)
 
     def __len__():
-        print('__len__')
+        print('BaseSettings.__len__')
+        return len(self.attributes)
+
 class Settings(BaseSettings):
     """
-    This object stores Scrapy settings for the configuration of internal
+    This object stores Jcrapy settings for the configuration of internal
     components, and can be used for any further customization.
 
     It is a direct subclass and supports all methods of
-    :class:`~scrapy.settings.BaseSettings`. Additionally, after instantiation
+    :class:`~Jcrapy.settings.BaseSettings`. Additionally, after instantiation
     of this class, the new object will have the global default settings
     described on :ref:`topics-settings-ref` already populated.
     """
@@ -333,11 +351,10 @@ class Settings(BaseSettings):
         # dicts, and we want to update, not replace, default dicts with the
         # values given by the user
         super(Settings, self).__init__()
-        self.setmodule(default_settings, 'default')
-        
-
+        self.setmodule(default_settings, 'default')               
         # Promote default dictionaries to BaseSettings instances for per-key
         # priorities
+
         for name, val in self.items():
             if isinstance(val, dict):
                 self.set(name, BaseSettings(val, 'default'), 'default')

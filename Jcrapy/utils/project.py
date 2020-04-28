@@ -3,7 +3,7 @@ import os
 from importlib import import_module
 
 from Jcrapy.utils.conf import init_env #,closest_scrapy_cfg
-# from jcrapy.settings import Settings
+from Jcrapy.settings import Settings
 
 ENVVAR = 'JCRAPY_SETTINGS_MODULE'
 DATADIR_CFG_SECTION = 'datadir'
@@ -24,10 +24,11 @@ def inside_project():
 def get_project_settings():
     if ENVVAR not in os.environ:
         project = os.environ.get('JCRAPY_PROJECT', 'default')
-        init_env(project)
-    print('get_project_settings')
-    return
+        init_env(project) 
+
     settings = Settings()
+    print('get_project_settings', settings)
+    return
     settings_module_path = os.environ.get(ENVVAR)
 
     if settings_module_path:

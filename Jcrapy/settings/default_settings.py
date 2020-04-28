@@ -25,14 +25,14 @@ AJAXCRAWL_ENABLED = False
 # AUTOTHROTTLE_START_DELAY = 5.0
 # AUTOTHROTTLE_TARGET_CONCURRENCY = 1.0
 
-BOT_NAME = 'Jackie'
+# BOT_NAME = 'Jackie'
 
 # CLOSESPIDER_TIMEOUT = 0
 # CLOSESPIDER_PAGECOUNT = 0
 # CLOSESPIDER_ITEMCOUNT = 0
 # CLOSESPIDER_ERRORCOUNT = 0
 
-COMMANDS_MODULE = ''
+# COMMANDS_MODULE = ''
 
 # COMPRESSION_ENABLED = True
 
@@ -63,15 +63,15 @@ DEFAULT_REQUEST_HEADERS = {
 
 # DOWNLOAD_DELAY = 0
 
-DOWNLOAD_HANDLERS = {}
-DOWNLOAD_HANDLERS_BASE = {
+# DOWNLOAD_HANDLERS = {}
+# DOWNLOAD_HANDLERS_BASE = {
     #'data': 'jcrapy.core.downloader.handlers.datauri.DataURIDownloadHandler',
     # 'file': 'jcrapy.core.downloader.handlers.file.FileDownloadHandler',
-    'http': 'jcrapy.core.downloader.handlers.http.HTTPDownloadHandler',
+    # 'http': 'jcrapy.core.downloader.handlers.http.HTTPDownloadHandler',
     # 'https': 'jcrapy.core.downloader.handlers.http.HTTPDownloadHandler',
     # 's3': 'jcrapy.core.downloader.handlers.s3.S3DownloadHandler',
     # 'ftp': 'jcrapy.core.downloader.handlers.ftp.FTPDownloadHandler',
-}
+# }
 
 # DOWNLOAD_TIMEOUT = 180      # 3mins
 
@@ -80,7 +80,7 @@ DOWNLOAD_HANDLERS_BASE = {
 
 # DOWNLOAD_FAIL_ON_DATALOSS = True
 
-DOWNLOADER = 'jcrapy.core.downloader.Downloader'
+# DOWNLOADER = 'jcrapy.core.downloader.Downloader'
 
 # DOWNLOADER_HTTPCLIENTFACTORY = 'scrapy.core.downloader.webclient.ScrapyHTTPClientFactory'
 # DOWNLOADER_CLIENTCONTEXTFACTORY = 'scrapy.core.downloader.contextfactory.ScrapyClientContextFactory'
@@ -192,15 +192,15 @@ DOWNLOADER = 'jcrapy.core.downloader.Downloader'
 # ITEM_PIPELINES = {}
 # ITEM_PIPELINES_BASE = {}
 
-LOG_ENABLED = True
+# LOG_ENABLED = True
 # LOG_ENCODING = 'utf-8'
-LOG_FORMATTER = 'jcrapy.logformatter.LogFormatter'
-LOG_FORMAT = '%(asctime)s [%(name)s] %(levelname)s: %(message)s'
+# LOG_FORMATTER = 'jcrapy.logformatter.LogFormatter'
+# LOG_FORMAT = '%(asctime)s [%(name)s] %(levelname)s: %(message)s'
 # LOG_DATEFORMAT = '%Y-%m-%d %H:%M:%S'
-LOG_STDOUT = False
-LOG_LEVEL = 'DEBUG'
-LOG_FILE = None
-LOG_SHORT_NAMES = False
+# LOG_STDOUT = False
+# LOG_LEVEL = 'DEBUG'
+# LOG_FILE = None
+# LOG_SHORT_NAMES = False
 
 # SCHEDULER_DEBUG = False
 
@@ -247,15 +247,15 @@ LOG_SHORT_NAMES = False
 # ROBOTSTXT_PARSER = 'scrapy.robotstxt.ProtegoRobotParser'
 # ROBOTSTXT_USER_AGENT = None
 
-SCHEDULER = 'jcrapy.core.scheduler.Scheduler'
+# SCHEDULER = 'jcrapy.core.scheduler.Scheduler'
 # SCHEDULER_DISK_QUEUE = 'scrapy.squeues.PickleLifoDiskQueue'
 # SCHEDULER_MEMORY_QUEUE = 'scrapy.squeues.LifoMemoryQueue'
 # SCHEDULER_PRIORITY_QUEUE = 'scrapy.pqueues.ScrapyPriorityQueue'
 
 # SCRAPER_SLOT_MAX_ACTIVE_SIZE = 5000000
 
-SPIDER_LOADER_CLASS = 'jcrapy.spiderloader.SpiderLoader'
-SPIDER_LOADER_WARN_ONLY = False
+# SPIDER_LOADER_CLASS = 'jcrapy.spiderloader.SpiderLoader'
+# SPIDER_LOADER_WARN_ONLY = False
 
 # SPIDER_MIDDLEWARES = {}
 
@@ -269,14 +269,14 @@ SPIDER_LOADER_WARN_ONLY = False
 #     # Spider side
 # }
 
-SPIDER_MODULES = []
+# SPIDER_MODULES = []
 
-STATS_CLASS = 'jcrapy.statscollectors.MemoryStatsCollector'
-STATS_DUMP = True
+# STATS_CLASS = 'jcrapy.statscollectors.MemoryStatsCollector'
+# STATS_DUMP = True
 
 # STATSMAILER_RCPTS = []
 
-TEMPLATES_DIR = abspath(join(dirname(__file__), '..', 'templates'))
+# TEMPLATES_DIR = abspath(join(dirname(__file__), '..', 'templates'))
 
 # URLLENGTH_LIMIT = 2083
 
@@ -288,7 +288,7 @@ TEMPLATES_DIR = abspath(join(dirname(__file__), '..', 'templates'))
 # TELNETCONSOLE_USERNAME = 'scrapy'
 # TELNETCONSOLE_PASSWORD = None
 
-TWISTED_REACTOR = None
+# TWISTED_REACTOR = None
 
 # SPIDER_CONTRACTS = {}
 # SPIDER_CONTRACTS_BASE = {
