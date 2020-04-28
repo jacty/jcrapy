@@ -36,11 +36,10 @@ def init_env(project='default', set_syspath=True):
 def get_config(use_closet=True):
     """Get Jcrapy config file as a ConfigParser"""
 
-    #TD: Error is needed to be prettied to be more catchy.
+    #TD: ErrorType is needed to be more accurate.
     sources = closest_scrapy_cfg()
     if sources == "":
-        print('Jcrapy config file is missing!')
-        return
+        raise NameError("Jcrapy config file is missing!")
     cfg = ConfigParser()
     cfg.read(sources)
     return cfg
