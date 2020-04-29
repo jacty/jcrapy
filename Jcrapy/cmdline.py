@@ -6,50 +6,43 @@ import inspect
 import pkg_resources
 
 # from Jcrapy.crawler import CrawlerProcess
-# from Jcrapy.commands import ScrapyCommand
+from Jcrapy.commands import JcrapyCommand
 # from Jcrapy.exceptions import UsageError
-# from Jcrapy.utils.misc import walk_modules
-from Jcrapy.utils.project import get_project_settings
-#,inside_project
+from Jcrapy.utils.misc import walk_modules
+from Jcrapy.utils.project import get_project_settings,inside_project
 
 def _iter_command_classes(module_name):
-    # TODO: add `name` attribute to commands and and merge this function with
-    # scrapy.utils.spider.iter_spider_classes
-
+    # TODO: add `name` attribute to commands and merge this function with
+    # jcrapy.utils.spider.iter_spider_classes
+        
     for module in walk_modules(module_name):
         for obj in vars(module).values():
             if inspect.isclass(obj) and \
-                    issubclass(obj, ScrapyCommand) and \
+                    issubclass(obj, JcrapyCommand) and \
                     obj.__module__ == module.__name__ and \
-                    not obj == ScrapyCommand:
+                    not obj == JcrapyCommand:
 
                 yield obj
 
 
 def _get_commands_from_module(module, inproject):
     d = {}
-    
+
     for cmd in _iter_command_classes(module):
         if inproject or not cmd.requires_project:
             cmdname = cmd.__module__.split('.')[-1]
             d[cmdname] = cmd()
     return d
 
-def _get_commands_from_entry_points(inproject, group='commands'):
-    cmds = {}
-    for entry_point in pkg_resources.iter_entry_points(group):
-        print('_get_commands_from_entry_points',entry_point)
-    return cmds
 
 def _get_commands_dict(settings, inproject):
     cmds = _get_commands_from_module('commands', inproject)
-    cmds.update(_get_commands_from_entry_points(inproject))
-
     cmds_module = settings['COMMANDS_MODULE']
 
     if cmds_module:
-        print('_get_commands_dict', cmds_module)
+        cmds.update(_get_commands_from_module(cmds_module, inproject))
     return cmds
+
 
 def _pop_command_name(argv):
     i = 0
@@ -101,12 +94,11 @@ def execute(argv=None, settings=None):
 
     if settings is None:
         settings = get_project_settings()
-
-    print('execute', settings)
-    return
  
     inproject = inside_project()
     cmds = _get_commands_dict(settings, inproject)
+    print('execute', cmds)
+    return
     cmdname = _pop_command_name(argv)
     parser = optparse.OptionParser(formatter=optparse.TitledHelpFormatter(), conflict_handler='resolve')
 

@@ -9,7 +9,7 @@ def arglist_to_dict(arglist):
     """
     return dict(x.split('=', 1) for x in arglist)    
 
-def closest_scrapy_cfg(path='.', prevpath=None):
+def closest_jcrapy_cfg(path='.', prevpath=None):
     """Return the path of the closest jcrapy.cfg file by traversing the current
     directory and its parents
     """
@@ -19,7 +19,7 @@ def closest_scrapy_cfg(path='.', prevpath=None):
     cfgfile = os.path.join(path, 'Jcrapy.cfg')
     if os.path.exists(cfgfile):
         return cfgfile
-    return closest_scrapy_cfg(os.path.dirname(path), path)
+    return closest_jcrapy_cfg(os.path.dirname(path), path)
 
 
 def init_env(project='default', set_syspath=True):
@@ -38,7 +38,7 @@ def get_config(use_closet=True):
     """Get Jcrapy config file as a ConfigParser"""
 
     #TD: ErrorType is needed to be more accurate.
-    sources = closest_scrapy_cfg()
+    sources = closest_jcrapy_cfg()
     if sources == "":
         raise NameError("Jcrapy config file is missing!")
     cfg = ConfigParser()

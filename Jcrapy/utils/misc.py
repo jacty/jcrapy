@@ -30,7 +30,7 @@ def walk_modules(path):
     returns them. If *any* module throws an exception while importing, that
     exception is thrown back.
 
-    For example: walk_modules('scrapy.utils')
+    For example: walk_modules('jcrapy.utils')
     """
     mods = []
     mod = import_module(path)
@@ -43,8 +43,8 @@ def walk_modules(path):
                 # mods += walk_modules(fullpath)
             else:
                 submod = import_module(fullpath)
-                mods.append(submod)   
-    return mod
+                mods.append(submod)
+    return mods
 
 def create_instance(objcls, settings, crawler, *args, **kwargs):
     print('create_instance')

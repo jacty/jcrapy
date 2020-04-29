@@ -1,11 +1,11 @@
 """
-Base class for Scrapy commands
+Base class for Jcrapy commands
 """
 from optparse import OptionGroup
 
-from jcrapy.utils.conf import arglist_to_dict
+# from Jcrapy.utils.conf import arglist_to_dict
 
-class ScrapyCommand:
+class JcrapyCommand:
 
     requires_project = False
     crawler_process = None
@@ -28,6 +28,7 @@ class ScrapyCommand:
         print("ScrapyCommand.short_desc")
 
     def long_desc(self):
+        print('JcrapyCommand.long_desc')
         return self.short_desc()
 
     def help(self):
@@ -37,6 +38,8 @@ class ScrapyCommand:
         """
         Populate option parse with options available for this command
         """
+        print('JcrapyCommand.add_options')
+        return
         group = OptionGroup(parser, "Global Options")
         group.add_option("--logfile", metavar="FILE",
             help="log file. if omitted stderr will be used")
@@ -55,6 +58,8 @@ class ScrapyCommand:
         parser.add_option_group(group)
 
     def process_options(self, args, opts):
+        print('JcrapyCommand.process_options')
+        return
         try:
             self.settings.setdict(arglist_to_dict(opts.set), priority='cmdline')
         except ValueError:
