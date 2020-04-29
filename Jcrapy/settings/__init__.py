@@ -237,8 +237,6 @@ class BaseSettings(MutableMapping):
         self._assert_mutability()
 
         if isinstance(module, str):
-            print('BaseSettings.setmodule')
-            return
             module = import_module(module)
         for key in dir(module):
             if key.isupper():

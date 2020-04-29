@@ -4,7 +4,7 @@ from importlib import import_module
 
 from Jcrapy.utils.conf import init_env #,closest_scrapy_cfg
 from Jcrapy.settings import Settings
-from Jcrapy.constants import ENVVAR
+from Jcrapy.constants import ENVVAR, valid_envvars
 
 
 
@@ -26,27 +26,15 @@ def get_project_settings():
 
     settings = Settings()
     settings_module_path = os.environ.get(ENVVAR)
-    print('get_project_settings', settings_module_path)
-    return
 
     if settings_module_path:
         settings.setmodule(settings_module_path, priority='project')
+    
 
-    pickled_settings = os.environ.get("SCRAPY_PICKLED_SETTINGS_TO_OVERRIDE")
-    if pickled_settings:
-        print('pickled_settings is true')
+    jcrapy_envvars = {k[7:]: v for k, v in os.environ.items() if
+                     k.startswith('JCRAPY_')}
 
-    scrapy_envvars = {k[7:]: v for k, v in os.environ.items() if
-                     k.startswith('SCRAPY_')}
-    valid_envvars = {
-        'CHECK',
-        'PICKLED_SETTINGS_TO_OVERRIDE',
-        'PROJECT',
-        'PYTHON_SHELL',
-        'SETTINGS_MODULE',
-    }
-    setting_envvars = {k for k in scrapy_envvars if k not in valid_envvars}
-    if setting_envvars:
-        print('project.get_project_settings', setting_envvars)
-    settings.setdict(scrapy_envvars, priority='project')#Q:why don't use settings.update() directly?
+    setting_envvars = {k for k in jcrapy_envvars if k not in valid_envvars}
+
+    settings.update(jcrapy_envvars, priority='project')
     return settings

@@ -137,6 +137,7 @@ def _run_command(cmd, args, opts):
 
 if __name__ == '__main__':
     try:
+        print('cmdline.__main__')
         execute()
     finally:
         # Twisted prints errors in DebugInfo.__del__, but PyPy does not run gc.collect()
