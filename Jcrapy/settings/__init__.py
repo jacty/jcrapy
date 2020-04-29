@@ -3,14 +3,7 @@ from collections.abc import MutableMapping
 from importlib import import_module
 
 from settings import default_settings
-
-SETTINGS_PRIORITIES = {
-    'default': 0,
-    'command': 10,
-    'project': 20,
-    'spider': 30,
-    'cmdline': 40,
-}
+from Jcrapy.constants import SETTINGS_PRIORITIES
 
 def get_settings_priority(priority):
     """

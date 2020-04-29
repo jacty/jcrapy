@@ -1,6 +1,7 @@
 import os
 import sys
 from configparser import ConfigParser
+from Jcrapy.constants import ENVVAR
 
 def arglist_to_dict(arglist):
     """Convert a list of arguments like ['arg1=val1', 'arg2=val2', ...] to a
@@ -30,7 +31,7 @@ def init_env(project='default', set_syspath=True):
     cfg = get_config()
 
     if cfg.has_option('settings', project):
-        os.environ['JCRAPY_SETTINGS_MODULE'] = cfg.get('settings', project)
+        os.environ[ENVVAR] = cfg.get('settings', project)
 
 
 def get_config(use_closet=True):
