@@ -1,39 +1,40 @@
 from Jcrapy.commands import JcrapyCommand
-# from Jcrapy.utils.conf import arglist_to_dict
+from Jcrapy.utils.conf import arglist_to_dict
 # from scrapy.exceptions import UsageError
 
 
 class Command(JcrapyCommand):
     requires_project = True
 
-    # def syntax(self):
-    #     return "[options] <spider>"
+    def syntax(self):
+        return "[options] <spider>"
 
-    # def short_desc(self):
-    #     return "Run a spider"
+    def short_desc(self):
+        return "Run a spider"
 
-    # def add_options(self, parser):
-    #     ScrapyCommand.add_options(self, parser)
-    #     parser.add_option("-a", dest="spargs", action="append", default=[], metavar="NAME=VALUE",
-    #                       help="set spider argument (may be repeated)")
-    #     parser.add_option("-o", "--output", metavar="FILE", action="append",
-    #                       help="dump scraped items into FILE (use - for stdout)")
-    #     parser.add_option("-t", "--output-format", metavar="FORMAT",
-    #                       help="format to use for dumping items with -o")
+    def add_options(self, parser):
+        JcrapyCommand.add_options(self, parser)
+        parser.add_option("-a", dest="spargs", action="append", default=[], metavar="NAME=VALUE",
+                          help="set spider argument (may be repeated)")
+        parser.add_option("-o", "--output", metavar="FILE", action="append",
+                          help="dump scraped items into FILE (use - for stdout)")
+        parser.add_option("-t", "--output-format", metavar="FORMAT",
+                          help="format to use for dumping items with -o")
 
-    # def process_options(self, args, opts):
-    #     ScrapyCommand.process_options(self, args, opts)
-    #     try:
-    #         opts.spargs = arglist_to_dict(opts.spargs)
-    #     except ValueError:
-    #         raise UsageError("Invalid -a value, use -a NAME=VALUE", print_help=False)
-    #     if opts.output:
-    #         print('crawl.process.opts.output is true')
-    #     #     feeds = feed_process_params_from_cli(self.settings, opts.output, opts.output_format)
-    #     #     self.settings.set('FEEDS', feeds, priority='cmdline')
+    def process_options(self, args, opts):
+        JcrapyCommand.process_options(self, args, opts)
+        try:
+            opts.spargs = arglist_to_dict(opts.spargs)
+        except ValueError:
+            raise UsageError("Invalid -a value, use -a NAME=VALUE", print_help=False)
 
-    # def run(self, args, opts):
+        if opts.output:
+            print('crawl.process.opts.output is true')
+            # feeds = feed_process_params_from_cli(self.settings, opts.output, opts.output_format)
+            # self.settings.set('FEEDS', feeds, priority='cmdline')
 
+    def run(self, args, opts):
+        print('crawl.run')
     #     if len(args) < 1:
     #         raise UsageError()
     #     elif len(args) > 1:

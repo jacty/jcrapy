@@ -1,13 +1,14 @@
 
 import sys
 import os
-import optparse
+import optparse #TD:replace with argparse due to deprecation
 import inspect
 import pkg_resources
 
-# from Jcrapy.crawler import CrawlerProcess
+import Jcrapy
+from Jcrapy.crawler import CrawlerProcess
 from Jcrapy.commands import JcrapyCommand
-# from Jcrapy.exceptions import UsageError
+from Jcrapy.exceptions import UsageError
 from Jcrapy.utils.misc import walk_modules
 from Jcrapy.utils.project import get_project_settings,inside_project
 
@@ -54,29 +55,10 @@ def _pop_command_name(argv):
 
 def _print_header(settings, inproject):
     if inproject:
-        print('In project')
+        print('-'*20 + " Jcrapy %s - project: %s " % (Jcrapy.__version__, settings['BOT_NAME']) + '-'*20 +'\n')
     else:
-        print("Scrapy %s - no active project\n" % '0.0.1')
+        print('-'*20 + " Jcrapy %s - no active project" % (Jcrapy.__version__) + '-'*20 +'\n')
 
-
-def _print_commands(settings, inproject):
-    _print_header(settings, inproject)
-    print("Usage")
-    print("  scrapy <command> [options] [args]\n")
-    print("Available commands:")
-    cmds = _get_commands_dict(settings, inproject)
-    for cmdname, cmdclass in sorted(cmds.items()):
-        print('Available cmds',cmds.items())
-    if not inproject:
-        print()
-        print("  [ more ]      More commands available when run from project directory")
-    print()
-    print('Use "scrapy <command> -h" to see more info about a command')
-
-def _print_unknown_command(settings, cmdname, inproject):
-    _print_header(settings, inproject)
-    print("Unknown command: %s\n" % cmdname)
-    print('Use "scrapy" to see available commands')
 
 def _run_print_help(parser, func, *a, **kw):
     try:
@@ -97,27 +79,22 @@ def execute(argv=None, settings=None):
  
     inproject = inside_project()
     cmds = _get_commands_dict(settings, inproject)
-    print('execute', cmds)
-    return
     cmdname = _pop_command_name(argv)
     parser = optparse.OptionParser(formatter=optparse.TitledHelpFormatter(), conflict_handler='resolve')
 
-    if not cmdname:
-        _print_commands(settings, inproject)
-        sys.exit(0)
-    elif cmdname not in cmds:
-        _print_unknown_command(settings, cmdname, inproject)
-        sys.exit(2)
-
     cmd = cmds[cmdname]
-    parser.usage = "scrapy %s %s" % (cmdname, cmd.syntax())
-    parser.description = cmd.long_desc()
-    settings.setdict(cmd.default_settings, priority='command')
+    
+    parser.usage = "Jcrapy %s %s" % (cmdname, cmd.syntax()) ##??
+    parser.description = cmd.long_desc() ##?? Usage? No usage, should be removed.
+     
+    settings.update(cmd.default_settings, priority='command')
     cmd.settings = settings
     cmd.add_options(parser)
     opts, args = parser.parse_args(args=argv[1:])
     _run_print_help(parser, cmd.process_options, args, opts)
     cmd.crawler_process = CrawlerProcess(settings)
+    print('execute')
+    return
     _run_print_help(parser, _run_command, cmd, args, opts)
     sys.exit(cmd.exitcode)
 

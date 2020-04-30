@@ -214,11 +214,6 @@ class BaseSettings(MutableMapping):
         else:
             self.attributes[name].set(value, priority)
 
-        
-    def setdict(self, values, priority='project'):
-        print('BaseSettings.setdict')
-        self.update(values, priority)
-
     def setmodule(self, module, priority='project'):
         """
         Store settings from a module with a given priority.

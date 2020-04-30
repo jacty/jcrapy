@@ -1,78 +1,80 @@
-import logging
-import pprint
-import signal
-import warnings
+# import logging
+# import pprint
+# import signal
+# import warnings
 
-from twisted.internet import defer
-from zope.interface.exceptions import DoesNotImplement
+# from twisted.internet import defer
+# from zope.interface.exceptions import DoesNotImplement
 
-try:
-    # zope >= 5.0 only supports MultipleInvalid
-    from zope.interface.exceptions import MultipleInvalid
-except ImportError:
-    MultipleInvalid = None
+# try:
+#     # zope >= 5.0 only supports MultipleInvalid
+#     from zope.interface.exceptions import MultipleInvalid
+# except ImportError:
+#     MultipleInvalid = None
 
-from zope.interface.verify import verifyClass
+# from zope.interface.verify import verifyClass
 
-from jcrapy import signals, Spider
-from jcrapy.core.engine import ExecutionEngine
-from jcrapy.exceptions import ScrapyDeprecationWarning
-from jcrapy.interfaces import ISpiderLoader
-from jcrapy.settings import overridden_settings
-from jcrapy.signalmanager import SignalManager
-from jcrapy.utils.log import(
-    configure_logging,
-    get_scrapy_root_handler,
-    install_scrapy_root_handler,
-    log_scrapy_info,
-    LogCounterHandler,
-)
-from jcrapy.utils.misc import load_object
-from jcrapy.utils.ossignal import install_shutdown_handlers
+# from jcrapy import signals, Spider
+# from jcrapy.core.engine import ExecutionEngine
+# from jcrapy.exceptions import ScrapyDeprecationWarning
+# from jcrapy.interfaces import ISpiderLoader
+# from jcrapy.settings import overridden_settings
+# from jcrapy.signalmanager import SignalManager
+# from jcrapy.utils.log import(
+#     configure_logging,
+#     get_scrapy_root_handler,
+#     install_scrapy_root_handler,
+#     log_scrapy_info,
+#     LogCounterHandler,
+# )
+# from jcrapy.utils.misc import load_object
+# from jcrapy.utils.ossignal import install_shutdown_handlers
 
-logger = logging.getLogger(__name__)
+# logger = logging.getLogger(__name__)
 
 class Crawler:
     
     def __init__(self, spidercls, settings=None):
-        if isinstance(spidercls, Spider):
-            raise ValueError('The spidercls argument must be a class, not an object')
+        print('Crawler.__init__')
+        # if isinstance(spidercls, Spider):
+        #     raise ValueError('The spidercls argument must be a class, not an object')
 
-        if isinstance(settings, dict) or settings is None:
-            settings = Settings(settings)
+        # if isinstance(settings, dict) or settings is None:
+        #     settings = Settings(settings)
 
-        self.spidercls = spidercls
-        self.settings = settings.copy()
-        self.spidercls.update_settings(self.settings)
+        # self.spidercls = spidercls
+        # self.settings = settings.copy()
+        # self.spidercls.update_settings(self.settings)
 
-        self.signals = SignalManager(self)
-        self.stats = load_object(self.settings['STATS_CLASS'])(self)
+        # self.signals = SignalManager(self)
+        # self.stats = load_object(self.settings['STATS_CLASS'])(self)
 
-        handler = LogCounterHandler(self, level=self.settings.get('LOG_LEVEL'))
-        logging.root.addHandler(handler)
+        # handler = LogCounterHandler(self, level=self.settings.get('LOG_LEVEL'))
+        # logging.root.addHandler(handler)
 
-        d = dict(overridden_settings(self.settings))
-        # logger.info("Overridden settings:\n%(settings)s",
-        #             {'settings': pprint.pformat(d)})
-        if get_scrapy_root_handler() is not None:
-            # scrapy root handler already installed: update it with new settings
-            install_scrapy_root_handler(self.settings)
-        # lambda is assigned to Crawler attribute because this way it is not
-        # garbage collected after leaving __init__ scope
-        self.__remove_handler = lambda: logging.root.removeHandler(handler)
-        self.signals.connect(self.__remove_handler, signals.engine_stopped)
+        # d = dict(overridden_settings(self.settings))
+        # # logger.info("Overridden settings:\n%(settings)s",
+        # #             {'settings': pprint.pformat(d)})
+        # if get_scrapy_root_handler() is not None:
+        #     # scrapy root handler already installed: update it with new settings
+        #     install_scrapy_root_handler(self.settings)
+        # # lambda is assigned to Crawler attribute because this way it is not
+        # # garbage collected after leaving __init__ scope
+        # self.__remove_handler = lambda: logging.root.removeHandler(handler)
+        # self.signals.connect(self.__remove_handler, signals.engine_stopped)
 
-        # lf_cls = load_object(self.settings['LOG_FORMATTER'])
-        # self.logformatter = lf_cls.from_crawler(self)
-        # self.extensions = ExtensionManager.from_crawler(self)
+        # # lf_cls = load_object(self.settings['LOG_FORMATTER'])
+        # # self.logformatter = lf_cls.from_crawler(self)
+        # # self.extensions = ExtensionManager.from_crawler(self)
 
-        self.settings.freeze()
-        self.crawling = False
-        self.spider = None
-        self.engine = None
+        # self.settings.freeze()
+        # self.crawling = False
+        # self.spider = None
+        # self.engine = None
 
     # @defer.inlineCallbacks
     def crawl(self, *args, **kwargs):
+        print('Crawler.crawl')
         assert not self.crawling, 'Crawling already taking place'
         self.crawling = True
 
@@ -81,9 +83,11 @@ class Crawler:
         print('crawl', *args, kwargs)
 
     def _create_spider(self, *args, **kwargs):
+        print('Crawler._create_spider')
         return self.spidercls.from_crawler(self, *args, **kwargs)
 
     def _create_engine(self):
+        print('Crawler._create_engine')
         return ExecutionEngine(self, lambda _: self.stop())
 
      
@@ -107,6 +111,7 @@ class CrawlerRunner:
 
     @staticmethod
     def _get_spider_loader(settings):
+        print('CrawlerRunner._get_spider_loader')
         """ Get SpiderLoader instance from settings """
         cls_path = settings.get('SPIDER_LOADER_CLASS')
         loader_cls = load_object(cls_path)
@@ -125,6 +130,7 @@ class CrawlerRunner:
         return loader_cls.from_settings(settings.frozencopy())
 
     def __init__(self, settings=None):
+        print('CrawlerRunner.__init__')
         if isinstance(settings, dict) or settings is None:
             print('CrawlerRunner', isinstance(settings, dict))
         self.settings = settings
@@ -160,6 +166,7 @@ class CrawlerRunner:
 
         :param dict kwargs: keyword arguments to initialize the spider
         """
+        print('CrawlerRunner.crawl')
         if isinstance(crawler_or_spidercls, Spider):
             raise ValueError(
                 'The crawler_or_spidercls argument cannot be a spider object, '
@@ -168,6 +175,7 @@ class CrawlerRunner:
         return self._crawl(crawler, *args, **kwargs)
 
     def _crawl(self, crawler, *args, **kwargs):
+        print('CrawlerRunner._crawl')
         self.crawlers.add(crawler)
         d = crawler.crawl(*args, **kwargs)
         print('CrawlerRunner._crawl', crawler)
@@ -185,6 +193,7 @@ class CrawlerRunner:
           a spider with this name in a Scrapy project (using spider loader),
           then creates a Crawler instance for it.
         """
+        print('CrawlerRunner._create_crawler')
         if isinstance(crawler_or_spidercls, Spider):
             raise ValueError(
                 'The crawler_or_spidercls argument cannot be a spider object, '
@@ -194,6 +203,7 @@ class CrawlerRunner:
         return self._create_crawler(crawler_or_spidercls)
 
     def _create_crawler(self, spidercls):
+        print('CrawlerRunner._create_crawler')
         if isinstance(spidercls, str):
             spidercls = self.spider_loader.load(spidercls)
         return Crawler(spidercls, self.settings)
@@ -206,6 +216,7 @@ class CrawlerRunner:
         print('CrawlerRunner.join')
 
     def _handle_twisted_reactor(self):
+        print('CrawlerRunner._handle_twisted_reactor')
         if self.settings.get("TWISTED_REACTOR"):
             print('CrawlerRunner._handle_twisted_reactor')
 
@@ -235,9 +246,10 @@ class CrawlerProcess(CrawlerRunner):
     """
 
     def __init__(self, settings=None, install_root_handler=True):
-        super(CrawlerProcess, self).__init__(settings)
-        install_shutdown_handlers(self._signal_shutdown)
-        configure_logging(self.settings, install_root_handler)
+        print('CrawlerProcess.__init__')
+        # super(CrawlerProcess, self).__init__(settings)
+        # install_shutdown_handlers(self._signal_shutdown)
+        # configure_logging(self.settings, install_root_handler)
         # log_scrapy_info(self.settings)
         
     def _signal_shutdown(self, signum, _):
@@ -256,6 +268,7 @@ class CrawlerProcess(CrawlerRunner):
         print('CrawlerProcess._stop_reactor')
 
     def _handle_twisted_reactor(self):
+        print('CrawlerProcess._handle_twisted_reactor')
         if self.settings.get("TWISTED_REACTOR"):
             print('CrawlerProcess._handle_twisted_reactor')
         super()._handle_twisted_reactor()

@@ -3,7 +3,7 @@ Base class for Jcrapy commands
 """
 from optparse import OptionGroup
 
-# from Jcrapy.utils.conf import arglist_to_dict
+from Jcrapy.utils.conf import arglist_to_dict
 
 class JcrapyCommand:
 
@@ -22,13 +22,22 @@ class JcrapyCommand:
         print('ScrapyCommand.set_crawler')
 
     def syntax(self):
-        print('ScrapyCommand.syntax')
+        """
+        Command syntax (preferably one-line). Do not include command name.
+        """
+        return ""
 
     def short_desc(self):
-        print("ScrapyCommand.short_desc")
+        """
+        A short description of the command
+        """
+        return ""
 
     def long_desc(self):
-        print('JcrapyCommand.long_desc')
+        """A long description of the command. Return short description when not
+        available. It cannot contain newlines, since contents will be formatted
+        by optparser which removes newlines and wraps text.
+        """
         return self.short_desc()
 
     def help(self):
@@ -38,8 +47,6 @@ class JcrapyCommand:
         """
         Populate option parse with options available for this command
         """
-        print('JcrapyCommand.add_options')
-        return
         group = OptionGroup(parser, "Global Options")
         group.add_option("--logfile", metavar="FILE",
             help="log file. if omitted stderr will be used")
@@ -58,10 +65,8 @@ class JcrapyCommand:
         parser.add_option_group(group)
 
     def process_options(self, args, opts):
-        print('JcrapyCommand.process_options')
-        return
         try:
-            self.settings.setdict(arglist_to_dict(opts.set), priority='cmdline')
+            self.settings.update(arglist_to_dict(opts.set), priority='cmdline')
         except ValueError:
             raise UsageError("Invalid -s value, use -s NAME=VALUE", print_help=False)
 

@@ -1,16 +1,17 @@
 # """
-# Scrapy - a web crawling and web scraping framework written for Python
+# Jcrapy - a web crawling and web scraping framework written for Python
 # """
 
-# __all__ = ['__version__', 'version_info', 'twisted_version',
-#            'Spider', 'Request', 'FormRequest', 'Selector', 'Item', 'Field']
+__all__ = ['__version__', 
+            #'version_info', 'twisted_version','Spider', 'Request', 'FormRequest', 'Selector', 'Item', 'Field'
+            ]
 
-# # Scrapy version
-# import pkgutil
-# __version__ = pkgutil.get_data(__package__, 'VERSION').decode('ascii').strip()
+# Jcrapy version
+import pkgutil
+__version__ = pkgutil.get_data(__package__, 'VERSION').decode('ascii').strip()
 # version_info = tuple(int(v) if v.isdigit() else v
 #                      for v in __version__.split('.'))
-# del pkgutil
+del pkgutil
 
 
 # # Ignore noisy twisted deprecation warnings
