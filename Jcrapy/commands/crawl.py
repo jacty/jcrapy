@@ -34,7 +34,7 @@ class Command(JcrapyCommand):
             # self.settings.set('FEEDS', feeds, priority='cmdline')
 
     def run(self, args, opts):
-        print('crawl.run')
+        print('crawl.run', args, opts)
     #     if len(args) < 1:
     #         raise UsageError()
     #     elif len(args) > 1:
