@@ -92,6 +92,7 @@ def execute(argv=None, settings=None):
     cmd.add_options(parser)
     opts, args = parser.parse_args(args=argv[1:])
     _run_print_help(parser, cmd.process_options, args, opts)
+    _print_header(settings, inproject)
     cmd.crawler_process = CrawlerProcess(settings)
     print('execute')
     return

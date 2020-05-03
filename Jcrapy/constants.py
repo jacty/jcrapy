@@ -16,3 +16,16 @@ valid_envvars = {
     'PYTHON_SHELL',
     'SETTINGS_MODULE',
 }
+DEFAULT_LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'loggers': {
+        'scrapy': {
+            'level': 'DEBUG',
+        },
+        'twisted': {
+            'level': 'ERROR',
+        },
+    }
+}
+_jcrapy_root_handler = None

@@ -11,7 +11,7 @@
 
 BOT_NAME = 'Jackie'
 
-# SPIDER_MODULES = ['Jackie.Jackie.spiders']
+SPIDER_MODULES = ['Jackie.spiders']
 # NEWSPIDER_MODULE = 'Jackie.spiders'
 
 

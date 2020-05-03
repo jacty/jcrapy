@@ -192,15 +192,15 @@ DEFAULT_REQUEST_HEADERS = {
 # ITEM_PIPELINES = {}
 # ITEM_PIPELINES_BASE = {}
 
-# LOG_ENABLED = True
+LOG_ENABLED = True
 # LOG_ENCODING = 'utf-8'
 # LOG_FORMATTER = 'jcrapy.logformatter.LogFormatter'
-# LOG_FORMAT = '%(asctime)s [%(name)s] %(levelname)s: %(message)s'
-# LOG_DATEFORMAT = '%Y-%m-%d %H:%M:%S'
-# LOG_STDOUT = False
-# LOG_LEVEL = 'DEBUG'
-# LOG_FILE = None
-# LOG_SHORT_NAMES = False
+LOG_FORMAT = '%(asctime)s [%(name)s] %(levelname)s: %(message)s'
+LOG_DATEFORMAT = '%Y-%m-%d %H:%M:%S'
+LOG_STDOUT = False
+LOG_LEVEL = 'DEBUG'
+LOG_FILE = None
+LOG_SHORT_NAMES = False
 
 # SCHEDULER_DEBUG = False
 
@@ -254,8 +254,8 @@ DEFAULT_REQUEST_HEADERS = {
 
 # SCRAPER_SLOT_MAX_ACTIVE_SIZE = 5000000
 
-# SPIDER_LOADER_CLASS = 'jcrapy.spiderloader.SpiderLoader'
-# SPIDER_LOADER_WARN_ONLY = False
+SPIDER_LOADER_CLASS = 'Jcrapy.spiderloader.SpiderLoader'
+SPIDER_LOADER_WARN_ONLY = False
 
 # SPIDER_MIDDLEWARES = {}
 
@@ -288,7 +288,7 @@ DEFAULT_REQUEST_HEADERS = {
 # TELNETCONSOLE_USERNAME = 'scrapy'
 # TELNETCONSOLE_PASSWORD = None
 
-# TWISTED_REACTOR = None
+TWISTED_REACTOR = None
 
 # SPIDER_CONTRACTS = {}
 # SPIDER_CONTRACTS_BASE = {

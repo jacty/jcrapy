@@ -91,7 +91,6 @@ class BaseSettings(MutableMapping):
         :param default: the value to return if no setting is found
         :type default: any
         """
-        print('BaseSettings.get')
         return self[name] if self[name] is not None else default  
     
     def getbool(self, name, default=False):
@@ -110,7 +109,6 @@ class BaseSettings(MutableMapping):
         :param default: the value to return if no setting is found
         :type default: any
         """
-        print('BaseSettings.getbool')
         got = self.get(name, default)
         try:
             return bool(int(got))
@@ -142,8 +140,8 @@ class BaseSettings(MutableMapping):
         :param default: the value to return if no setting is found
         :type default: any
         """
-        print('BaseSettings.getlist')
         value = self.get(name, default or [])
+
         if isinstance(value, str):
             value = value.split(',')
         return list(value) 
@@ -291,7 +289,6 @@ class BaseSettings(MutableMapping):
         Modifications to the new object won't be reflected on the original
         settings.
         """
-        print('BaseSettings.copy')
         return copy.deepcopy(self)
 
     def freeze(self):

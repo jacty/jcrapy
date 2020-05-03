@@ -8,11 +8,11 @@ from logging.config import dictConfig
 from twisted.python import log as twisted_log
 # from twisted.python.failure import Failure
 
-import jcrapy
+import Jcrapy
 # from scrapy.exceptions import ScrapyDeprecationWarning
 # from scrapy.settings import Settings
-from utils.versions import scrapy_components_versions
-
+from Jcrapy.utils.versions import jcrapy_components_versions
+from Jcrapy.constants import DEFAULT_LOGGING,_jcrapy_root_handler
 
 logger = logging.getLogger(__name__)
 
@@ -45,28 +45,13 @@ class TopLevelFormatter(logging.Filter):
         #     record.name = record.name.split('.', 1)[0]
         # return True
 
-
-DEFAULT_LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'loggers': {
-        'scrapy': {
-            'level': 'DEBUG',
-        },
-        'twisted': {
-            'level': 'ERROR',
-        },
-    }
-}
-
-
 def configure_logging(settings=None, install_root_handler=True):
     """
-    Initialize logging defaults for Scrapy.
+    Initialize logging defaults for Jcrapy.
 
     :param settings: settings used to create and configure a handler for the
         root logger (default: None).
-    :type settings: dict, :class:`~scrapy.settings.Settings` object or ``None``
+    :type settings: dict, :class:`~Jcrapy.settings.Settings` object or ``None``
 
     :param install_root_handler: whether to install root logging handler
         (default: True)
@@ -75,7 +60,7 @@ def configure_logging(settings=None, install_root_handler=True):
     This function does:
 
     - Route warnings and twisted logging through Python standard logging
-    - Assign DEBUG and ERROR level to Scrapy and Twisted loggers respectively
+    - Assign DEBUG and ERROR level to Jcrapy and Twisted loggers respectively
     - Route stdout to log if LOG_STDOUT setting is True
 
     When ``install_root_handler`` is True (default), this function also
@@ -84,7 +69,6 @@ def configure_logging(settings=None, install_root_handler=True):
     using ``settings`` argument. When ``settings`` is empty or None, defaults
     are used.
     """
-
     if not sys.warnoptions:
         # Route warnings through python logging
         logging.captureWarnings(True)
@@ -95,31 +79,32 @@ def configure_logging(settings=None, install_root_handler=True):
     dictConfig(DEFAULT_LOGGING)
 
     if isinstance(settings, dict) or settings is None:
+        print('configure_logging:settings is dict or None')
         settings = Settings(settings)
 
     if settings.getbool('LOG_STDOUT'):
         print('configure_logging')
-    #     sys.stdout = StreamLogger(logging.getLogger('stdout'))
+        sys.stdout = StreamLogger(logging.getLogger('stdout'))
 
     if install_root_handler:
-        install_scrapy_root_handler(settings)
+        install_jcrapy_root_handler(settings)
 
 
-def install_scrapy_root_handler(settings):    
-    global _scrapy_root_handler
-    
-    if (_scrapy_root_handler is not None
-            and _scrapy_root_handler in logging.root.handlers):
-        logging.root.removeHandler(_scrapy_root_handler)
+def install_jcrapy_root_handler(settings):    
+    global _jcrapy_root_handler
+    if (_jcrapy_root_handler is not None
+            and _jcrapy_root_handler in logging.root.handlers):
+        print('install_jcrapy_root_handler', _jcrapy_root_handler)
+#         logging.root.removeHandler(_scrapy_root_handler)
     logging.root.setLevel(logging.NOTSET)
-    _scrapy_root_handler = _get_handler(settings)
-    logging.root.addHandler(_scrapy_root_handler)
+    _jcrapy_root_handler = _get_handler(settings)
+    logging.root.addHandler(_jcrapy_root_handler)
 
-def get_scrapy_root_handler():
-    return _scrapy_root_handler
+# def get_scrapy_root_handler():
+    # return _scrapy_root_handler
 
 
-_scrapy_root_handler = None
+
 
 
 def _get_handler(settings):
@@ -146,15 +131,15 @@ def _get_handler(settings):
     return handler
 
 
-def log_scrapy_info(settings):
-
+def log_jcrapy_info(settings):
+    #TD: use another extra commander to invoke this function to show logs
     logger.info("Jcrapy %(version)s started (bot: %(bot)s)",
-                {'version': jcrapy.__version__, 'bot': settings['BOT_NAME']})
+                {'version': Jcrapy.__version__, 'bot': settings['BOT_NAME']})
 
     logger.info("Versions: %(versions)s",
                 {'versions': ", ".join("%s %s" % (name, version)
-                    for name, version in scrapy_components_versions()
-                    if name != "Scrapy")})
+                    for name, version in jcrapy_components_versions()
+                    if name != "Jcrapy")})
     from twisted.internet import reactor
     logger.debug("Using reactor: %s.%s", reactor.__module__, reactor.__class__.__name__)
 

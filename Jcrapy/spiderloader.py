@@ -2,15 +2,15 @@
 from collections import defaultdict
 
 from zope.interface import implementer
-from jcrapy.interfaces import ISpiderLoader
-from jcrapy.utils.misc import walk_modules
-from jcrapy.utils.spider import iter_spider_classes
+from Jcrapy.interfaces import ISpiderLoader
+from Jcrapy.utils.misc import walk_modules
+from Jcrapy.utils.spider import iter_spider_classes
 
 @implementer(ISpiderLoader)
 class SpiderLoader:
     """
     SpiderLoader is a class which locates and loads spiders
-    in a Scrapy project.
+    in a Jcrapy project.
     """
     def __init__(self, settings):
         self.spider_modules = settings.getlist('SPIDER_MODULES')
@@ -25,6 +25,7 @@ class SpiderLoader:
                            for (mod, cls) in locations)
                  for name, locations in self._found.items()
                  if len(locations) > 1]
+        
         if dupes:
             msg = ("There are several spiders with the same name:\n\n"
                    "{}\n\n  This can cause unexpected behavior.".format(
@@ -60,10 +61,11 @@ class SpiderLoader:
         Return the Spider class for the given spider name. If the spider
         name is not found, raise a KeyError.
         """
-        try:
-            return self._spiders[spider_name]
-        except KeyError:
-            raise KeyError("Spider not found: {}".format(spider_name))
+        print('SpiderLoader.load')
+        # try:
+        #     return self._spiders[spider_name]
+        # except KeyError:
+        #     raise KeyError("Spider not found: {}".format(spider_name))
 
     def find_by_request(self, request):
         print('SpiderLoader.find_by_request')

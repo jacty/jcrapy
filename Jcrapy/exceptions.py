@@ -65,7 +65,7 @@ class UsageError(Exception):
         # super(UsageError, self).__init__(*a, **kw)
 
 
-class ScrapyDeprecationWarning(Warning):
+class JcrapyDeprecationWarning(Warning):
     """Warning category for deprecated features, since the default
     DeprecationWarning is silenced on Python 2.7+
     """

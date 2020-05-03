@@ -1,34 +1,33 @@
 # import logging
 # import pprint
 # import signal
-# import warnings
+import warnings
 
 # from twisted.internet import defer
-# from zope.interface.exceptions import DoesNotImplement
+from zope.interface.exceptions import DoesNotImplement
 
-# try:
-#     # zope >= 5.0 only supports MultipleInvalid
-#     from zope.interface.exceptions import MultipleInvalid
-# except ImportError:
-#     MultipleInvalid = None
+try:
+    # zope >= 5.0 only supports MultipleInvalid
+    from zope.interface.exceptions import MultipleInvalid
+except ImportError:
+    MultipleInvalid = None
 
-# from zope.interface.verify import verifyClass
+from zope.interface.verify import verifyClass
 
 # from jcrapy import signals, Spider
 # from jcrapy.core.engine import ExecutionEngine
-# from jcrapy.exceptions import ScrapyDeprecationWarning
-# from jcrapy.interfaces import ISpiderLoader
+from Jcrapy.exceptions import JcrapyDeprecationWarning
+from Jcrapy.interfaces import ISpiderLoader
 # from jcrapy.settings import overridden_settings
 # from jcrapy.signalmanager import SignalManager
-# from jcrapy.utils.log import(
-#     configure_logging,
+from Jcrapy.utils.log import(
+    configure_logging,
 #     get_scrapy_root_handler,
 #     install_scrapy_root_handler,
-#     log_scrapy_info,
 #     LogCounterHandler,
-# )
-# from jcrapy.utils.misc import load_object
-# from jcrapy.utils.ossignal import install_shutdown_handlers
+)
+from Jcrapy.utils.misc import load_object
+from Jcrapy.utils.ossignal import install_shutdown_handlers
 
 # logger = logging.getLogger(__name__)
 
@@ -97,21 +96,20 @@ class CrawlerRunner:
     crawlers inside an already setup :mod:`~twisted.internet.reactor`.
 
     The CrawlerRunner object must be instantiated with a
-    :class:`~scrapy.settings.Settings` object.
+    :class:`~Jcrapy.settings.Settings` object.
 
-    This class shouldn't be needed (since Scrapy is responsible of using it
+    This class shouldn't be needed (since Jcrapy is responsible of using it
     accordingly) unless writing scripts that manually handle the crawling
     process. See :ref:`run-from-script` for an example.
     """
-    crawlers = property(
-        lambda self: self._crawlers,
-        doc="Set of :class:`crawlers <scrapy.crawler.Crawler>` started by "
-            ":meth:`crawl` and managed by this class."
-    )
+    # crawlers = property(
+    #     lambda self: self._crawlers,
+    #     doc="Set of :class:`crawlers <scrapy.crawler.Crawler>` started by "
+    #         ":meth:`crawl` and managed by this class."
+    # )
 
     @staticmethod
     def _get_spider_loader(settings):
-        print('CrawlerRunner._get_spider_loader')
         """ Get SpiderLoader instance from settings """
         cls_path = settings.get('SPIDER_LOADER_CLASS')
         loader_cls = load_object(cls_path)
@@ -121,18 +119,16 @@ class CrawlerRunner:
             verifyClass(ISpiderLoader, loader_cls)
         except excs:
             warnings.warn(
-                'SPIDER_LOADER_CLASS (previously named SPIDER_MANAGER_CLASS) does '
-                'not fully implement scrapy.interfaces.ISpiderLoader interface. '
+                'SPIDER_LOADER_CLASS does '
+                'not fully implement Jcrapy.interfaces.ISpiderLoader interface. '
                 'Please add all missing methods to avoid unexpected runtime errors.',
-                category=ScrapyDeprecationWarning, stacklevel=2
+                category=JcrapyDeprecationWarning, stacklevel=2
             )
-
         return loader_cls.from_settings(settings.frozencopy())
 
     def __init__(self, settings=None):
-        print('CrawlerRunner.__init__')
         if isinstance(settings, dict) or settings is None:
-            print('CrawlerRunner', isinstance(settings, dict))
+            print('CrawlerRunner.__init__', isinstance(settings, dict))
         self.settings = settings
         self.spider_loader = self._get_spider_loader(settings)
         self._crawlers = set()
@@ -167,20 +163,20 @@ class CrawlerRunner:
         :param dict kwargs: keyword arguments to initialize the spider
         """
         print('CrawlerRunner.crawl')
-        if isinstance(crawler_or_spidercls, Spider):
-            raise ValueError(
-                'The crawler_or_spidercls argument cannot be a spider object, '
-                'it must be a spider class (or a Crawler object)')
-        crawler = self.create_crawler(crawler_or_spidercls)
-        return self._crawl(crawler, *args, **kwargs)
+        # if isinstance(crawler_or_spidercls, Spider):
+        #     raise ValueError(
+        #         'The crawler_or_spidercls argument cannot be a spider object, '
+        #         'it must be a spider class (or a Crawler object)')
+        # crawler = self.create_crawler(crawler_or_spidercls)
+        # return self._crawl(crawler, *args, **kwargs)
 
     def _crawl(self, crawler, *args, **kwargs):
         print('CrawlerRunner._crawl')
-        self.crawlers.add(crawler)
-        d = crawler.crawl(*args, **kwargs)
-        print('CrawlerRunner._crawl', crawler)
-        def _done(result):
-            print('CrawlerRunner._crawl._done')
+        # self.crawlers.add(crawler)
+        # d = crawler.crawl(*args, **kwargs)
+        # print('CrawlerRunner._crawl', crawler)
+        # def _done(result):
+        #     print('CrawlerRunner._crawl._done')
 
     def create_crawler(self, crawler_or_spidercls):
         """
@@ -194,64 +190,61 @@ class CrawlerRunner:
           then creates a Crawler instance for it.
         """
         print('CrawlerRunner._create_crawler')
-        if isinstance(crawler_or_spidercls, Spider):
-            raise ValueError(
-                'The crawler_or_spidercls argument cannot be a spider object, '
-                'it must be a spider class (or a Crawler object)')        
-        if isinstance(crawler_or_spidercls, Crawler):
-            print('CrawlerRunner.create_crawler')
-        return self._create_crawler(crawler_or_spidercls)
+        # if isinstance(crawler_or_spidercls, Spider):
+        #     raise ValueError(
+        #         'The crawler_or_spidercls argument cannot be a spider object, '
+        #         'it must be a spider class (or a Crawler object)')        
+        # if isinstance(crawler_or_spidercls, Crawler):
+        #     print('CrawlerRunner.create_crawler')
+        # return self._create_crawler(crawler_or_spidercls)
 
     def _create_crawler(self, spidercls):
         print('CrawlerRunner._create_crawler')
-        if isinstance(spidercls, str):
-            spidercls = self.spider_loader.load(spidercls)
-        return Crawler(spidercls, self.settings)
+        # if isinstance(spidercls, str):
+        #     spidercls = self.spider_loader.load(spidercls)
+        # return Crawler(spidercls, self.settings)
 
     def stop(self):
         print('CrawlerRunner.stop')
 
-    @defer.inlineCallbacks
+    # @defer.inlineCallbacks
     def join(self):
         print('CrawlerRunner.join')
 
     def _handle_twisted_reactor(self):
-        print('CrawlerRunner._handle_twisted_reactor')
         if self.settings.get("TWISTED_REACTOR"):
             print('CrawlerRunner._handle_twisted_reactor')
 
 
 class CrawlerProcess(CrawlerRunner):
     """
-    A class to run multiple scrapy crawlers in a process simultaneously.
+    A class to run multiple Jcrapy crawlers in a process simultaneously.
 
-    This class extends :class:`~scrapy.crawler.CrawlerRunner` by adding support
+    This class extends :class:`~Jcrapy.crawler.CrawlerRunner` by adding support
     for starting a :mod:`~twisted.internet.reactor` and handling shutdown
     signals, like the keyboard interrupt command Ctrl-C. It also configures
     top-level logging.
 
     This utility should be a better fit than
-    :class:`~scrapy.crawler.CrawlerRunner` if you aren't running another
+    :class:`~Jcrapy.crawler.CrawlerRunner` if you aren't running another
     :mod:`~twisted.internet.reactor` within your application.
 
     The CrawlerProcess object must be instantiated with a
-    :class:`~scrapy.settings.Settings` object.
+    :class:`~Jcrapy.settings.Settings` object.
 
     :param install_root_handler: whether to install root logging handler
         (default: True)
 
-    This class shouldn't be needed (since Scrapy is responsible of using it
+    This class shouldn't be needed (since Jcrapy is responsible of using it
     accordingly) unless writing scripts that manually handle the crawling
     process. See :ref:`run-from-script` for an example.
     """
 
     def __init__(self, settings=None, install_root_handler=True):
-        print('CrawlerProcess.__init__')
-        # super(CrawlerProcess, self).__init__(settings)
-        # install_shutdown_handlers(self._signal_shutdown)
-        # configure_logging(self.settings, install_root_handler)
-        # log_scrapy_info(self.settings)
-        
+        super(CrawlerProcess, self).__init__(settings)
+        install_shutdown_handlers(self._signal_shutdown)
+        configure_logging(self.settings, install_root_handler)
+
     def _signal_shutdown(self, signum, _):
         print('CrawlerProcess._signal_shutdown')
 
@@ -268,7 +261,6 @@ class CrawlerProcess(CrawlerRunner):
         print('CrawlerProcess._stop_reactor')
 
     def _handle_twisted_reactor(self):
-        print('CrawlerProcess._handle_twisted_reactor')
         if self.settings.get("TWISTED_REACTOR"):
             print('CrawlerProcess._handle_twisted_reactor')
         super()._handle_twisted_reactor()
