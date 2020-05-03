@@ -13,6 +13,7 @@ BOT_NAME = 'Jackie'
 
 SPIDER_MODULES = ['Jackie.spiders']
 # NEWSPIDER_MODULE = 'Jackie.spiders'
+LOG_LEVEL = 'ERROR'
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent

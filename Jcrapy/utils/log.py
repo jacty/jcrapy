@@ -94,14 +94,13 @@ def install_jcrapy_root_handler(settings):
     global _jcrapy_root_handler
     if (_jcrapy_root_handler is not None
             and _jcrapy_root_handler in logging.root.handlers):
-        print('install_jcrapy_root_handler', _jcrapy_root_handler)
-#         logging.root.removeHandler(_scrapy_root_handler)
+        logging.root.removeHandler(_jcrapy_root_handler)
     logging.root.setLevel(logging.NOTSET)
     _jcrapy_root_handler = _get_handler(settings)
     logging.root.addHandler(_jcrapy_root_handler)
 
-# def get_scrapy_root_handler():
-    # return _scrapy_root_handler
+def get_jcrapy_root_handler():
+    return _jcrapy_root_handler
 
 
 

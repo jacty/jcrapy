@@ -47,9 +47,9 @@ class JSpider(Jcrapy.Spider):
 
         loader.add_css('content', '.entry')
         return loader.load_item()
-    def update_settings(self):
-        pass
-    def from_crawler(self):
-        pass
+    # def update_settings(self):
+    #     pass
+    # def from_crawler(self):
+    #     pass
         
         

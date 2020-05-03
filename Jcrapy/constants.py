@@ -20,7 +20,7 @@ DEFAULT_LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'loggers': {
-        'scrapy': {
+        'jcrapy': {
             'level': 'DEBUG',
         },
         'twisted': {
@@ -29,3 +29,4 @@ DEFAULT_LOGGING = {
     }
 }
 _jcrapy_root_handler = None
+

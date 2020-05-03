@@ -1,50 +1,60 @@
-import random
-from time import time
-from datetime import datetime
-from collections import deque
+# import random
+# from time import time
+# from datetime import datetime
+# from collections import deque
 
-from twisted.internet import defer, task
+# from twisted.internet import defer, task
 
-from scrapy.utils.defer import mustbe_deferred
-from scrapy.utils.httpobj import urlparse_cached
-from scrapy.resolver import dnscache
-from scrapy import signals
-from scrapy.core.downloader.middleware import DownloaderMiddlewareManager
-from scrapy.core.downloader.handlers import DownloadHandlers
+# from scrapy.utils.defer import mustbe_deferred
+# from scrapy.utils.httpobj import urlparse_cached
+# from scrapy.resolver import dnscache
+# from scrapy import signals
+# from scrapy.core.downloader.middleware import DownloaderMiddlewareManager
+# from scrapy.core.downloader.handlers import DownloadHandlers
 
 
 class Slot:
     """Downloader slot"""
 
     def __init__(self, concurrency, delay, randomize_delay):
-        self.concurrency = concurrency
-        self.delay = delay
-        self.randomize_delay = randomize_delay
+        print('core.Slot.__init__')
+        # self.concurrency = concurrency
+        # self.delay = delay
+        # self.randomize_delay = randomize_delay
 
-        self.active = set()
-        self.queue = deque()
-        self.transferring = set()
-        self.lastseen = 0
-        self.latercall = None
+        # self.active = set()
+        # self.queue = deque()
+        # self.transferring = set()
+        # self.lastseen = 0
+        # self.latercall = None
 
     def free_transfer_slots(self):
-        return self.concurrency - len(self.transferring)
+        print('core.Slot.free_transfer_slots')
+        # return self.concurrency - len(self.transferring)
 
     def download_delay(self):
+        print('core.Slot.download_delay')
+        return
         if self.randomize_delay:
             return random.uniform(0.5 * self.delay, 1.5 * self.delay)
         return self.delay
 
     def close(self):
+        print('core.Slot.close')
+        return
         if self.latercall and self.latercall.active():
             self.latercall.cancel()
 
     def __repr__(self):
+        print('core.Slot.__repr__')
+        return
         cls_name = self.__class__.__name__
         return "%s(concurrency=%r, delay=%0.2f, randomize_delay=%r)" % (
             cls_name, self.concurrency, self.delay, self.randomize_delay)
 
     def __str__(self):
+        print('core.Slot.__str__')
+        return
         return (
             "<downloader.Slot concurrency=%r delay=%0.2f randomize_delay=%r "
             "len(active)=%d len(queue)=%d len(transferring)=%d lastseen=%s>" % (
@@ -56,6 +66,8 @@ class Slot:
 
 
 def _get_concurrency_delay(concurrency, spider, settings):
+    print('core._get_concurrency_delay')
+    return
     delay = settings.getfloat('DOWNLOAD_DELAY')
     if hasattr(spider, 'download_delay'):
         delay = spider.download_delay
@@ -71,6 +83,8 @@ class Downloader:
     DOWNLOAD_SLOT = 'download_slot'
 
     def __init__(self, crawler):
+        print('Downloader.__init__')
+        return
         self.settings = crawler.settings
         self.signals = crawler.signals
         self.slots = {}
@@ -85,6 +99,8 @@ class Downloader:
         self._slot_gc_loop.start(60)
 
     def fetch(self, request, spider):
+        print('Downloader.fetch')
+        return
         def _deactivate(response):
             self.active.remove(request)
             return response
@@ -94,9 +110,11 @@ class Downloader:
         return dfd.addBoth(_deactivate)
 
     def needs_backout(self):
+        print('Downloader.needs_backout')
         return len(self.active) >= self.total_concurrency
 
     def _get_slot(self, request, spider):
+        print('Downloader._get_slot')
         key = self._get_slot_key(request, spider)
         if key not in self.slots:
             conc = self.ip_concurrency if self.ip_concurrency else self.domain_concurrency
@@ -106,6 +124,7 @@ class Downloader:
         return key, self.slots[key]
 
     def _get_slot_key(self, request, spider):
+        print('Downloader._get_slot_key')
         if self.DOWNLOAD_SLOT in request.meta:
             return request.meta[self.DOWNLOAD_SLOT]
 
@@ -116,6 +135,7 @@ class Downloader:
         return key
 
     def _enqueue_request(self, request, spider):
+        print('Downloader._enqueue_request')
         key, slot = self._get_slot(request, spider)
         request.meta[self.DOWNLOAD_SLOT] = key
 
@@ -133,6 +153,7 @@ class Downloader:
         return deferred
 
     def _process_queue(self, spider, slot):
+        print('Downloader._process_queue')
         from twisted.internet import reactor
         if slot.latercall and slot.latercall.active():
             return
@@ -159,7 +180,7 @@ class Downloader:
 
     def _download(self, slot, request, spider):
         # The order is very important for the following deferreds. Do not change!
-
+        print('Downloader._download')
         # 1. Create the download deferred
         dfd = mustbe_deferred(self.handlers.download_request, request, spider)
 
@@ -190,11 +211,13 @@ class Downloader:
         return dfd.addBoth(finish_transferring)
 
     def close(self):
+        print('Downloader.close')
         self._slot_gc_loop.stop()
         for slot in self.slots.values():
             slot.close()
 
     def _slot_gc(self, age=60):
+        print('Downloader._slot_gc')
         mintime = time() - age
         for key, slot in list(self.slots.items()):
             if not slot.active and slot.lastseen + slot.delay < mintime:

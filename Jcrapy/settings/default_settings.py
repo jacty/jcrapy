@@ -194,7 +194,7 @@ DEFAULT_REQUEST_HEADERS = {
 
 LOG_ENABLED = True
 # LOG_ENCODING = 'utf-8'
-# LOG_FORMATTER = 'jcrapy.logformatter.LogFormatter'
+LOG_FORMATTER = 'Jcrapy.logformatter.LogFormatter'
 LOG_FORMAT = '%(asctime)s [%(name)s] %(levelname)s: %(message)s'
 LOG_DATEFORMAT = '%Y-%m-%d %H:%M:%S'
 LOG_STDOUT = False
@@ -271,8 +271,8 @@ SPIDER_LOADER_WARN_ONLY = False
 
 # SPIDER_MODULES = []
 
-# STATS_CLASS = 'jcrapy.statscollectors.MemoryStatsCollector'
-# STATS_DUMP = True
+STATS_CLASS = 'Jcrapy.statscollectors.MemoryStatsCollector'
+STATS_DUMP = True
 
 # STATSMAILER_RCPTS = []
 

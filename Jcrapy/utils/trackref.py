@@ -9,14 +9,14 @@ and no performance penalty at all when disabled (as object_ref becomes just an
 alias to object in that case).
 """
 
-# import weakref
-# from time import time
+import weakref
+from time import time
 # from operator import itemgetter
-# from collections import defaultdict
+from collections import defaultdict
 
 
 # NoneType = type(None)
-# live_refs = defaultdict(weakref.WeakKeyDictionary)
+live_refs = defaultdict(weakref.WeakKeyDictionary)
 
 
 class object_ref:
@@ -25,10 +25,9 @@ class object_ref:
     __slots__ = ()
 
     def __new__(cls, *args, **kwargs):
-          print('object_ref.__new__')
-#         obj = object.__new__(cls)
-#         live_refs[cls][obj] = time()
-#         return obj
+        obj = object.__new__(cls)
+        live_refs[cls][obj] = time()
+        return obj
 
 
 # def format_live_refs(ignore=NoneType):

@@ -5,7 +5,6 @@ from Jcrapy.utils.conf import arglist_to_dict
 
 class Command(JcrapyCommand):
     requires_project = True
-
     def syntax(self):
         return "[options] <spider>"
 
@@ -34,15 +33,15 @@ class Command(JcrapyCommand):
             # self.settings.set('FEEDS', feeds, priority='cmdline')
 
     def run(self, args, opts):
-        print('crawl.run')
-    #     if len(args) < 1:
-    #         raise UsageError()
-    #     elif len(args) > 1:
-    #         raise UsageError("running 'scrapy crawl' with more than one spider is no longer supported")
-    #     spname = args[0]
 
-    #     crawl_defer = self.crawler_process.crawl(spname, **opts.spargs)
-    #     print('crawl.run', self.crawler_process)
+        if len(args) < 1:
+            raise UsageError()
+        elif len(args) > 1:
+            raise UsageError("running 'Jcrapy crawl' with more than one spider is no longer supported")
+        spname = args[0]
+
+        crawl_defer = self.crawler_process.crawl(spname, **opts.spargs)
+        print('crawl.run')
         # if getattr(crawl_defer, 'result', None) is not None and issubclass(crawl_defer.result.type, Exception):
         #     self.exitcode = 1
         # else:

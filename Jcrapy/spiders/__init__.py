@@ -1,12 +1,12 @@
 """
-Base class for Scrapy spiders
+Base class for Jcrapy spiders
 
 See documentation in docs/topics/spiders.rst
 """
 # import logging
 # import warnings
 
-# from scrapy import signals
+from Jcrapy import signals
 # from scrapy.http import Request
 from Jcrapy.utils.trackref import object_ref
 # from scrapy.utils.url import url_is_from_spider
@@ -22,14 +22,13 @@ class Spider(object_ref):
     custom_settings = None
 
     def __init__(self, name=None, **kwargs):
-        print('Spider.__init__')
-        # if name is not None:
-        #     self.name = name
-        # elif not getattr(self, 'name', None):
-        #     raise ValueError("%s must have a name" % type(self).__name__)
-        # self.__dict__.update(kwargs)
-        # if not hasattr(self, 'start_urls'):
-        #     self.start_urls = []
+        if name is not None:
+            self.name = name
+        elif not getattr(self, 'name', None):
+            raise ValueError("%s must have a name" % type(self).__name__)
+        self.__dict__.update(kwargs)
+        if not hasattr(self, 'start_urls'):
+            self.start_urls = []
 
 #     @property
 #     def logger(self):
@@ -45,16 +44,16 @@ class Spider(object_ref):
 #         """
 #         self.logger.log(level, message, **kw)
 
-#     @classmethod
-#     def from_crawler(cls, crawler, *args, **kwargs):
-#         spider = cls(*args, **kwargs)
-#         spider._set_crawler(crawler)
-#         return spider
+    @classmethod
+    def from_crawler(cls, crawler, *args, **kwargs):
+        spider = cls(*args, **kwargs)        
+        spider._set_crawler(crawler)
+        return spider
 
-#     def _set_crawler(self, crawler):
-#         self.crawler = crawler
-#         self.settings = crawler.settings
-#         crawler.signals.connect(self.close, signals.spider_closed)
+    def _set_crawler(self, crawler):
+        self.crawler = crawler
+        self.settings = crawler.settings
+        crawler.signals.connect(self.close, signals.spider_closed)
 
 #     def start_requests(self):
 #         cls = self.__class__
@@ -90,16 +89,17 @@ class Spider(object_ref):
 #     def parse(self, response):
 #         raise NotImplementedError('{}.parse callback is not defined'.format(self.__class__.__name__))
 
-#     @classmethod
-#     def update_settings(cls, settings):
-#         settings.setdict(cls.custom_settings or {}, priority='spider')
+    @classmethod
+    def update_settings(cls, settings):
+        settings.update(cls.custom_settings or {}, priority='spider')
 
 #     @classmethod
 #     def handles_request(cls, request):
 #         return url_is_from_spider(request.url, cls)
 
-#     @staticmethod
-#     def close(spider, reason):
+    @staticmethod
+    def close(spider, reason):
+        print('Spider.close')
 #         closed = getattr(spider, 'closed', None)
 #         if callable(closed):
 #             return closed(reason)

@@ -1,9 +1,9 @@
-# import logging
-# import pprint
+import logging
+import pprint
 # import signal
 import warnings
 
-# from twisted.internet import defer
+from twisted.internet import defer
 from zope.interface.exceptions import DoesNotImplement
 
 try:
@@ -14,79 +14,78 @@ except ImportError:
 
 from zope.interface.verify import verifyClass
 
-# from jcrapy import signals, Spider
-# from jcrapy.core.engine import ExecutionEngine
+from Jcrapy import signals, Spider
+from Jcrapy.core.engine import ExecutionEngine
 from Jcrapy.exceptions import JcrapyDeprecationWarning
 from Jcrapy.interfaces import ISpiderLoader
-# from jcrapy.settings import overridden_settings
-# from jcrapy.signalmanager import SignalManager
+from Jcrapy.settings import overridden_settings
+from Jcrapy.signalmanager import SignalManager
+from Jcrapy.constants import _jcrapy_root_handler
 from Jcrapy.utils.log import(
     configure_logging,
-#     get_scrapy_root_handler,
-#     install_scrapy_root_handler,
-#     LogCounterHandler,
+    get_jcrapy_root_handler,
+    install_jcrapy_root_handler,
+    LogCounterHandler,
 )
 from Jcrapy.utils.misc import load_object
 from Jcrapy.utils.ossignal import install_shutdown_handlers
 
-# logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 class Crawler:
     
     def __init__(self, spidercls, settings=None):
-        print('Crawler.__init__')
-        # if isinstance(spidercls, Spider):
-        #     raise ValueError('The spidercls argument must be a class, not an object')
 
-        # if isinstance(settings, dict) or settings is None:
-        #     settings = Settings(settings)
+        if isinstance(spidercls, Spider):
+            raise ValueError('The spidercls argument must be a class, not an object')
 
-        # self.spidercls = spidercls
-        # self.settings = settings.copy()
-        # self.spidercls.update_settings(self.settings)
+        if isinstance(settings, dict) or settings is None:
+            settings = Settings(settings)
 
-        # self.signals = SignalManager(self)
-        # self.stats = load_object(self.settings['STATS_CLASS'])(self)
+        self.spidercls = spidercls
+        self.settings = settings.copy()
+        self.spidercls.update_settings(self.settings)
 
-        # handler = LogCounterHandler(self, level=self.settings.get('LOG_LEVEL'))
-        # logging.root.addHandler(handler)
+        self.signals = SignalManager(self)
+        self.stats = load_object(self.settings['STATS_CLASS'])(self)
 
-        # d = dict(overridden_settings(self.settings))
-        # # logger.info("Overridden settings:\n%(settings)s",
-        # #             {'settings': pprint.pformat(d)})
-        # if get_scrapy_root_handler() is not None:
-        #     # scrapy root handler already installed: update it with new settings
-        #     install_scrapy_root_handler(self.settings)
-        # # lambda is assigned to Crawler attribute because this way it is not
-        # # garbage collected after leaving __init__ scope
-        # self.__remove_handler = lambda: logging.root.removeHandler(handler)
-        # self.signals.connect(self.__remove_handler, signals.engine_stopped)
+        handler = LogCounterHandler(self, level=self.settings.get('LOG_LEVEL'))
+        logging.root.addHandler(handler)
 
-        # # lf_cls = load_object(self.settings['LOG_FORMATTER'])
-        # # self.logformatter = lf_cls.from_crawler(self)
+        d = dict(overridden_settings(self.settings))
+        logger.info("Overridden settings:\n%(settings)s",
+                    {'settings': pprint.pformat(d)})
+        if get_jcrapy_root_handler() is not None:
+            # jcrapy root handler already installed: update it with new settings
+            install_jcrapy_root_handler(self.settings)
+        # lambda is assigned to Crawler attribute because this way it is not
+        # garbage collected after leaving __init__ scope
+        self.__remove_handler = lambda: logging.root.removeHandler(handler)
+        self.signals.connect(self.__remove_handler, signals.engine_stopped)
+        #TD: ADD log and extensions part
+        # lf_cls = load_object(self.settings['LOG_FORMATTER'])
+        # self.logformatter = lf_cls.from_crawler(self)
         # # self.extensions = ExtensionManager.from_crawler(self)
 
-        # self.settings.freeze()
-        # self.crawling = False
-        # self.spider = None
-        # self.engine = None
+        self.settings.freeze()
+        self.crawling = False
+        self.spider = None
+        self.engine = None
 
-    # @defer.inlineCallbacks
+    #@defer.inlineCallbacks
     def crawl(self, *args, **kwargs):
-        print('Crawler.crawl')
-        assert not self.crawling, 'Crawling already taking place'
+        if self.crawling:
+            raise RuntimeError('Crawling already taking place')
         self.crawling = True
-
+        #try:
         self.spider = self._create_spider(*args, **kwargs)
         self.engine = self._create_engine()
-        print('crawl', *args, kwargs)
+        print('Crawler.crawl')
 
     def _create_spider(self, *args, **kwargs):
-        print('Crawler._create_spider')
         return self.spidercls.from_crawler(self, *args, **kwargs)
 
     def _create_engine(self):
-        print('Crawler._create_engine')
         return ExecutionEngine(self, lambda _: self.stop())
 
      
@@ -102,11 +101,11 @@ class CrawlerRunner:
     accordingly) unless writing scripts that manually handle the crawling
     process. See :ref:`run-from-script` for an example.
     """
-    # crawlers = property(
-    #     lambda self: self._crawlers,
-    #     doc="Set of :class:`crawlers <scrapy.crawler.Crawler>` started by "
-    #         ":meth:`crawl` and managed by this class."
-    # )
+    crawlers = property(
+        lambda self: self._crawlers,
+        doc="Set of :class:`crawlers <Jcrapy.crawler.Crawler>` started by "
+            ":meth:`crawl` and managed by this class."
+    )
 
     @staticmethod
     def _get_spider_loader(settings):
@@ -147,7 +146,7 @@ class CrawlerRunner:
         It will call the given Crawler's :meth:`~Crawler.crawl` method, while
         keeping track of it so it can be stopped later.
 
-        If ``crawler_or_spidercls`` isn't a :class:`~scrapy.crawler.Crawler`
+        If ``crawler_or_spidercls`` isn't a :class:`~Jcrapy.crawler.Crawler`
         instance, this method will try to create one using this parameter as
         the spider class given to it.
 
@@ -155,54 +154,51 @@ class CrawlerRunner:
 
         :param crawler_or_spidercls: already created crawler, or a spider class
             or spider's name inside the project to create it
-        :type crawler_or_spidercls: :class:`~scrapy.crawler.Crawler` instance,
-            :class:`~scrapy.spiders.Spider` subclass or string
+        :type crawler_or_spidercls: :class:`~Jcrapy.crawler.Crawler` instance,
+            :class:`~Jcrapy.spiders.Spider` subclass or string
 
         :param list args: arguments to initialize the spider
 
         :param dict kwargs: keyword arguments to initialize the spider
         """
-        print('CrawlerRunner.crawl')
-        # if isinstance(crawler_or_spidercls, Spider):
-        #     raise ValueError(
-        #         'The crawler_or_spidercls argument cannot be a spider object, '
-        #         'it must be a spider class (or a Crawler object)')
-        # crawler = self.create_crawler(crawler_or_spidercls)
-        # return self._crawl(crawler, *args, **kwargs)
+        if isinstance(crawler_or_spidercls, Spider):
+            raise ValueError(
+                'The crawler_or_spidercls argument cannot be a spider object, '
+                'it must be a spider class (or a Crawler object)')
+        crawler = self.create_crawler(crawler_or_spidercls)
+        return self._crawl(crawler, *args, **kwargs)
 
     def _crawl(self, crawler, *args, **kwargs):
-        print('CrawlerRunner._crawl')
-        # self.crawlers.add(crawler)
-        # d = crawler.crawl(*args, **kwargs)
-        # print('CrawlerRunner._crawl', crawler)
+        self.crawlers.add(crawler)
+        d = crawler.crawl(*args, **kwargs)
+        print('CrawlerRunner._crawl', crawler)
         # def _done(result):
         #     print('CrawlerRunner._crawl._done')
 
     def create_crawler(self, crawler_or_spidercls):
         """
-        Return a :class:`~scrapy.crawler.Crawler` object.
+        Return a :class:`~Jcrapy.crawler.Crawler` object.
 
         * If ``crawler_or_spidercls`` is a Crawler, it is returned as-is.
         * If ``crawler_or_spidercls`` is a Spider subclass, a new Crawler
           is constructed for it.
         * If ``crawler_or_spidercls`` is a string, this function finds
-          a spider with this name in a Scrapy project (using spider loader),
+          a spider with this name in a Jcrapy project (using spider loader),
           then creates a Crawler instance for it.
         """
-        print('CrawlerRunner._create_crawler')
-        # if isinstance(crawler_or_spidercls, Spider):
-        #     raise ValueError(
-        #         'The crawler_or_spidercls argument cannot be a spider object, '
-        #         'it must be a spider class (or a Crawler object)')        
-        # if isinstance(crawler_or_spidercls, Crawler):
-        #     print('CrawlerRunner.create_crawler')
-        # return self._create_crawler(crawler_or_spidercls)
+        if isinstance(crawler_or_spidercls, Spider):
+            raise ValueError(
+                'The crawler_or_spidercls argument cannot be a spider object, '
+                'it must be a spider class (or a Crawler object)')        
+        if isinstance(crawler_or_spidercls, Crawler):
+            print('CrawlerRunner.create_crawler')
+        return self._create_crawler(crawler_or_spidercls)
 
     def _create_crawler(self, spidercls):
-        print('CrawlerRunner._create_crawler')
-        # if isinstance(spidercls, str):
-        #     spidercls = self.spider_loader.load(spidercls)
-        # return Crawler(spidercls, self.settings)
+        if isinstance(spidercls, str):
+            spidercls = self.spider_loader.load(spidercls)
+
+        return Crawler(spidercls, self.settings)
 
     def stop(self):
         print('CrawlerRunner.stop')

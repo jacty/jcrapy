@@ -60,12 +60,11 @@ class SpiderLoader:
         """
         Return the Spider class for the given spider name. If the spider
         name is not found, raise a KeyError.
-        """
-        print('SpiderLoader.load')
-        # try:
-        #     return self._spiders[spider_name]
-        # except KeyError:
-        #     raise KeyError("Spider not found: {}".format(spider_name))
+        """       
+        try:
+            return self._spiders[spider_name]
+        except KeyError:
+            raise KeyError("Spider not found: {}".format(spider_name))
 
     def find_by_request(self, request):
         print('SpiderLoader.find_by_request')

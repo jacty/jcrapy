@@ -1,5 +1,5 @@
 """
-This is the Scrapy engine which controls the Scheduler, Downloader and Spiders.
+This is the Jcrapy engine which controls the Scheduler, Downloader and Spiders.
 
 For more information see docs/topics/architecture.rst
 
@@ -10,12 +10,12 @@ from time import time
 from twisted.internet import defer, task
 from twisted.python.failure import Failure
 
-from jcrapy import signals
+from Jcrapy import signals
 # from scrapy.core.scraper import Scraper
-from jcrapy.exceptions import DontCloseSpider
+from Jcrapy.exceptions import DontCloseSpider
 # from scrapy.http import Response, Request
-from jcrapy.utils.misc import load_object
-from scrapy.utils.reactor import CallLaterOnce
+from Jcrapy.utils.misc import load_object
+# from scrapy.utils.reactor import CallLaterOnce
 # from scrapy.utils.log import logformatter_adapter, failure_to_exc_info
 
 logger = logging.getLogger(__name__)
@@ -56,6 +56,8 @@ logger = logging.getLogger(__name__)
 class ExecutionEngine:
 
     def __init__(self, crawler, spider_closed_callback):
+        print('ExecutionEngine.__init__')
+        return
         self.crawler = crawler
         self.settings = crawler.settings
         self.signals = crawler.signals

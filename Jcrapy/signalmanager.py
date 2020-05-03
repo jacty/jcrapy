@@ -11,7 +11,7 @@ class SignalManager:
         """
         Connect a receiver function to a signal.
 
-        The signal can be any object, although Scrapy comes with some
+        The signal can be any object, although Jcrapy comes with some
         predefined signals that are documented in the :ref:`topics-signals`
         section.
 
@@ -21,7 +21,6 @@ class SignalManager:
         :param signal: the signal to connect to
         :type signal: object
         """
-        
         kwargs.setdefault('sender', self.sender)
         return dispatcher.connect(receiver, signal, **kwargs)
 

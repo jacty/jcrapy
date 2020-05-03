@@ -78,12 +78,11 @@ def execute(argv=None, settings=None):
         settings = get_project_settings()
  
     inproject = inside_project()
+    _print_header(settings, inproject)
     cmds = _get_commands_dict(settings, inproject)
     cmdname = _pop_command_name(argv)
     parser = optparse.OptionParser(formatter=optparse.TitledHelpFormatter(), conflict_handler='resolve')
-
-    cmd = cmds[cmdname]
-    
+    cmd = cmds[cmdname]    
     parser.usage = "Jcrapy %s %s" % (cmdname, cmd.syntax()) ##??
     parser.description = cmd.long_desc() ##?? Usage? No usage, should be removed.
      
@@ -91,12 +90,12 @@ def execute(argv=None, settings=None):
     cmd.settings = settings
     cmd.add_options(parser)
     opts, args = parser.parse_args(args=argv[1:])
+    #resolve command options.
     _run_print_help(parser, cmd.process_options, args, opts)
-    _print_header(settings, inproject)
     cmd.crawler_process = CrawlerProcess(settings)
+    _run_print_help(parser, _run_command, cmd, args, opts)
     print('execute')
     return
-    _run_print_help(parser, _run_command, cmd, args, opts)
     sys.exit(cmd.exitcode)
 
 def _run_command(cmd, args, opts):
