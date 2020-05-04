@@ -82,7 +82,9 @@ def execute(argv=None, settings=None):
     cmds = _get_commands_dict(settings, inproject)
     cmdname = _pop_command_name(argv)
     parser = optparse.OptionParser(formatter=optparse.TitledHelpFormatter(), conflict_handler='resolve')
+
     cmd = cmds[cmdname]    
+
     parser.usage = "Jcrapy %s %s" % (cmdname, cmd.syntax()) ##??
     parser.description = cmd.long_desc() ##?? Usage? No usage, should be removed.
      
