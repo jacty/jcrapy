@@ -7,7 +7,7 @@ See documentation in docs/topics/spiders.rst
 # import warnings
 
 from Jcrapy import signals
-from Jcrapy.http import Request
+from Jcrapy.https import Request
 from Jcrapy.utils.trackref import object_ref
 # from scrapy.utils.url import url_is_from_spider
 
