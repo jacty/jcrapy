@@ -4,11 +4,11 @@ import logging
 
 from twisted.internet import defer
 
-# from scrapy import signals
-from jcrapy.exceptions import NotConfigured, NotSupported
-# from scrapy.utils.httpobj import urlparse_cached
-from jcrapy.utils.misc import load_object,create_instance
-from jcrapy.utils.python import without_none_values
+from Jcrapy import signals
+from Jcrapy.exceptions import NotConfigured, NotSupported
+# # from scrapy.utils.httpobj import urlparse_cached
+from Jcrapy.utils.misc import load_object,create_instance
+from Jcrapy.utils.python import without_none_values
 
 
 logger = logging.getLogger(__name__)
@@ -27,8 +27,8 @@ class DownloadHandlers:
         for scheme, clspath in handlers.items():
             self._schemes[scheme] = clspath
             self._load_handler(scheme, skip_lazy=True)
-        print('DownloadHandlers.__init__')
-        # crawler.signals.connect(self._close, signals.engine_stopped)
+              
+        crawler.signals.connect(self._close, signals.engine_stopped)
 
     # def _get_handler(self, scheme):
     #     """Lazy-load the downloadhandler for a scheme
@@ -47,11 +47,11 @@ class DownloadHandlers:
     def _load_handler(self, scheme, skip_lazy=False):
         path = self._schemes[scheme]
 
+
         try:
             dhcls = load_object(path)
             if skip_lazy and getattr(dhcls, 'lazy', True):
                 return None
-
             dh = create_instance(
                 objcls=dhcls,
                 settings=self._crawler.settings,
@@ -78,8 +78,9 @@ class DownloadHandlers:
     #                            (scheme, self._notconfigured[scheme]))
     #     return handler.download_request(request, spider)
 
-    # @defer.inlineCallbacks
-    # def _close(self, *_a, **_kw):
+    @defer.inlineCallbacks
+    def _close(self, *_a, **_kw):
+        print('DownloadHandlers._close')
     #     for dh in self._handlers.values():
     #         if hasattr(dh, 'close'):
     #             yield dh.close()

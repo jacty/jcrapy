@@ -1,29 +1,29 @@
 """Download handlers for http and https schemes"""
 
-import ipaddress
+# import ipaddress
 import logging
-import re
-import warnings
-from contextlib import suppress
-from io import BytesIO
-from time import time
-from urllib.parse import urldefrag
+# import re
+# import warnings
+# from contextlib import suppress
+# from io import BytesIO
+# from time import time
+# from urllib.parse import urldefrag
 
-from twisted.internet import defer, protocol, ssl
-from twisted.internet.endpoints import TCP4ClientEndpoint
-from twisted.internet.error import TimeoutError
+# from twisted.internet import defer, protocol, ssl
+# from twisted.internet.endpoints import TCP4ClientEndpoint
+# from twisted.internet.error import TimeoutError
 from twisted.web.client import Agent, HTTPConnectionPool, ResponseDone, ResponseFailed, URI
-from twisted.web.http import _DataLoss, PotentialDataLoss
-from twisted.web.http_headers import Headers as TxHeaders
-from twisted.web.iweb import IBodyProducer, UNKNOWN_LENGTH
-from zope.interface import implementer
+# from twisted.web.http import _DataLoss, PotentialDataLoss
+# from twisted.web.http_headers import Headers as TxHeaders
+# from twisted.web.iweb import IBodyProducer, UNKNOWN_LENGTH
+# from zope.interface import implementer
 
-# from scrapy.core.downloader.tls import openssl_methods
+from Jcrapy.core.downloader.tls import openssl_methods
 # from scrapy.core.downloader.webclient import _parse
 # from scrapy.exceptions import ScrapyDeprecationWarning
 # from scrapy.http import Headers
 # from scrapy.responsetypes import responsetypes
-# from scrapy.utils.misc import create_instance, load_object
+from Jcrapy.utils.misc import create_instance, load_object
 # from scrapy.utils.python import to_bytes, to_unicode
 
 
@@ -34,43 +34,43 @@ class HTTP11DownloadHandler:
     lazy = False
 
     def __init__(self, settings, crawler=None):
-        print('HTTP11DownloadHandler.__init__')
- #        from twisted.internet import reactor
- #        self._pool = HTTPConnectionPool(reactor, persistent=True)
- #        self._pool.maxPersistentPerHost = settings.getint('CONCURRENT_REQUESTS_PER_DOMAIN')
- #        self._pool._factory.noisy = False
+        from twisted.internet import reactor
+        self._pool = HTTPConnectionPool(reactor, persistent=True)
+        self._pool.maxPersistentPerHost = settings.getint('CONCURRENT_REQUESTS_PER_DOMAIN')
+        self._pool._factory.noisy = False
 
- #        self._sslMethod = openssl_methods[settings.get('DOWNLOADER_CLIENT_TLS_METHOD')]
- #        self._contextFactoryClass = load_object(settings['DOWNLOADER_CLIENTCONTEXTFACTORY'])
- #        # try method-aware context factory
- #        try:
- #            self._contextFactory = create_instance(
- #                objcls=self._contextFactoryClass,
- #                settings=settings,
- #                crawler=crawler,
- #                method=self._sslMethod,
- #            )
- #        except TypeError:
- #            # use context factory defaults
- #            self._contextFactory = create_instance(
- #                objcls=self._contextFactoryClass,
- #                settings=settings,
- #                crawler=crawler,
- #            )
- #            msg = """
+        self._sslMethod = openssl_methods[settings.get('DOWNLOADER_CLIENT_TLS_METHOD')]
+        self._contextFactoryClass = load_object(settings['DOWNLOADER_CLIENTCONTEXTFACTORY'])
+        # try method-aware context factory
+        try:
+            self._contextFactory = create_instance(
+                objcls=self._contextFactoryClass,
+                settings=settings,
+                crawler=crawler,
+                method=self._sslMethod,
+            )
+        except TypeError:
+            # use context factory defaults
+            self._contextFactory = create_instance(
+                objcls=self._contextFactoryClass,
+                settings=settings,
+                crawler=crawler,
+            )
+            msg = """
  # '%s' does not accept `method` argument (type OpenSSL.SSL method,\
  # e.g. OpenSSL.SSL.SSLv23_METHOD) and/or `tls_verbose_logging` argument and/or `tls_ciphers` argument.\
  # Please upgrade your context factory class to handle them or ignore them.""" % (
- #                settings['DOWNLOADER_CLIENTCONTEXTFACTORY'],)
- #            warnings.warn(msg)
- #        self._default_maxsize = settings.getint('DOWNLOAD_MAXSIZE')
- #        self._default_warnsize = settings.getint('DOWNLOAD_WARNSIZE')
- #        self._fail_on_dataloss = settings.getbool('DOWNLOAD_FAIL_ON_DATALOSS')
- #        self._disconnect_timeout = 1
+                settings['DOWNLOADER_CLIENTCONTEXTFACTORY'],)
+            warnings.warn(msg)
 
-    # @classmethod
-    # def from_crawler(cls, crawler):
-    #     return cls(crawler.settings, crawler)
+        self._default_maxsize = settings.getint('DOWNLOAD_MAXSIZE')
+        self._default_warnsize = settings.getint('DOWNLOAD_WARNSIZE')
+        self._fail_on_dataloss = settings.getbool('DOWNLOAD_FAIL_ON_DATALOSS')
+        self._disconnect_timeout = 1
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        return cls(crawler.settings, crawler)
 
     # def download_request(self, request, spider):
     #     """Return a deferred for the HTTP download"""

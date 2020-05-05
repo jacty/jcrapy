@@ -96,8 +96,6 @@ def execute(argv=None, settings=None):
     _run_print_help(parser, cmd.process_options, args, opts)
     cmd.crawler_process = CrawlerProcess(settings)
     _run_print_help(parser, _run_command, cmd, args, opts)
-    print('execute')
-    return
     sys.exit(cmd.exitcode)
 
 def _run_command(cmd, args, opts):

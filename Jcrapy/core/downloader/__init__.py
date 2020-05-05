@@ -1,22 +1,24 @@
 # import random
-# from time import time
+from time import time
 # from datetime import datetime
 # from collections import deque
 
-# from twisted.internet import defer, task
+from twisted.internet import defer, task
 
 # from scrapy.utils.defer import mustbe_deferred
 # from scrapy.utils.httpobj import urlparse_cached
 # from scrapy.resolver import dnscache
 # from scrapy import signals
-# from scrapy.core.downloader.middleware import DownloaderMiddlewareManager
-from jcrapy.core.downloader.handlers import DownloadHandlers
+from Jcrapy.core.downloader.middleware import DownloaderMiddlewareManager
+from Jcrapy.core.downloader.handlers import DownloadHandlers
 
 
 class Slot:
     """Downloader slot"""
 
     def __init__(self, concurrency, delay, randomize_delay):
+        print('Slot.__init__')
+        return
         self.concurrency = concurrency
         self.delay = delay
         self.randomize_delay = randomize_delay
@@ -28,23 +30,33 @@ class Slot:
         self.latercall = None
 
     def free_transfer_slots(self):
+        print('Slot.free_transfer_slots')
+        return
         return self.concurrency - len(self.transferring)
 
     def download_delay(self):
+        print('Slot.download_delay')
+        return        
         if self.randomize_delay:
             return random.uniform(0.5 * self.delay, 1.5 * self.delay)
         return self.delay
 
     def close(self):
+        print('Slot.close')
+        return        
         if self.latercall and self.latercall.active():
             self.latercall.cancel()
 
     def __repr__(self):
+        print('Slot.__repr__')
+        return
         cls_name = self.__class__.__name__
         return "%s(concurrency=%r, delay=%0.2f, randomize_delay=%r)" % (
             cls_name, self.concurrency, self.delay, self.randomize_delay)
 
     def __str__(self):
+        print('Slot.__str__')
+        return        
         return (
             "<downloader.Slot concurrency=%r delay=%0.2f randomize_delay=%r "
             "len(active)=%d len(queue)=%d len(transferring)=%d lastseen=%s>" % (
@@ -56,6 +68,8 @@ class Slot:
 
 
 def _get_concurrency_delay(concurrency, spider, settings):
+    print('_get_concurrency_delay')
+    return      
     delay = settings.getfloat('DOWNLOAD_DELAY')
     if hasattr(spider, 'download_delay'):
         delay = spider.download_delay
@@ -76,14 +90,13 @@ class Downloader:
         self.slots = {}
         self.active = set()
         self.handlers = DownloadHandlers(crawler)
-        print('Downloader.__init__', crawler)
-        # self.total_concurrency = self.settings.getint('CONCURRENT_REQUESTS')
-        # self.domain_concurrency = self.settings.getint('CONCURRENT_REQUESTS_PER_DOMAIN')
-        # self.ip_concurrency = self.settings.getint('CONCURRENT_REQUESTS_PER_IP')
-        # self.randomize_delay = self.settings.getbool('RANDOMIZE_DOWNLOAD_DELAY')
+        self.total_concurrency = self.settings.getint('CONCURRENT_REQUESTS')
+        self.domain_concurrency = self.settings.getint('CONCURRENT_REQUESTS_PER_DOMAIN')
+        self.ip_concurrency = self.settings.getint('CONCURRENT_REQUESTS_PER_IP')
+        self.randomize_delay = self.settings.getbool('RANDOMIZE_DOWNLOAD_DELAY')
         # self.middleware = DownloaderMiddlewareManager.from_crawler(crawler)
-        # self._slot_gc_loop = task.LoopingCall(self._slot_gc)
-        # self._slot_gc_loop.start(60)
+        self._slot_gc_loop = task.LoopingCall(self._slot_gc)
+        self._slot_gc_loop.start(60)
 
     # def fetch(self, request, spider):
     #     def _deactivate(response):
@@ -195,8 +208,9 @@ class Downloader:
     #     for slot in self.slots.values():
     #         slot.close()
 
-    # def _slot_gc(self, age=60):
-    #     mintime = time() - age
-    #     for key, slot in list(self.slots.items()):
+    def _slot_gc(self, age=60):
+        mintime = time() - age
+        for key, slot in list(self.slots.items()):
+            print('_slot_gc',key, slot)
     #         if not slot.active and slot.lastseen + slot.delay < mintime:
     #             self.slots.pop(key).close()

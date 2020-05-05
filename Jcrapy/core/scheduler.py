@@ -42,6 +42,7 @@ class Scheduler:
     def __init__(self, dupefilter, jobdir=None, dqclass=None, mqclass=None,
                  logunser=False, stats=None, pqclass=None, crawler=None):
         print('scheduler.__init__')
+        return
         self.df = dupefilter
         self.dqdir = self._dqdir(jobdir)
         self.pqclass = pqclass

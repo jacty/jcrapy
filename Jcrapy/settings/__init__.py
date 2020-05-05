@@ -120,11 +120,21 @@ class BaseSettings(MutableMapping):
             raise ValueError("Supported values for boolean settings "
                              "are 0/1, True/False, '0'/'1', "
                              "'True'/'False' and 'true'/'false'")
-    def getinit(self, name, default=0):
-        print('BaseSettings.getint')
+    def getint(self, name, default=0):
+        """
+        Get a setting value as an int.
+
+        :param name: the setting name
+        :type name: string
+
+        :param default: the value to return if no setting is found
+        :type default: any
+        """
+        
+        return int(self.get(name, default))
 
     def getfloat(self, name, default=0.0):
-        print('BaseSettings.getfloat')  
+        return float(self.get(name, default))
 
     def getlist(self, name, default=None):
         """
@@ -156,7 +166,7 @@ class BaseSettings(MutableMapping):
         :param name: name of the dictionary-like setting
         :type name: string
         """
-        print('BaseSettings.getwithbase')
+
         compbs = BaseSettings()
         compbs.update(self[name + '_BASE'])
         compbs.update(self[name])
@@ -170,7 +180,7 @@ class BaseSettings(MutableMapping):
         :param name: the setting name
         :type name: string
         """
-        print('BaseSettings.getpriority')
+        
         if name not in self:
             return None
         return self.attributes[name].priority
@@ -259,10 +269,9 @@ class BaseSettings(MutableMapping):
         """
         self._assert_mutability()
         if isinstance(values, str):
-            print('BaseSettings.update')
+            print('BaseSettings.update', values)
         if values is not None:
             if isinstance(values, BaseSettings):
-                print('BaseSettings.update')
                 for name, value in values.items():
                     self.set(name, value, values.getpriority(name))
             else:
@@ -343,6 +352,7 @@ class Settings(BaseSettings):
                 self.set(name, BaseSettings(val, 'default'), 'default')
 
         self.update(values, priority)
+
 
 def iter_default_settings():
     """Return the default settings as an iterator of (name, value) tuples"""

@@ -27,7 +27,7 @@ from Jcrapy.utils.log import(
     install_jcrapy_root_handler,
     LogCounterHandler,
 )
-from Jcrapy.utils.misc import load_object
+from Jcrapy.utils.misc import create_instance,load_object
 from Jcrapy.utils.ossignal import install_shutdown_handlers
 
 logger = logging.getLogger(__name__)
@@ -77,16 +77,29 @@ class Crawler:
         if self.crawling:
             raise RuntimeError('Crawling already taking place')
         self.crawling = True
-        #try:
+        
+        # try:
         self.spider = self._create_spider(*args, **kwargs)
         self.engine = self._create_engine()
-        print('Crawler.crawl')
+        # start_requests = iter(self.spider.start_requests())
+        #yield self.engine.open_spider(self.spider, start_requests)
+        #yield defer.maybeDefered(self.engine.start)
+        # except Exception:
+        #     self.crawling = False
+        #     if self.engine is not None:
+        #         yield self.engine.close()
+        #     raise
+        print('Crawler.crawl', self.spider.start_requests())
 
     def _create_spider(self, *args, **kwargs):
         return self.spidercls.from_crawler(self, *args, **kwargs)
 
     def _create_engine(self):
         return ExecutionEngine(self, lambda _: self.stop())
+
+    # @defer.inlineCallbacks
+    def stop(self):
+        print('Crawler.stop')
 
      
 class CrawlerRunner:
@@ -169,9 +182,10 @@ class CrawlerRunner:
         return self._crawl(crawler, *args, **kwargs)
 
     def _crawl(self, crawler, *args, **kwargs):
+
         self.crawlers.add(crawler)
         d = crawler.crawl(*args, **kwargs)
-        print('CrawlerRunner._crawl', crawler)
+        print('CrawlerRunner._crawl')
         # def _done(result):
         #     print('CrawlerRunner._crawl._done')
 
@@ -248,7 +262,21 @@ class CrawlerProcess(CrawlerRunner):
         print('CrawlerProcess._signal_kill')
 
     def start(self, stop_after_crawl=True):
-        print('CrawlerProcess.start')
+        """
+        This method starts a :mod:`~twisted.internet.reactor`, adjusts its pool
+        size to :setting:`REACTOR_THREADPOOL_MAXSIZE`, and installs a DNS cache
+        based on :setting:`DNSCACHE_ENABLED` and :setting:`DNSCACHE_SIZE`.
+
+        If ``stop_after_crawl`` is True, the reactor will be stopped after all
+        crawlers have finished, using :meth:`join`.
+
+        :param boolean stop_after_crawl: stop or not the reactor when all
+            crawlers have finished
+        """
+        from twisted.internet import reactor
+        resolver_class = load_object(self.settings["DNS_RESOLVER"])
+        resolver = create_instance(resolver_class,self.settings, self, reactor=reactor)
+        resolver.install_on_reactor()
 
     def _graceful_stop_reactor(self):
         print('CrawlerProcess._graceful_stop_reactor')

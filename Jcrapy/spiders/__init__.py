@@ -7,11 +7,9 @@ See documentation in docs/topics/spiders.rst
 # import warnings
 
 from Jcrapy import signals
-# from scrapy.http import Request
+from Jcrapy.http import Request
 from Jcrapy.utils.trackref import object_ref
 # from scrapy.utils.url import url_is_from_spider
-# from scrapy.utils.deprecate import method_is_overridden
-
 
 class Spider(object_ref):
     """Base class for scrapy spiders. All spiders must inherit from this
@@ -55,36 +53,17 @@ class Spider(object_ref):
         self.settings = crawler.settings
         crawler.signals.connect(self.close, signals.spider_closed)
 
-#     def start_requests(self):
-#         cls = self.__class__
-#         if not self.start_urls and hasattr(self, 'start_url'):
-#             raise AttributeError(
-#                 "Crawling could not start: 'start_urls' not found "
-#                 "or empty (but found 'start_url' attribute instead, "
-#                 "did you miss an 's'?)")
-#         if method_is_overridden(cls, Spider, 'make_requests_from_url'):
-#             warnings.warn(
-#                 "Spider.make_requests_from_url method is deprecated; it "
-#                 "won't be called in future Scrapy releases. Please "
-#                 "override Spider.start_requests method instead (see %s.%s)." % (
-#                     cls.__module__, cls.__name__
-#                 ),
-#             )
-#             for url in self.start_urls:
-#                 yield self.make_requests_from_url(url)
-#         else:
-#             for url in self.start_urls:
-#                 yield Request(url, dont_filter=True)
+    def start_requests(self):
 
-#     def make_requests_from_url(self, url):
-#         """ This method is deprecated. """
-#         warnings.warn(
-#             "Spider.make_requests_from_url method is deprecated: "
-#             "it will be removed and not be called by the default "
-#             "Spider.start_requests method in future Scrapy releases. "
-#             "Please override Spider.start_requests method instead."
-#         )
-#         return Request(url, dont_filter=True)
+        cls = self.__class__
+        if not self.start_urls and hasattr(self, 'start_url'):
+            raise AttributeError(
+                "Crawling could not start: 'start_urls' not found "
+                "or empty (but found 'start_url' attribute instead, "
+                "did you miss an 's'?)")
+
+        for url in self.start_urls:
+            yield Request(url, dont_filter=True)
 
 #     def parse(self, response):
 #         raise NotImplementedError('{}.parse callback is not defined'.format(self.__class__.__name__))

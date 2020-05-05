@@ -56,8 +56,6 @@ logger = logging.getLogger(__name__)
 class ExecutionEngine:
 
     def __init__(self, crawler, spider_closed_callback):
-        print('ExecutionEngine.__init__')
-        return
         self.crawler = crawler
         self.settings = crawler.settings
         self.signals = crawler.signals
@@ -66,12 +64,12 @@ class ExecutionEngine:
         self.spider = None
         self.running = False
         self.paused = False
-        self.scheduler_cls = load_object(self.settings['SCHEDULER'])
-        downloader_cls = load_object(self.settings['DOWNLOADER'])
-        self.downloader = downloader_cls(crawler)
+        # self.scheduler_cls = load_object(self.settings['SCHEDULER'])
+        # downloader_cls = load_object(self.settings['DOWNLOADER'])
+        # self.downloader = downloader_cls(crawler)
         # self.scraper = Scraper(crawler)
         # self._spider_closed_callback = spider_closed_callback
-        print('ExecutionEngine.__init__', crawler)
+
     # @defer.inlineCallbacks
     def start(self):
         """Start the execution engine"""

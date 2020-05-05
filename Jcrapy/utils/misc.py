@@ -47,13 +47,14 @@ def walk_modules(path):
     return mods
 
 def create_instance(objcls, settings, crawler, *args, **kwargs):
-    print('create_instance')
-    # if settings is None:
-    #     if crawler is None:
-    #         raise ValueError("Specify at least one of settings and crawler.")
-    #     settings = crawler.settings
-    # if crawler and hasattr(objcls, 'from_crawler'):
-    #     return objcls.from_crawler(crawler, *args, **kwargs)
+    if settings is None:
+        if crawler is None:
+            raise ValueError("Specify at least one of settings and crawler.")
+        settings = crawler.settings
+    if crawler and hasattr(objcls, 'from_crawler'):
+        return objcls.from_crawler(crawler, *args, **kwargs)
+    else:
+        print('Error in misc.py')
     # elif hasattr(objcls, 'from_settings'):
     #     return objcls.from_settings(settings, *args, **kwargs)
     # else:

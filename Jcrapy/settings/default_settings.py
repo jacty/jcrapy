@@ -1,10 +1,10 @@
 """
-This module contains the default values for all settings used by Scrapy.
+This module contains the default values for all settings used by Jcrapy.
 
 For more information about these settings you can read the settings
 documentation in docs/topics/settings.rst
 
-Scrapy developers, if you add a setting here remember to:
+ If you add a setting here remember to:
 
 * add it in alphabetical order
 * group similar settings without leaving blank lines
@@ -38,9 +38,9 @@ COMMANDS_MODULE = ''
 
 # CONCURRENT_ITEMS = 100
 
-# CONCURRENT_REQUESTS = 16
-# CONCURRENT_REQUESTS_PER_DOMAIN = 8
-# CONCURRENT_REQUESTS_PER_IP = 0
+CONCURRENT_REQUESTS = 16
+CONCURRENT_REQUESTS_PER_DOMAIN = 8
+CONCURRENT_REQUESTS_PER_IP = 0
 
 # COOKIES_ENABLED = True
 # COOKIES_DEBUG = False
@@ -56,38 +56,38 @@ DEFAULT_REQUEST_HEADERS = {
 # DEPTH_STATS_VERBOSE = False
 # DEPTH_PRIORITY = 0
 
-# DNSCACHE_ENABLED = True
-# DNSCACHE_SIZE = 10000
-# DNS_RESOLVER = 'scrapy.resolver.CachingThreadedResolver'
-# DNS_TIMEOUT = 60
+DNSCACHE_ENABLED = True
+DNSCACHE_SIZE = 10000
+DNS_RESOLVER = 'Jcrapy.resolver.CachingThreadedResolver'
+DNS_TIMEOUT = 60
 
 # DOWNLOAD_DELAY = 0
 
-# DOWNLOAD_HANDLERS = {}
-# DOWNLOAD_HANDLERS_BASE = {
+DOWNLOAD_HANDLERS = {}
+DOWNLOAD_HANDLERS_BASE = {
     #'data': 'jcrapy.core.downloader.handlers.datauri.DataURIDownloadHandler',
-    # 'file': 'jcrapy.core.downloader.handlers.file.FileDownloadHandler',
-    # 'http': 'jcrapy.core.downloader.handlers.http.HTTPDownloadHandler',
-    # 'https': 'jcrapy.core.downloader.handlers.http.HTTPDownloadHandler',
-    # 's3': 'jcrapy.core.downloader.handlers.s3.S3DownloadHandler',
-    # 'ftp': 'jcrapy.core.downloader.handlers.ftp.FTPDownloadHandler',
-# }
+    #'file': 'jcrapy.core.downloader.handlers.file.FileDownloadHandler',
+    'http': 'Jcrapy.core.downloader.handlers.http.HTTPDownloadHandler',
+    #'https': 'jcrapy.core.downloader.handlers.http.HTTPDownloadHandler',
+    #'s3': 'jcrapy.core.downloader.handlers.s3.S3DownloadHandler',
+    #'ftp': 'jcrapy.core.downloader.handlers.ftp.FTPDownloadHandler',
+}
 
 # DOWNLOAD_TIMEOUT = 180      # 3mins
 
-# DOWNLOAD_MAXSIZE = 1024 * 1024 * 1024   # 1024m
-# DOWNLOAD_WARNSIZE = 32 * 1024 * 1024    # 32m
+DOWNLOAD_MAXSIZE = 1024 * 1024 * 1024   # 1024m
+DOWNLOAD_WARNSIZE = 32 * 1024 * 1024    # 32m
 
-# DOWNLOAD_FAIL_ON_DATALOSS = True
+DOWNLOAD_FAIL_ON_DATALOSS = True
 
-# DOWNLOADER = 'jcrapy.core.downloader.Downloader'
+DOWNLOADER = 'Jcrapy.core.downloader.Downloader'
 
 # DOWNLOADER_HTTPCLIENTFACTORY = 'scrapy.core.downloader.webclient.ScrapyHTTPClientFactory'
-# DOWNLOADER_CLIENTCONTEXTFACTORY = 'scrapy.core.downloader.contextfactory.ScrapyClientContextFactory'
-# DOWNLOADER_CLIENT_TLS_CIPHERS = 'DEFAULT'
-# # Use highest TLS/SSL protocol version supported by the platform, also allowing negotiation:
-# DOWNLOADER_CLIENT_TLS_METHOD = 'TLS'
-# DOWNLOADER_CLIENT_TLS_VERBOSE_LOGGING = False
+DOWNLOADER_CLIENTCONTEXTFACTORY = 'Jcrapy.core.downloader.contextfactory.JcrapyClientContextFactory'
+DOWNLOADER_CLIENT_TLS_CIPHERS = 'DEFAULT'
+# Use highest TLS/SSL protocol version supported by the platform, also allowing negotiation:
+DOWNLOADER_CLIENT_TLS_METHOD = 'TLS'
+DOWNLOADER_CLIENT_TLS_VERBOSE_LOGGING = False
 
 # DOWNLOADER_MIDDLEWARES = {}
 
@@ -227,7 +227,7 @@ LOG_SHORT_NAMES = False
 
 # NEWSPIDER_MODULE = ''
 
-# RANDOMIZE_DOWNLOAD_DELAY = True
+RANDOMIZE_DOWNLOAD_DELAY = True
 
 # REACTOR_THREADPOOL_MAXSIZE = 10
 
@@ -247,7 +247,7 @@ LOG_SHORT_NAMES = False
 # ROBOTSTXT_PARSER = 'scrapy.robotstxt.ProtegoRobotParser'
 # ROBOTSTXT_USER_AGENT = None
 
-# SCHEDULER = 'jcrapy.core.scheduler.Scheduler'
+SCHEDULER = 'Jcrapy.core.scheduler.Scheduler'
 # SCHEDULER_DISK_QUEUE = 'scrapy.squeues.PickleLifoDiskQueue'
 # SCHEDULER_MEMORY_QUEUE = 'scrapy.squeues.LifoMemoryQueue'
 # SCHEDULER_PRIORITY_QUEUE = 'scrapy.pqueues.ScrapyPriorityQueue'
