@@ -1,12 +1,7 @@
-
-def execute(argv=None, settings=None):
-    print('execute')
-    return
-    # if argv is None:
-    #     argv = sys.argv
-
-    # if settings is None:
-    #     settings = get_project_settings()
+import sys
+def execute():
+    argv = sys.argv
+    settings = get_project_settings()
  
     # inproject = inside_project()
     # _print_header(settings, inproject)
@@ -32,10 +27,4 @@ def execute(argv=None, settings=None):
 
 
 if __name__ == '__main__':
-    try:
-        print('cmdline.__main__')
-        execute()
-    finally:
-        # Twisted prints errors in DebugInfo.__del__, but PyPy does not run gc.collect()
-        # on exit: http://doc.pypy.org/en/latest/cpython_differences.html?highlight=gc.collect#differences-related-to-garbage-collection-strategies
-        garbage_collect()
+    execute()
