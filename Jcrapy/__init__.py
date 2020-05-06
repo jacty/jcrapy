@@ -8,4 +8,3 @@ twisted_version = (_txv.major, _txv.minor, _txv.micro)
 # Declare top-level shortcuts
 # from Jcrapy.spiders import Spider
 
-
