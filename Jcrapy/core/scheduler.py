@@ -9,14 +9,14 @@ from queuelib import PriorityQueue
 # from jcrapy.utils.misc import load_object, create_instance
 # from jcrapy.utils.job import job_dir
 # from jcrapy.utils.deprecate import ScrapyDeprecationWarning
-
+# from scrapy.pqueues import ScrapyPriorityQueue
 
 logger = logging.getLogger(__name__)
 
 
 class Scheduler:
     """
-    Scrapy Scheduler. It allows to enqueue requests and then get
+    Jcrapy Scheduler. It allows to enqueue requests and then get
     a next request to download. Scheduler is also handling duplication
     filtering, via dupefilter.
 
@@ -41,8 +41,7 @@ class Scheduler:
     """
     def __init__(self, dupefilter, jobdir=None, dqclass=None, mqclass=None,
                  logunser=False, stats=None, pqclass=None, crawler=None):
-        print('scheduler.__init__')
-        return
+
         self.df = dupefilter
         self.dqdir = self._dqdir(jobdir)
         self.pqclass = pqclass
@@ -54,31 +53,27 @@ class Scheduler:
 
     @classmethod
     def from_crawler(cls, crawler):
-        settings = crawler.settings
-        print('scheduler.from_crawler')
-        return
-        dupefilter_cls = load_object(settings['DUPEFILTER_CLASS'])
-        dupefilter = create_instance(dupefilter_cls, settings, crawler)
-        pqclass = load_object(settings['SCHEDULER_PRIORITY_QUEUE'])
-        if pqclass is PriorityQueue:
-            warnings.warn("SCHEDULER_PRIORITY_QUEUE='queuelib.PriorityQueue'"
-                          " is no longer supported because of API changes; "
-                          "please use 'scrapy.pqueues.ScrapyPriorityQueue'",
-                          ScrapyDeprecationWarning)
-            from scrapy.pqueues import ScrapyPriorityQueue
-            pqclass = ScrapyPriorityQueue
+        # settings = crawler.settings
+        # dupefilter_cls = load_object(settings['DUPEFILTER_CLASS'])
+        # dupefilter = create_instance(dupefilter_cls, settings, crawler)
+        # pqclass = ScrapyPriorityQueue
 
-        dqclass = load_object(settings['SCHEDULER_DISK_QUEUE'])
-        mqclass = load_object(settings['SCHEDULER_MEMORY_QUEUE'])
-        logunser = settings.getbool('SCHEDULER_DEBUG')
-        return cls(dupefilter, jobdir=job_dir(settings), logunser=logunser,
-                   stats=crawler.stats, pqclass=pqclass, dqclass=dqclass,
-                   mqclass=mqclass, crawler=crawler)
+        # dqclass = load_object(settings['SCHEDULER_DISK_QUEUE'])
+        # mqclass = load_object(settings['SCHEDULER_MEMORY_QUEUE'])
+        # logunser = settings.getbool('SCHEDULER_DEBUG')
+        
+        #debug
+        return cls('', jobdir='', logunser='', stats='', pqclass='', dqclass='', mqclass='', crawler=crawler)
+        
+        # return cls(dupefilter, jobdir=job_dir(settings), logunser=logunser,
+                   # stats=crawler.stats, pqclass=pqclass, dqclass=dqclass,
+                   # mqclass=mqclass, crawler=crawler)
 
     # def has_pending_requests(self):
     #     return len(self) > 0
 
-    # def open(self, spider):
+    def open(self, spider):
+        print('scheduler.open')
     #     self.spider = spider
     #     self.mqs = self._mq()
     #     self.dqs = self._dq() if self.dqdir else None
@@ -166,8 +161,10 @@ class Scheduler:
     #                     {'queuesize': len(q)}, extra={'spider': self.spider})
     #     return q
 
-    # def _dqdir(self, jobdir):
-    #     """ Return a folder name to keep disk queue state at """
+    def _dqdir(self, jobdir):
+        """ Return a folder name to keep disk queue state at """
+        #debug
+        return ""
     #     if jobdir:
     #         dqdir = join(jobdir, 'requests.queue')
     #         if not exists(dqdir):
