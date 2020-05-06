@@ -21,10 +21,10 @@ from Jcrapy.utils.reactor import CallLaterOnce
 logger = logging.getLogger(__name__)
 
 
-# class Slot:
+class Slot:
 
-#     def __init__(self, start_requests, close_if_idle, nextcall, scheduler):
-#         self.closing = False
+    def __init__(self, start_requests, close_if_idle, nextcall, scheduler):
+        self.closing = False
 #         self.inprogress = set()  # requests in progress
 #         self.start_requests = iter(start_requests)
 #         self.close_if_idle = close_if_idle
@@ -264,10 +264,10 @@ class ExecutionEngine:
         nextcall = CallLaterOnce(self._next_request, spider)
         scheduler = self.scheduler_cls.from_crawler(self.crawler)
         start_requests = yield self.scraper.spidermw.process_start_requests(start_requests, spider)
-        # slot = Slot(start_requests, close_if_idle, nextcall, scheduler)
-    #     self.slot = slot
-    #     self.spider = spider
-    #     yield scheduler.open(spider)
+        slot = Slot(start_requests, close_if_idle, nextcall, scheduler)
+        self.slot = slot
+        self.spider = spider
+        yield scheduler.open(spider)
     #     yield self.scraper.open_spider(spider)
     #     self.crawler.stats.open_spider(spider)
     #     yield self.signals.send_catch_log_deferred(signals.spider_opened, spider=spider)
