@@ -54,7 +54,7 @@ def create_instance(objcls, settings, crawler, *args, **kwargs):
     if crawler and hasattr(objcls, 'from_crawler'):
         return objcls.from_crawler(crawler, *args, **kwargs)
     else:
-        print('Error in misc.py')
+        print('Error in misc.py', objcls)
     # elif hasattr(objcls, 'from_settings'):
     #     return objcls.from_settings(settings, *args, **kwargs)
     # else:

@@ -11,11 +11,11 @@ from twisted.internet import defer, task
 from twisted.python.failure import Failure
 
 from Jcrapy import signals
-# from scrapy.core.scraper import Scraper
+from Jcrapy.core.scraper import Scraper
 from Jcrapy.exceptions import DontCloseSpider
 # from scrapy.http import Response, Request
 from Jcrapy.utils.misc import load_object
-# from scrapy.utils.reactor import CallLaterOnce
+from Jcrapy.utils.reactor import CallLaterOnce
 # from scrapy.utils.log import logformatter_adapter, failure_to_exc_info
 
 logger = logging.getLogger(__name__)
@@ -64,10 +64,10 @@ class ExecutionEngine:
         self.spider = None
         self.running = False
         self.paused = False
-        # self.scheduler_cls = load_object(self.settings['SCHEDULER'])
+        self.scheduler_cls = load_object(self.settings['SCHEDULER'])
         # downloader_cls = load_object(self.settings['DOWNLOADER'])
         # self.downloader = downloader_cls(crawler)
-        # self.scraper = Scraper(crawler)
+        self.scraper = Scraper(crawler)
         # self._spider_closed_callback = spider_closed_callback
 
     # @defer.inlineCallbacks
@@ -113,7 +113,8 @@ class ExecutionEngine:
     #     """Resume the execution engine"""
     #     self.paused = False
 
-    # def _next_request(self, spider):
+    def _next_request(self, spider):
+        print('_next_request')
     #     slot = self.slot
     #     if not slot:
     #         return
@@ -199,13 +200,14 @@ class ExecutionEngine:
 
     #     return True
 
-    # @property
-    # def open_spiders(self):
+    @property
+    def open_spiders(self):
+        print('open_spiders')
     #     return [self.spider] if self.spider else []
 
-    # def has_capacity(self):
-    #     """Does the engine have capacity to handle more spiders"""
-    #     return not bool(self.slot)
+    def has_capacity(self):
+        """Does the engine have capacity to handle more spiders"""
+        return not bool(self.slot)
 
     # def crawl(self, request, spider):
     #     assert spider in self.open_spiders, \
@@ -254,15 +256,15 @@ class ExecutionEngine:
     #     dwld.addBoth(_on_complete)
     #     return dwld
 
-    # @defer.inlineCallbacks
-    # def open_spider(self, spider, start_requests=(), close_if_idle=True):
-    #     assert self.has_capacity(), "No free spider slot when opening %r" % \
-    #         spider.name
-    #     logger.info("Spider opened", extra={'spider': spider})
-    #     nextcall = CallLaterOnce(self._next_request, spider)
-    #     scheduler = self.scheduler_cls.from_crawler(self.crawler)
-    #     start_requests = yield self.scraper.spidermw.process_start_requests(start_requests, spider)
-    #     slot = Slot(start_requests, close_if_idle, nextcall, scheduler)
+    @defer.inlineCallbacks
+    def open_spider(self, spider, start_requests=(), close_if_idle=True):
+        assert self.has_capacity(), "No free spider slot when opening %r" % \
+            spider.name
+        logger.info("Spider opened", extra={'spider': spider})
+        nextcall = CallLaterOnce(self._next_request, spider)
+        scheduler = self.scheduler_cls.from_crawler(self.crawler)
+        start_requests = yield self.scraper.spidermw.process_start_requests(start_requests, spider)
+        # slot = Slot(start_requests, close_if_idle, nextcall, scheduler)
     #     self.slot = slot
     #     self.spider = spider
     #     yield scheduler.open(spider)
@@ -271,7 +273,7 @@ class ExecutionEngine:
     #     yield self.signals.send_catch_log_deferred(signals.spider_opened, spider=spider)
     #     slot.nextcall.schedule()
     #     slot.heartbeat.start(5)
-
+        print('open_spider', scheduler)
     # def _spider_idle(self, spider):
     #     """Called when a spider gets idle. This function is called when there
     #     are no remaining pages to download or schedule. It can be called

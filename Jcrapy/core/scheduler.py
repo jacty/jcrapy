@@ -52,26 +52,28 @@ class Scheduler:
         self.stats = stats
         self.crawler = crawler
 
-    # @classmethod
-    # def from_crawler(cls, crawler):
-    #     settings = crawler.settings
-    #     dupefilter_cls = load_object(settings['DUPEFILTER_CLASS'])
-    #     dupefilter = create_instance(dupefilter_cls, settings, crawler)
-    #     pqclass = load_object(settings['SCHEDULER_PRIORITY_QUEUE'])
-    #     if pqclass is PriorityQueue:
-    #         warnings.warn("SCHEDULER_PRIORITY_QUEUE='queuelib.PriorityQueue'"
-    #                       " is no longer supported because of API changes; "
-    #                       "please use 'scrapy.pqueues.ScrapyPriorityQueue'",
-    #                       ScrapyDeprecationWarning)
-    #         from scrapy.pqueues import ScrapyPriorityQueue
-    #         pqclass = ScrapyPriorityQueue
+    @classmethod
+    def from_crawler(cls, crawler):
+        settings = crawler.settings
+        print('scheduler.from_crawler')
+        return
+        dupefilter_cls = load_object(settings['DUPEFILTER_CLASS'])
+        dupefilter = create_instance(dupefilter_cls, settings, crawler)
+        pqclass = load_object(settings['SCHEDULER_PRIORITY_QUEUE'])
+        if pqclass is PriorityQueue:
+            warnings.warn("SCHEDULER_PRIORITY_QUEUE='queuelib.PriorityQueue'"
+                          " is no longer supported because of API changes; "
+                          "please use 'scrapy.pqueues.ScrapyPriorityQueue'",
+                          ScrapyDeprecationWarning)
+            from scrapy.pqueues import ScrapyPriorityQueue
+            pqclass = ScrapyPriorityQueue
 
-    #     dqclass = load_object(settings['SCHEDULER_DISK_QUEUE'])
-    #     mqclass = load_object(settings['SCHEDULER_MEMORY_QUEUE'])
-    #     logunser = settings.getbool('SCHEDULER_DEBUG')
-    #     return cls(dupefilter, jobdir=job_dir(settings), logunser=logunser,
-    #                stats=crawler.stats, pqclass=pqclass, dqclass=dqclass,
-    #                mqclass=mqclass, crawler=crawler)
+        dqclass = load_object(settings['SCHEDULER_DISK_QUEUE'])
+        mqclass = load_object(settings['SCHEDULER_MEMORY_QUEUE'])
+        logunser = settings.getbool('SCHEDULER_DEBUG')
+        return cls(dupefilter, jobdir=job_dir(settings), logunser=logunser,
+                   stats=crawler.stats, pqclass=pqclass, dqclass=dqclass,
+                   mqclass=mqclass, crawler=crawler)
 
     # def has_pending_requests(self):
     #     return len(self) > 0

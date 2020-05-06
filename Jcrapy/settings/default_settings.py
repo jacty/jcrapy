@@ -257,17 +257,17 @@ SCHEDULER = 'Jcrapy.core.scheduler.Scheduler'
 SPIDER_LOADER_CLASS = 'Jcrapy.spiderloader.SpiderLoader'
 SPIDER_LOADER_WARN_ONLY = False
 
-# SPIDER_MIDDLEWARES = {}
+SPIDER_MIDDLEWARES = {}
 
-# SPIDER_MIDDLEWARES_BASE = {
-#     # Engine side
-#     'scrapy.spidermiddlewares.httperror.HttpErrorMiddleware': 50,
+SPIDER_MIDDLEWARES_BASE = {
+    # Engine side
+    'Jcrapy.spidermiddlewares.httperror.HttpErrorMiddleware': 50,
 #     'scrapy.spidermiddlewares.offsite.OffsiteMiddleware': 500,
 #     'scrapy.spidermiddlewares.referer.RefererMiddleware': 700,
 #     'scrapy.spidermiddlewares.urllength.UrlLengthMiddleware': 800,
 #     'scrapy.spidermiddlewares.depth.DepthMiddleware': 900,
 #     # Spider side
-# }
+}
 
 # SPIDER_MODULES = []
 
