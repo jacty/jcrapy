@@ -1,3 +1,4 @@
+import json
 import copy
 
 from collections.abc import MutableMapping
@@ -57,7 +58,6 @@ class BaseSettings(MutableMapping):
             return None
         return self.attributes[opt_name].value
  
-
     def __contains__(self, name):
         return name in self.attributes
 
@@ -72,6 +72,51 @@ class BaseSettings(MutableMapping):
         :type default: any
         """
         return self[name] if self[name] is not None else default        
+
+    def getbool(self, name, default=False):
+        got = self.get(name, default)
+        try:
+            return bool(int(got))
+        except ValueError:
+            if got in ("True", "true"):
+                return True
+            if got in ("False", "false"):
+                return False
+            raise ValueError("Supported values for boolean settings "
+                             "are 0/1, True/False, '0'/'1', "
+                             "'True'/'False' and 'true'/'false'")
+
+    def getint(self, name, default=0):
+        return int(self.get(name, default))
+
+    def getfloat(self, name, default=0.0):
+        return float(self.get(name, default))
+
+    def getlist(self, name, default=None):
+        value = self.get(name, default or [])
+        if isinstance(value, str):
+            value = value.split(',')
+        return list(value)
+    def getdict(self, name, default=None):
+        """
+        Get a setting value as a dictionary. If the setting original type is a
+        dictionary, a copy of it will be returned. If it is a string it will be
+        evaluated as a JSON dictionary. In the case that it is a
+        :class:`~Jcrapy.settings.BaseSettings` instance itself, it will be
+        converted to a dictionary, containing all its current settings values
+        as they would be returned by :meth:`~jcrapy.settings.BaseSettings.get`,
+        and losing all information about priority and mutability.
+
+        :param name: the setting name
+        :type name: string
+
+        :param default: the value to return if no setting is found
+        :type default: any
+        """
+        value = self.get(name, default or {})
+        if isinstance(value, str):
+            value = json.loads(value)# Bug:May raise an error.
+        return dict(value)
 
     def getpriority(self, name):
         """
@@ -115,6 +160,9 @@ class BaseSettings(MutableMapping):
                 self.attributes[name] = SettingsAttribute(value, priority)
         else:
             self.attributes[name].set(value, priority)
+
+    def setdict(self, values, priority='project'):
+        self.update(values, priority)
 
     def setmodule(self, module, priority='project'):
         """
