@@ -97,15 +97,11 @@ class BaseSettings(MutableMapping):
         if isinstance(value, str):
             value = value.split(',')
         return list(value)
+
     def getdict(self, name, default=None):
         """
         Get a setting value as a dictionary. If the setting original type is a
-        dictionary, a copy of it will be returned. If it is a string it will be
-        evaluated as a JSON dictionary. In the case that it is a
-        :class:`~Jcrapy.settings.BaseSettings` instance itself, it will be
-        converted to a dictionary, containing all its current settings values
-        as they would be returned by :meth:`~jcrapy.settings.BaseSettings.get`,
-        and losing all information about priority and mutability.
+        dictionary, a copy of it will be returned.
 
         :param name: the setting name
         :type name: string
@@ -114,8 +110,7 @@ class BaseSettings(MutableMapping):
         :type default: any
         """
         value = self.get(name, default or {})
-        if isinstance(value, str):
-            value = json.loads(value)# Bug:May raise an error.
+
         return dict(value)
 
     def getpriority(self, name):

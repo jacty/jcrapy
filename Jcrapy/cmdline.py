@@ -5,8 +5,8 @@ from utils.project import get_project_settings
 def execute():
     argv = sys.argv
     settings = get_project_settings()
-    print('execute')
     # inproject = inside_project()
+    print('execute',sys.argv)
     # _print_header(settings, inproject)
     # cmds = _get_commands_dict(settings, inproject)
     # cmdname = _pop_command_name(argv)
