@@ -97,6 +97,7 @@ class BaseSettings(MutableMapping):
         if isinstance(value, str):
             value = value.split(',')
         return list(value)
+
     def getdict(self, name, default=None):
         """
         Get a setting value as a dictionary. If the setting original type is a
@@ -115,7 +116,7 @@ class BaseSettings(MutableMapping):
         """
         value = self.get(name, default or {})
         if isinstance(value, str):
-            value = json.loads(value)# Bug:May raise an error.
+            value = json.loads(value)
         return dict(value)
 
     def getpriority(self, name):
