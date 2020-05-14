@@ -1,12 +1,12 @@
 import sys
 
-from utils.project import get_project_settings
+from utils.project import inside_project, get_project_settings
 
 def execute():
     argv = sys.argv
     settings = get_project_settings()
-    # inproject = inside_project()
-    print('execute',sys.argv)
+    inproject = inside_project()
+    print('execute', inproject)
     # _print_header(settings, inproject)
     # cmds = _get_commands_dict(settings, inproject)
     # cmdname = _pop_command_name(argv)

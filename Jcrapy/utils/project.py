@@ -1,8 +1,24 @@
 import os
+import warnings
+
+from importlib import import_module
 
 from utils.const import ENVVAR
-from utils.conf import init_env
+from utils.conf import init_env, closest_jcrapy_cfg
 from settings import Settings
+
+def inside_project():
+    jcrapy_module = os.environ.get(ENVVAR)
+    if jcrapy_module is not None:
+        try:
+            import_module(jcrapy_module)
+        except ImportError as exc:
+            warnings.warn("Cannot import jcrapy settings module %s: %s" % (jcrapy_module, exc))
+        else:
+            return True
+            
+    return bool(closest_jcrapy_cfg())
+
 
 def get_project_settings():
     if ENVVAR not in os.environ:
