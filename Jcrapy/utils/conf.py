@@ -1,7 +1,7 @@
 import os
 import sys
 from configparser import ConfigParser
-
+from .const import ENVVAR
 def closest_jcrapy_cfg(path='.', prevpath=None):
     """Return the path to the closest Jcrapy.cfg file by traversing the current
     directory and its parents
@@ -32,7 +32,7 @@ def init_env(project='default', set_syspath=True, use_closest=True):
         cfg = get_config()
 
     if cfg.has_option('settings', project):
-        os.environ['JCRAPY_SETTINGS_MODULE'] = cfg.get('settings', project)
+        os.environ[ENVVAR] = cfg.get('settings', project)
     
 
 def get_config(closest=None):
