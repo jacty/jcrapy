@@ -1,13 +1,20 @@
 import sys
 
+import Jcrapy
 from utils.project import inside_project, get_project_settings
+
+def _print_header(settings, inproject):
+    if inproject:
+        print('-'*20 + " Jcrapy %s - project: %s " % (Jcrapy.__version__,settings['BOT_NAME'])+'-'*20)
+    else:
+        print('-'*20 + " Jcrapy %s - no active project " % Jcrapy.__version__ + '-'*20)
 
 def execute():
     argv = sys.argv
     settings = get_project_settings()
     inproject = inside_project()
-    print('execute', inproject)
-    # _print_header(settings, inproject)
+    _print_header(settings, inproject)
+    print('execute')
     # cmds = _get_commands_dict(settings, inproject)
     # cmdname = _pop_command_name(argv)
     # parser = optparse.OptionParser(formatter=optparse.TitledHelpFormatter(), conflict_handler='resolve')
