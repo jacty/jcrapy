@@ -1,7 +1,32 @@
 import sys
+import inspect
 
 import Jcrapy
-from utils.project import inside_project, get_project_settings
+from Jcrapy.commands import JcrapyCommand
+from Jcrapy.utils.project import inside_project, get_project_settings
+from Jcrapy.utils.misc import walk_modules
+
+def _iter_command_classes(module_name):
+    for module in walk_modules(module_name):
+        for obj in vars(module).values():
+            if inspect.isclass(obj) and \
+                issubclass(obj, JcrapyCommand) and \
+                obj.__module__ == module.__name__ and \
+                not obj == JcrapyCommand:
+                yield obj
+
+def _get_commands_from_module(module, inproject):
+    d = {}
+    for cmd in _iter_command_classes(module):
+        if inproject or not cmd.requires_project:
+            cmdname = cmd.__module__.split('.')[-1]
+            d[cmdname] = cmd()
+    return d
+
+def _get_commands_dict(settings, inproject):
+    cmds =_get_commands_from_module('Jcrapy.commands', inproject)
+    cmds_module = settings['COMMANDS_MODULE']
+    return cmds
 
 def _print_header(settings, inproject):
     if inproject:
@@ -14,9 +39,9 @@ def execute():
     settings = get_project_settings()
     inproject = inside_project()
     _print_header(settings, inproject)
-    print('execute')
-    # cmds = _get_commands_dict(settings, inproject)
-    # cmdname = _pop_command_name(argv)
+    cmds = _get_commands_dict(settings, inproject)
+    cmdname = _pop_command_name(argv)
+    print('execute', cmds)
     # parser = optparse.OptionParser(formatter=optparse.TitledHelpFormatter(), conflict_handler='resolve')
 
     # cmd = cmds[cmdname]    
@@ -33,6 +58,7 @@ def execute():
     # cmd.crawler_process = CrawlerProcess(settings)
     # _run_print_help(parser, _run_command, cmd, args, opts)
     # sys.exit(cmd.exitcode)
+
 
 
 
