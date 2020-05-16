@@ -1,5 +1,6 @@
 import sys
 import inspect
+import optparse
 
 import Jcrapy
 from Jcrapy.commands import JcrapyCommand
@@ -50,7 +51,11 @@ def execute():
     cmds = _get_commands_dict(settings, inproject)
     cmdname = _pop_command_name(argv)
     print('execute', cmds, cmdname)
-    # parser = optparse.OptionParser(formatter=optparse.TitledHelpFormatter(), conflict_handler='resolve')
+    parser = optparse.OptionParser(formatter=optparse.TitledHelpFormatter(), conflict_handler='resolve')
+
+    #default command
+    if cmdname not in cmds:
+        cmdname = 'crawl'
 
     # cmd = cmds[cmdname]    
 
