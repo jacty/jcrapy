@@ -28,6 +28,14 @@ def _get_commands_dict(settings, inproject):
     cmds_module = settings['COMMANDS_MODULE']
     return cmds
 
+def _pop_command_name(argv):
+    i = 0
+    for arg in argv[1:]:
+        if not arg.startswith('-'):
+            del argv[i]
+            return arg
+        i += 1
+
 def _print_header(settings, inproject):
     if inproject:
         print('-'*20 + " Jcrapy %s - project: %s " % (Jcrapy.__version__,settings['BOT_NAME'])+'-'*20)
@@ -41,7 +49,7 @@ def execute():
     _print_header(settings, inproject)
     cmds = _get_commands_dict(settings, inproject)
     cmdname = _pop_command_name(argv)
-    print('execute', cmds)
+    print('execute', cmds, cmdname)
     # parser = optparse.OptionParser(formatter=optparse.TitledHelpFormatter(), conflict_handler='resolve')
 
     # cmd = cmds[cmdname]    
