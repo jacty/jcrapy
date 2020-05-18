@@ -15,3 +15,13 @@ def walk_modules(path):
                 submod = import_module(fullpath)
                 mods.append(submod)
     return mods
+
+def load_object(path):
+
+    dot = path.rindex('.')
+    module, name = path[:dot], path[dot+1:]
+    mod = import_module(module)
+    
+    obj = getattr(mod, name)
+    
+    return obj

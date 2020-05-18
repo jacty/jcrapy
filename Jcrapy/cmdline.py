@@ -3,6 +3,7 @@ import inspect
 import optparse
 
 import Jcrapy
+from Jcrapy.crawler import CrawlerProcess
 from Jcrapy.commands import JcrapyCommand
 from Jcrapy.utils.project import inside_project, get_project_settings
 from Jcrapy.utils.misc import walk_modules
@@ -43,6 +44,7 @@ def _print_header(settings, inproject):
     else:
         print('-'*20 + " Jcrapy %s - no active project " % Jcrapy.__version__ + '-'*20)
 
+
 def execute():
     argv = sys.argv
     settings = get_project_settings()
@@ -50,28 +52,22 @@ def execute():
     _print_header(settings, inproject)
     cmds = _get_commands_dict(settings, inproject)
     cmdname = _pop_command_name(argv)
-    print('execute', cmds, cmdname)
     parser = optparse.OptionParser(formatter=optparse.TitledHelpFormatter(), conflict_handler='resolve')
 
     #default command
     if cmdname not in cmds:
         cmdname = 'crawl'
 
-    # cmd = cmds[cmdname]    
+    cmd = cmds[cmdname]    
+    cmd.settings = settings
+    args = parser.parse_args(args=argv[1:])[1]
 
-    # parser.usage = "Jcrapy %s %s" % (cmdname, cmd.syntax()) ##??
-    # parser.description = cmd.long_desc() ##?? Usage? No usage, should be removed.
-     
-    # settings.update(cmd.default_settings, priority='command')
-    # cmd.settings = settings
-    # cmd.add_options(parser)
-    # opts, args = parser.parse_args(args=argv[1:])
-    # #resolve command options.
-    # _run_print_help(parser, cmd.process_options, args, opts)
-    # cmd.crawler_process = CrawlerProcess(settings)
-    # _run_print_help(parser, _run_command, cmd, args, opts)
-    # sys.exit(cmd.exitcode)
+    cmd.crawler_process = CrawlerProcess(settings)
+    _run_command(cmd, args)
+    sys.exit(0)
 
+def _run_command(cmd, args):
+    cmd.run(args)
 
 
 
