@@ -53,15 +53,10 @@ def execute():
     cmds = _get_commands_dict(settings, inproject)
     cmdname = _pop_command_name(argv)
     parser = optparse.OptionParser(formatter=optparse.TitledHelpFormatter(), conflict_handler='resolve')
-
-    #default command
-    if cmdname not in cmds:
-        cmdname = 'crawl'
-
+    
     cmd = cmds[cmdname]    
     cmd.settings = settings
-    args = parser.parse_args(args=argv[1:])[1]
-
+    args = parser.parse_args(args=argv[1:])[1]    
     cmd.crawler_process = CrawlerProcess(settings)
     _run_command(cmd, args)
     sys.exit(0)
