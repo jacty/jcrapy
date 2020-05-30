@@ -12,5 +12,19 @@ class Spider:
     name = None
     custom_settings = None
 
-    def __init__(self, name=None, **kwargs):
-        print('Spider.__init__')
+    def __init__(self):
+        #get spider name
+        self.name = getattr(self, 'name')
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        spider = cls()
+        spider._set_crawler(crawler)
+        return spider
+
+    def _set_crawler(self,crawler):
+        self.crawler = crawler
+        self.settings = crawler.settings
+        # crawler.signals.connect(self.close, signals.spider_closed)
+
+
