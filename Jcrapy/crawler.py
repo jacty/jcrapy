@@ -1,5 +1,6 @@
 from Jcrapy import Spider
 from Jcrapy.spiderloader import SpiderLoader
+from Jcrapy.core.engine import ExecutionEngine
 from Jcrapy.signalmanager import SignalManager
 
 class Crawler:
@@ -12,6 +13,7 @@ class Crawler:
     def crawl(self, *args):
         #initiate spiderclass from crawler
         self.spider = self.spidercls.from_crawler(self)
+        self.engine = ExecutionEngine(self, lambda _: self.stop())
         print('Crawler.crawl')
         
 
