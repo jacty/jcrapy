@@ -8,6 +8,10 @@ class Crawler:
         self.spidercls = spidercls
         self.settings = settings
         self.signals = SignalManager(self)
+
+    def crawl(self, *args):
+        self.spider = self.spidercls.from_crawler(self)
+        print('Crawler.crawl')
         
 
 class CrawlerRunner:
@@ -22,13 +26,13 @@ class CrawlerRunner:
     accordingly) unless writing scripts that manually handle the crawling
     process. See :ref:`run-from-script` for an example.
     """
-    def _get_spider_loader(self,settings):
-        
+    def _get_spider_loader(self,settings):        
         return SpiderLoader(settings.frozencopy())
 
     def __init__(self, settings=None):
         self.settings = settings
         self.spider_loader = self._get_spider_loader(settings)
+        self._crawlers = set()
         self._handle_twisted_reactor()
 
     def crawl(self, spidername):
@@ -38,9 +42,15 @@ class CrawlerRunner:
         It will call the given Crawler's :meth:`~Crawler.crawl` method, while
         keeping track of it so it can be stopped later.
         
-        """        
+        """               
         spidercls = self.spider_loader.load(spidername)
-        return Crawler(spidercls, self.settings)
+        crawler = Crawler(spidercls, self.settings)
+        return self._crawl(crawler)
+
+    def _crawl(self, crawler):
+        self._crawlers.add(crawler)
+        d = crawler.crawl()
+        print('CrawlerRunner._crawl')
         
     def _handle_twisted_reactor(self):
         pass
