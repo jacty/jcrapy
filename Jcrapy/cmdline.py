@@ -27,7 +27,6 @@ def _get_commands_from_module(module, inproject):
 
 def _get_commands_dict(settings, inproject):
     cmds =_get_commands_from_module('Jcrapy.commands', inproject)
-    cmds_module = settings['COMMANDS_MODULE']
     return cmds
 
 def _pop_command_name(argv):
