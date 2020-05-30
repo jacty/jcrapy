@@ -3,9 +3,9 @@ import warnings
 
 from importlib import import_module
 
-from utils.const import ENVVAR
-from utils.conf import init_env, closest_jcrapy_cfg
-from settings import Settings
+from Jcrapy.utils.const import ENVVAR
+from Jcrapy.utils.conf import init_env, closest_jcrapy_cfg
+from Jcrapy.settings import Settings
 
 def inside_project():
     jcrapy_module = os.environ.get(ENVVAR)

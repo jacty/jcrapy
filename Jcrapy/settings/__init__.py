@@ -3,7 +3,7 @@ import copy
 
 from collections.abc import MutableMapping
 from importlib import import_module
-from settings import default_settings
+from Jcrapy.settings import default_settings
 
 class SettingsAttribute:
 
