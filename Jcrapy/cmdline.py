@@ -57,13 +57,13 @@ def execute():
     
     cmd = cmds[cmdname]    
     cmd.settings = settings
-    args = parser.parse_args(args=argv[1:])[1]    
+    args = parser.parse_args(args=argv[1:])[1]   
+    # Assign CrawlerProcess to Base Class of commands in __init__.py 
     cmd.crawler_process = CrawlerProcess(settings)
-    _run_command(cmd, args)
+    #Invoke CrawlerProcess.crawl() through cmd.run()
+    cmd.run(args)
     sys.exit(0)
 
-def _run_command(cmd, args):
-    cmd.run(args)
 
 
 
