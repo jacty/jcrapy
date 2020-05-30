@@ -1,9 +1,14 @@
+from Jcrapy import Spider
 from Jcrapy.spiderloader import SpiderLoader
+from Jcrapy.signalmanager import SignalManager
 
 class Crawler:
 
     def __init__(self, spidercls, settings=None):
-        pass
+        self.spidercls = spidercls
+        self.settings = settings
+        self.signals = SignalManager(self)
+        
 
 class CrawlerRunner:
     """
