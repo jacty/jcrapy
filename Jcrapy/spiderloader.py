@@ -31,10 +31,6 @@ class SpiderLoader:
                         category=RuntimeWarning,
                     )
         
-    @classmethod
-    def from_settings(cls, settings):
-        return cls(settings)
-
     def load(self, spider_name):
         try:
             return self._spiders[spider_name]

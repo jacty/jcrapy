@@ -1,4 +1,4 @@
-from Jcrapy.utils.misc import load_object
+from Jcrapy.spiderloader import SpiderLoader
 
 class Crawler:
 
@@ -19,9 +19,7 @@ class CrawlerRunner:
     """
     def _get_spider_loader(self,settings):
         
-        loader_cls = load_object('Jcrapy.spiderloader.SpiderLoader')
-
-        return loader_cls.from_settings(settings.frozencopy())
+        return SpiderLoader(settings.frozencopy())
 
     def __init__(self, settings=None):
         self.settings = settings
