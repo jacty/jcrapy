@@ -32,24 +32,10 @@ class CrawlerRunner:
 
         It will call the given Crawler's :meth:`~Crawler.crawl` method, while
         keeping track of it so it can be stopped later.
-
-        If ``crawler_or_spidercls`` isn't a :class:`~scrapy.crawler.Crawler`
-        instance, this method will try to create one using this parameter as
-        the spider class given to it.
-
-        Returns a deferred that is fired when the crawling is finished.
-
-        :param crawler_or_spidercls: already created crawler, or a spider class
-            or spider's name inside the project to create it
-        :type crawler_or_spidercls: :class:`~scrapy.crawler.Crawler` instance,
-            :class:`~scrapy.spiders.Spider` subclass or string
-
-        :param list args: arguments to initialize the spider
-
-        :param dict kwargs: keyword arguments to initialize the spider
+        
         """        
         spidercls = self.spider_loader.load(spidername)
-        return Crawler(spidername, self.settings)
+        return Crawler(spidercls, self.settings)
         
     def _handle_twisted_reactor(self):
         pass
