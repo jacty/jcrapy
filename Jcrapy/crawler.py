@@ -10,6 +10,7 @@ class Crawler:
         self.signals = SignalManager(self)
 
     def crawl(self, *args):
+        #initiate spiderclass from crawler
         self.spider = self.spidercls.from_crawler(self)
         print('Crawler.crawl')
         
@@ -50,7 +51,7 @@ class CrawlerRunner:
     def _crawl(self, crawler):
         self._crawlers.add(crawler)
         d = crawler.crawl()
-        print('CrawlerRunner._crawl')
+        print('CrawlerRunner._crawl',crawler)
         
     def _handle_twisted_reactor(self):
         pass

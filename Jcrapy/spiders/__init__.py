@@ -4,6 +4,7 @@ Base class for Jcrapy spiders
 See documentation in docs/topics/spiders.rst
 """
 
+from Jcrapy import signals
 
 class Spider:
     """Base class for Jcrapy spiders. All spiders must inherit from this
@@ -25,6 +26,10 @@ class Spider:
     def _set_crawler(self,crawler):
         self.crawler = crawler
         self.settings = crawler.settings
-        # crawler.signals.connect(self.close, signals.spider_closed)
+        crawler.signals.connect(self.close, signals.spider_closed)
+
+    @staticmethod
+    def close(spider, reason):
+        print('Spider.close')
 
 
