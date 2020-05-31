@@ -5,11 +5,10 @@
 __all__ = ['__version__']
 
 # Jcrapy version
-import pkgutil
-__version__ = pkgutil.get_data(__package__, 'VERSION').decode('ascii').strip()
+
+__version__ = "1.0.0"
 version_info = tuple(int(v) if v.isdigit() else v
                      for v in __version__.split('.'))
-del pkgutil
 
 from twisted import version as _txv
 twisted_version = (_txv.major, _txv.minor, _txv.micro)
