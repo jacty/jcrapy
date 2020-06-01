@@ -14,6 +14,8 @@ class Crawler:
         #initiate spiderclass from crawler
         self.spider = self.spidercls.from_crawler(self)
         self.engine = ExecutionEngine(self, lambda _: self.stop())
+        start_requests = self.spider.start_requests()
+
         print('Crawler.crawl')
         
 

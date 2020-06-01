@@ -5,6 +5,7 @@ See documentation in docs/topics/spiders.rst
 """
 
 from Jcrapy import signals
+from Jcrapy.https import Request
 
 class Spider:
     """Base class for Jcrapy spiders. All spiders must inherit from this
@@ -27,6 +28,16 @@ class Spider:
         self.crawler = crawler
         self.settings = crawler.settings
         crawler.signals.connect(self.close, signals.spider_closed)
+
+    def start_requests(self):
+        cls = self.__class__
+        if not self.start_urls and hasattr(self, 'start_url'):
+            raise AttributeError(
+                "Crawling could not start: 'start_urls' not found "
+                "or empty (but found 'start_url' attribute instead, "
+                "did you miss an 's'?)")
+        for url in self.start_urls:
+            yield Request(url)
 
     @staticmethod
     def close(spider, reason):
