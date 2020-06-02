@@ -4,11 +4,9 @@ This is the Jcrapy engine which controls the Scheduler, Downloader and Spiders.
 For more information see docs/topics/architecture.rst
 
 """
-import logging
-# from Jcrapy.core.scheduler import Scheduler
-from Jcrapy.utils.reactor import CallLaterOnce
 
-logger = logging.getLogger(__name__)
+from Jcrapy.utils.misc import load_object
+from Jcrapy.utils.reactor import CallLaterOnce
 
 class ExecutionEngine:
 
@@ -16,7 +14,7 @@ class ExecutionEngine:
         self.crawler = crawler
         self._spider_closed_callback = spider_closed_callback
         self.slot = None
-        # self.scheduler_cls=Scheduler
+        self.scheduler_cls=load_object('Jcrapy.core.scheduler.Scheduler')
 
     def _next_request(self, spider):
         slot = self.slot
@@ -30,6 +28,7 @@ class ExecutionEngine:
         if not self.has_capacity():
             raise RuntimeError("No free spider slot when opening %r" % spider.name)
         nextcall = CallLaterOnce(self._next_request, spider)
-        # scheduler = self.scheduler_cls.from_crawler(self.crawler)
-        print('ExecutionEngine.open_spider')  
+        scheduler = self.scheduler_cls.from_crawler(self.crawler)
+        # start_requests = self
+        print('ExecutionEngine.open_spider',self.scheduler_cls)  
               

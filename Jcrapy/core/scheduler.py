@@ -33,4 +33,4 @@ class Scheduler:
         settings = crawler.settings
         dupefilter_cls = load_object('Jcrapy.dupefilters.RFPDupeFilter')
         dupefilter = create_instance(dupefilter_cls, settings, crawler)
-        print('Scheduler.from_crawler')
+        return cls()
