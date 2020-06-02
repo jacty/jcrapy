@@ -297,9 +297,9 @@ class Settings(BaseSettings):
         # dicts, and we want to update, not replace, default dicts with the
         # values given by the user
         super(Settings, self).__init__()
-        if values:
-            self.setmodule(default_settings, 'default')
-        
+
+        if values is None:
+            self.setmodule(default_settings, 'default')        
         self.update(values, priority)
         
 def get_settings_priority(priority):
