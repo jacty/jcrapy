@@ -255,18 +255,6 @@ DEFAULT_REQUEST_HEADERS = {
 # SPIDER_LOADER_CLASS = 'scrapy.spiderloader.SpiderLoader'
 # SPIDER_LOADER_WARN_ONLY = False
 
-# SPIDER_MIDDLEWARES = {}
-
-# SPIDER_MIDDLEWARES_BASE = {
-#     # Engine side
-#     'scrapy.spidermiddlewares.httperror.HttpErrorMiddleware': 50,
-#     'scrapy.spidermiddlewares.offsite.OffsiteMiddleware': 500,
-#     'scrapy.spidermiddlewares.referer.RefererMiddleware': 700,
-#     'scrapy.spidermiddlewares.urllength.UrlLengthMiddleware': 800,
-#     'scrapy.spidermiddlewares.depth.DepthMiddleware': 900,
-#     # Spider side
-# }
-
 # SPIDER_MODULES = []
 
 # STATS_CLASS = 'scrapy.statscollectors.MemoryStatsCollector'

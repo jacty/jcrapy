@@ -26,7 +26,7 @@ class Scheduler:
     Also, it handles dupefilters.
     """
     def __init__(self):
-        print('Scheduler.__init__')
+        pass
 
     @classmethod
     def from_crawler(cls, crawler):
