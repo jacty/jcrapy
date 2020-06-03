@@ -1,6 +1,5 @@
 import sys
 import inspect
-import optparse
 
 import Jcrapy
 from Jcrapy.crawler import CrawlerProcess
@@ -52,11 +51,11 @@ def execute():
     _print_header(settings, inproject)
     cmds = _get_commands_dict(settings, inproject)
     cmdname = _pop_command_name(argv)
-    parser = optparse.OptionParser(formatter=optparse.TitledHelpFormatter(), conflict_handler='resolve')
-    
+
+
     cmd = cmds[cmdname]    
     cmd.settings = settings
-    args = parser.parse_args(args=argv[1:])[1]   
+    args=argv[1:]   
     # Assign CrawlerProcess to Base Class of commands in __init__.py 
     cmd.crawler_process = CrawlerProcess(settings)
     #Invoke CrawlerProcess.crawl() through cmd.run()
