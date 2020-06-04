@@ -1,9 +1,11 @@
-from twisted.internet import defer
+from twisted.internet import defer, reactor
 
 from Jcrapy import Spider
 from Jcrapy.spiderloader import SpiderLoader
 from Jcrapy.core.engine import ExecutionEngine
 from Jcrapy.signalmanager import SignalManager
+
+from Jcrapy.utils.ossignal import install_shutdown_handlers
 
 class Crawler:
 
@@ -66,6 +68,21 @@ class CrawlerRunner:
             print('_done')
 
         return d.addBoth(_done)
+
+    def stop(self):
+        print('stop')
+        return defer.DeferredList([c.stop() for c in list(self.crawlers)])
+
+    @defer.inlineCallbacks
+    def join(self):
+        """
+        join()
+
+        Returns a deferred that is fired when all managed :attr:`crawlers` have
+        completed their executions.
+        """
+        while self._active:
+            yield defer.DeferredList(self._active)
         
     def _handle_twisted_reactor(self):
         pass
@@ -97,9 +114,32 @@ class CrawlerProcess(CrawlerRunner):
 
     def __init__(self, settings=None, install_root_handler=True):
         super(CrawlerProcess, self).__init__(settings)
+        install_shutdown_handlers(self._signal_shutdown)
 
     def _signal_shutdown(self, signum, _):
         print('CrawlerProcess._signal_shutdown')
+
+    def start(self):
+        """
+        This method starts a :mod:`~twisted.internet.reactor`, adjusts its pool
+        size to :setting:`REACTOR_THREADPOOL_MAXSIZE`, and installs a DNS cache
+        based on :setting:`DNSCACHE_ENABLED` and :setting:`DNSCACHE_SIZE`.
+
+        If ``stop_after_crawl`` is True, the reactor will be stopped after all
+        crawlers have finished, using :meth:`join`.
+
+        :param boolean stop_after_crawl: stop or not the reactor when all
+            crawlers have finished
+        """  
+        d = self.join() 
+        if d.called:
+            return
+        d.addBoth(self._stop_reactor)
+        reactor.addSystemEventTrigger('before', 'shutdown', self.stop)
+        reactor.run(installSignalHandlers=False) #blocking call     
+
+    def _stop_reactor(self):
+        print('_stop_reactor')
 
     def _handle_twisted_reactor(self):
         super()._handle_twisted_reactor()
