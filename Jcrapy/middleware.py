@@ -1,7 +1,7 @@
 from collections import defaultdict, deque
 
 from Jcrapy.utils.misc import create_instance, load_object
-from Jcrapy.utils.defer import process_chain
+from Jcrapy.utils.defer import process_parallel, process_chain
 
 class MiddlewareManager:
     """Base class for implementing middleware managers"""
@@ -20,5 +20,11 @@ class MiddlewareManager:
             middlewares.append(mw)
         return cls(*middlewares)
 
+    def _process_parallel(self, methodname, obj, *args):
+        return process_parallel(self.methods[methodname], obj)
+
     def _process_chain(self, methodname, obj, *args):
         return process_chain(self.methods[methodname], obj, *args)
+
+    def open_spider(self, spider):
+        return self._process_parallel('open_spider', spider)

@@ -25,12 +25,16 @@ class Scheduler:
     (in-memory and on-disk) and implements fallback logic for them.
     Also, it handles dupefilters.
     """
-    def __init__(self):
-        pass
+    def __init__(self, dupefilter):
+        self.df = dupefilter
 
     @classmethod
     def from_crawler(cls, crawler):
         settings = crawler.settings
         dupefilter_cls = load_object('Jcrapy.dupefilters.RFPDupeFilter')
         dupefilter = create_instance(dupefilter_cls, settings, crawler)
-        return cls()
+        return cls(dupefilter)
+
+    def open(self, spider):
+        self.spider = spider
+        return self.df.open()
