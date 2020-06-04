@@ -1,12 +1,7 @@
-import traceback
-import warnings
-from zope.interface import implementer
 
-from Jcrapy.interfaces import ISpiderLoader
 from Jcrapy.utils.misc import walk_modules
 from Jcrapy.utils.spider import iter_spider_classes
 
-@implementer(ISpiderLoader)
 class SpiderLoader:
     def __init__(self, settings):
         self.spider_modules = settings.getlist('SPIDER_MODULES')
@@ -23,13 +18,7 @@ class SpiderLoader:
                 for module in walk_modules(name):
                     self._load_spiders(module)
             except ImportError:
-                    warnings.warn(
-                        "\n{tb}Could not load spiders from module '{modname}'. "
-                        "See above traceback for details.".format(
-                            modname=name, tb=traceback.format_exc()
-                        ),
-                        category=RuntimeWarning,
-                    )
+                    print('Could not load spiders from module {modname}')
         
     def load(self, spider_name):
         try:
