@@ -4,6 +4,8 @@ This is the Jcrapy engine which controls the Scheduler, Downloader and Spiders.
 For more information see docs/topics/architecture.rst
 
 """
+from time import time
+
 from twisted.internet import defer, task
 
 from Jcrapy.core.scraper import Scraper
@@ -22,8 +24,19 @@ class ExecutionEngine:
         self.crawler = crawler
         self._spider_closed_callback = spider_closed_callback
         self.slot = None
+        self.running = False
         self.scheduler_cls=load_object('Jcrapy.core.scheduler.Scheduler')
         self.scraper = Scraper(crawler)
+
+    @defer.inlineCallbacks
+    def start(self):
+        """Start the execution engine"""
+        if self.running:
+            raise RuntimeError("Engine already running")
+        self.start_time = time()
+        self.running = True
+        self._closewait = defer.Deferred()
+        yield self._closewait
 
     def _next_request(self, spider):
         slot = self.slot
