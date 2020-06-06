@@ -13,6 +13,7 @@ class Crawler:
         self.spidercls = spidercls
         self.settings = settings
         self.signals = SignalManager(self)
+        self.crawling = False
 
     @defer.inlineCallbacks
     def crawl(self, *args):
@@ -23,6 +24,13 @@ class Crawler:
         yield self.engine.open_spider(self.spider, start_requests)
         yield defer.maybeDeferred(self.engine.start)
 
+    @defer.inlineCallbacks
+    def stop(self):
+        """Starts a graceful stop of the crawler and returns a deferred that is
+        fired when the crawler is stopped."""
+        if self.crawling:
+            self.crawling = False
+            yield defer.maybeDeferred(self.engine.stop)        
         
 
 class CrawlerRunner:
@@ -37,6 +45,12 @@ class CrawlerRunner:
     accordingly) unless writing scripts that manually handle the crawling
     process. See :ref:`run-from-script` for an example.
     """
+
+    crawlers = property(
+        lambda self: self._crawlers
+    )
+
+
     def _get_spider_loader(self,settings):        
         return SpiderLoader(settings.frozencopy())
 
@@ -70,7 +84,6 @@ class CrawlerRunner:
         return d.addBoth(_done)
 
     def stop(self):
-        print('stop')
         return defer.DeferredList([c.stop() for c in list(self.crawlers)])
 
     @defer.inlineCallbacks
