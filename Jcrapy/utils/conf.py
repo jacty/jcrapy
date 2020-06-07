@@ -3,17 +3,22 @@ import sys
 from configparser import ConfigParser
 from .const import ENVVAR
 
-def closest_jcrapy_cfg(path='.', prevpath=None):
-    """Return the path to the closest Jcrapy.cfg file by traversing the current
+def closest_file(filename='Jcrapy.cfg' ,path='.', prevpath=None):
+    """Return the path to the closest filename file by traversing the current
     directory and its parents
-    """   
-    if path == prevpath: 
+    """
+    if filename == '' :
+        print('Argument filename cannot be empty!')
+
+    if path == prevpath:
         return ''
     path = os.path.abspath(path)
-    cfgfile = os.path.join(path, 'Jcrapy.cfg')
-    if os.path.exists(cfgfile):
-        return cfgfile
-    return closest_jcrapy_cfg(os.path.dirname(path), path)
+    file = os.path.join(path, filename)
+    if os.path.exists(file):
+        return file
+    return closest_file(filename,os.path.dirname(path), path)
+
+
 
 
 def init_env(project='default', set_syspath=True, use_closest=True):
@@ -21,7 +26,8 @@ def init_env(project='default', set_syspath=True, use_closest=True):
     dir. This sets the Jcrapy settings module and modifies the Python path to
     be able to locate the project module.
     """
-    closest = closest_jcrapy_cfg()
+    closest = closest_file()
+    
     if closest:
         projdir = os.path.dirname(closest)
         if set_syspath and projdir not in sys.path:
