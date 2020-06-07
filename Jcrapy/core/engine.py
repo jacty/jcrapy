@@ -18,7 +18,7 @@ class Slot:
         self.start_requests = iter(start_requests)
         self.close_if_idle = close_if_idle
         self.nextcall = nextcall
-        # self.heartbeat = task.LoopingCall(nextcall.schedule)
+        self.heartbeat = task.LoopingCall(nextcall.schedule)
 
 class ExecutionEngine:
 
@@ -66,28 +66,26 @@ class ExecutionEngine:
         if self.slot.start_requests is not None:
             return False
 
-    # @property
-    # def open_spiders(self):
-    #     return [self.spider] if self.spider else []
+    @property
+    def open_spiders(self):
+        return [self.spider] if self.spider else []
     
     def crawl(self, request, spider):
-        # if spider not in self.open_spiders:
-        #     raise RuntimeError("Spider %r not opened when crawling: %s" % (spider.name, request))
-        print(111)
-        # self.schedule(request, spider)
-        # self.slot.nextcall.schedule()        
+        if spider not in self.open_spiders:
+            raise RuntimeError("Spider %r not opened when crawling: %s" % (spider.name, request))
+        self.slot.nextcall.schedule()        
 
     @defer.inlineCallbacks
     def open_spider(self, spider, start_requests=(), close_if_idle=True):
         nextcall = CallLaterOnce(self._next_request, spider)
-        # scheduler = self.scheduler_cls.from_crawler(self.crawler)
+        scheduler = self.scheduler_cls.from_crawler(self.crawler)
         start_requests = yield self.scraper.spidermw.process_start_requests(start_requests, spider)
         self.slot = Slot(start_requests, close_if_idle, nextcall)
         self.spider = spider
-        # yield scheduler.open(spider)
+        yield scheduler.open(spider)
         yield self.scraper.open_spider(spider)
         self.slot.nextcall.schedule()
-        # self.slot.heartbeat.start(5)  
+        self.slot.heartbeat.start(5)  
     
     def _spider_idle(self, spider):
         print('_spider_idle')
