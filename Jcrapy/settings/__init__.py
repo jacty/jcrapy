@@ -60,9 +60,6 @@ class BaseSettings:
             #custom settings replace relevant default settings.
             self.attributes[name].set(value)
 
-    def setdict(self, values, priority='project'):
-        self.update(values, priority)
-
     def setmodule(self, module):
         """
         Deliver uppercased settings to self.set().
@@ -74,37 +71,14 @@ class BaseSettings:
             if key.isupper():
                 self.set(key, getattr(module, key))
 
-    def update(self, values, priority='project'):
+    def update(self, values):
         """
-        Store key/value pairs with a given priority.
-
-        This is a helper function that calls
-        :meth:`~Jcrapy.settings.BaseSettings.set` for every item of ``values``
-        with the provided ``priority``.
-
-        If ``values`` is a string, it is assumed to be JSON-encoded and parsed
-        into a dict with ``json.loads()`` first. If it is a
-        :class:`~Jcrapy.settings.BaseSettings` instance, the per-key priorities
-        will be used and the ``priority`` parameter ignored. This allows
-        inserting/updating settings with different priorities with a single
-        command.
-
         :param values: the settings names and values
         :type values: dict or string or :class:`~Jcrapy.settings.BaseSettings`
 
-        :param priority: the priority of the settings. Should be a key of
-            :attr:`~Jcrapy.settings.SETTINGS_PRIORITIES` or an integer
-        :type priority: string or int
         """
-        self._assert_mutability()
-        if isinstance(values, str):
-            print('BaseSettings.update', values)
-        elif values is not None:
-            if isinstance(values, BaseSettings):
-                print('BaseSettings.update1', isinstance(values, BaseSettings))
-            else:
-                for name, value in values.items():
-                    self.set(name, value, priority)
+        for name, value in values.items():
+            self.set(name, value)
 
     def __delitem__(self, name):
         print('BaseSettings.__delitem__')

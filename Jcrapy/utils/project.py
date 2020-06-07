@@ -29,11 +29,6 @@ def get_project_settings():
     #initialize custom settings from settings.py in user's project folder
     settings_module_path = os.environ.get(ENVVAR)
     settings.setmodule(settings_module_path)
-  
-    jcrapy_envvars = {k[7:]: v for k, v in os.environ.items() if
-                        k.startswith('JCRAPY_')}
-
-    settings.setdict(jcrapy_envvars, priority='project')
     
     return settings        
 
