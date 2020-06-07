@@ -1,7 +1,6 @@
 import json
 import copy
 
-from collections.abc import MutableMapping
 from importlib import import_module
 from Jcrapy.settings import default_settings
 
@@ -25,113 +24,29 @@ class SettingsAttribute:
 
     __repr__ = __str__
 
-class BaseSettings(MutableMapping):
-    """
-    Instances of this class behave like dictionaries, but store priorities
-    along with their ``(key, value)`` pairs, and can be frozen (i.e. marked
-    immutable).
-
-    Key-value entries can be passed on initialization with the ``values``
-    argument, and they would take the ``priority`` level (unless ``values`` is
-    already an instance of :class:`~Jcrapy.settings.BaseSettings`, in which
-    case the existing priority levels will be kept).  If the ``priority``
-    argument is a string, the priority name will be looked up in
-    :attr:`~Jcrapy.settings.SETTINGS_PRIORITIES`. Otherwise, a specific integer
-    should be provided.
-
-    Once the object is created, new settings can be loaded or updated with the
-    :meth:`~Jcrapy.settings.BaseSettings.set` method, and can be accessed with
-    the square bracket notation of dictionaries, or with the
-    :meth:`~Jcrapy.settings.BaseSettings.get` method of the instance and its
-    value conversion variants. When requesting a stored key, the value with the
-    <highest priority> will be retrieved.
-    """
-
-    def __init__(self, values=None, priority='project'):
+class BaseSettings:
+    def __init__(self, values=None):
         self.frozen = False
         self.attributes = {}
         if values:
+            print('BaseSettings.__init__.update()')
             self.update(values, priority)
     
     def __getitem__(self, opt_name):
+        print('BaseSettings.__getitem__')
         if opt_name not in self:
             return None
         return self.attributes[opt_name].value
  
     def __contains__(self, name):
+        print('BaseSettings.__contains__')
         return name in self.attributes
-
-    def get(self, name, default=None):
-        """
-        Get a setting value without affecting its original type.
-
-        :param name: the setting name
-        :type name: string
-
-        :param default: the value to return if no setting is found
-        :type default: any
-        """
-        return self[name] if self[name] is not None else default        
-
-    def getbool(self, name, default=False):
-        got = self.get(name, default)
-        try:
-            return bool(int(got))
-        except ValueError:
-            if got in ("True", "true"):
-                return True
-            if got in ("False", "false"):
-                return False
-            raise ValueError("Supported values for boolean settings "
-                             "are 0/1, True/False, '0'/'1', "
-                             "'True'/'False' and 'true'/'false'")
-
-    def getint(self, name, default=0):
-        return int(self.get(name, default))
-
-    def getfloat(self, name, default=0.0):
-        return float(self.get(name, default))
-
-    def getlist(self, name, default=None):
-        value = self.get(name, default or [])
-        if isinstance(value, str):
-            value = value.split(',')
-        return list(value)
-
-    def getdict(self, name, default=None):
-        """
-        Get a setting value as a dictionary. If the setting original type is a
-        dictionary, a copy of it will be returned.
-
-        :param name: the setting name
-        :type name: string
-
-        :param default: the value to return if no setting is found
-        :type default: any
-        """
-        value = self.get(name, default or {})
-
-        return dict(value)
-
-    def getpriority(self, name):
-        """
-        Return the current numerical priority value of a setting, or ``None`` if
-        the given ``name`` does not exist.
-
-        :param name: the setting name
-        :type name: string
-        """
-        if name not in self:
-            return None
-        return self.attributes[name].priority
 
     def __setitem__(self, name, value):
         print('BaseSettings.__setitem__')
 
-    def set(self, name, value, priority='project'):
+    def set(self, name, value):
         """
-        Store a key/value attribute with a given priority.
-
         Settings should be populated *before* configuring the Crawler object
         (through the :meth:`~Jcrapy.crawler.Crawler.configure` method),
         otherwise they won't have any effect.
@@ -141,13 +56,9 @@ class BaseSettings(MutableMapping):
 
         :param value: the value to associate with the setting
         :type value: any
-
-        :param priority: the priority of the setting. Should be a key of
-            :attr:`~Jcrapy.settings.SETTINGS_PRIORITIES` or an integer
-        :type priority: string or int
         """      
-        self._assert_mutability()
-        # priority = get_settings_priority(priority)
+        print('set', name)
+        return
         if name not in self:
             if isinstance(value, SettingsAttribute):
                 print('BaseSettings.set', name, value) 
@@ -159,27 +70,16 @@ class BaseSettings(MutableMapping):
     def setdict(self, values, priority='project'):
         self.update(values, priority)
 
-    def setmodule(self, module, priority='project'):
+    def setmodule(self, module):
         """
-        Store settings from a module with a given priority.
-
-        This is a helper function that calls
-        :meth:`~Jcrapy.settings.BaseSettings.set` for every globally declared
-        uppercase variable of ``module`` with the provided ``priority``.
-
-        :param module: the module or the path of the module
-        :type module: module object or string
-
-        :param priority: the priority of the settings. Should be a key of
-            :attr:`~Jcrapy.settings.SETTINGS_PRIORITIES` or an integer
-        :type priority: string or int
-        """    
-        self._assert_mutability()
+        Deliver uppercased settings to self.set().
+        """ 
         if isinstance(module, str):
             module = import_module(module)
+
         for key in dir(module):
             if key.isupper():
-                self.set(key, getattr(module, key), priority)
+                self.set(key, getattr(module, key))
 
     def update(self, values, priority='project'):
         """
@@ -213,48 +113,8 @@ class BaseSettings(MutableMapping):
                 for name, value in values.items():
                     self.set(name, value, priority)
 
-    def delete(self, name, priority='project'):
-        self._assert_mutability()
-        print('delete')
-
     def __delitem__(self, name):
         print('BaseSettings.__delitem__')
-
-    def _assert_mutability(self):
-        if self.frozen:
-            raise TypeError("Trying to modify an immutable Settings object")
-
-    def copy(self):
-        """
-        Make a deep copy of current settings.
-
-        This method returns a new instance of the :class:`Settings` class,
-        populated with the same values and their priorities.
-
-        Modifications to the new object won't be reflected on the original
-        settings.
-        """
-        return copy.deepcopy(self)
-
-    def freeze(self):
-        """
-        Disable further changes to the current settings.
-
-        After calling this method, the present state of the settings will become
-        immutable. Trying to change values through the :meth:`~set` method and
-        its variants won't be possible and will be alerted.
-        """
-        self.frozen = True
-
-    def frozencopy(self):
-        """
-        Return an immutable copy of the current settings.
-
-        Alias for a :meth:`~freeze` call in the object returned by :meth:`copy`.
-        """
-        copy = self.copy()
-        copy.freeze()
-        return copy
 
     def __iter__(self):
         return iter(self.attributes)
@@ -262,50 +122,19 @@ class BaseSettings(MutableMapping):
     def __len__(self):
         print('BaseSettings.__len__')
 
-    def _to_dict(self):
-        return {k: (v._to_dict() if isinstance(v, BaseSettings) else v)
-                for k, v in self.items()}
-
-    def copy_to_dict(self):
-        """
-        Make a copy of current settings and convert to a dict.
-
-        This method returns a new dict populated with the same values
-        and their priorities as the current settings.
-
-        Modifications to the returned dict won't be reflected on the original
-        settings.
-
-        This method can be useful for example for printing settings
-        in shell.
-        """
-        settings = self.copy()
-        return settings._to_dict()
-
 class Settings(BaseSettings):
     """
     This object stores Jcrapy settings for the configuration of <internal
     components>, and can be used for any further customization.
 
-    It is a direct subclass and supports all methods of
-    :class:`~Jcrapy.settings.BaseSettings`. Additionally, after instantiation
-    of this class, the new object will have the global default settings
-    described on :ref:`topics-settings-ref` already populated.
     """
-    def __init__(self, values=None, priority='project'):
-        # Do not pass kwarg values here. We don't want to promote user-defined
-        # dicts, and we want to update, not replace, default dicts with the
-        # values given by the user
+    def __init__(self, values=None):
         super(Settings, self).__init__()
-
+        
+        # Assign default settings to Settings
         if values is None:
-            self.setmodule(default_settings, 'default')        
+            self.setmodule(default_settings)        
+        print('Settings.__init__')
+        return
         self.update(values, priority)
         
-def get_settings_priority(priority):
-    """
-    Small helper function that looks up a given string priority in the
-    :attr:`~Jcrapy.settings.SETTINGS_PRIORITIES` dictionary and returns its
-    numerical value, or directly returns a given numerical priority.
-    """
-    print('get_settings_priority',priority)
