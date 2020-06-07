@@ -11,16 +11,11 @@ class SettingsAttribute:
     This class is intended for internal usage, you should try Settings class
     for settings configuration, not this one.
     """
-    def __init__(self, value, priority):
+    def __init__(self, value):
         self.value = value
-        if isinstance(self.value, BaseSettings):
-            print('SettingsAttribute.__init__', isinstance(self.value, BaseSettings))
-        else:
-            self.priority = priority
 
     def __str__(self):
-        return "<SettingsAttribute value={self.value!r} " \
-               "priority={self.priority}>".format(self=self)
+        return "<SettingsAttribute value={self.value!r} ".format(self=self)
 
     __repr__ = __str__
 
@@ -57,15 +52,7 @@ class BaseSettings:
         :param value: the value to associate with the setting
         :type value: any
         """      
-        print('set', name)
-        return
-        if name not in self:
-            if isinstance(value, SettingsAttribute):
-                print('BaseSettings.set', name, value) 
-            else:
-                self.attributes[name] = SettingsAttribute(value, priority)
-        else:
-            self.attributes[name].set(value, priority)
+        self.attributes[name] = SettingsAttribute(value)
 
     def setdict(self, values, priority='project'):
         self.update(values, priority)
@@ -134,7 +121,5 @@ class Settings(BaseSettings):
         # Assign default settings to Settings
         if values is None:
             self.setmodule(default_settings)        
-        print('Settings.__init__')
-        return
-        self.update(values, priority)
+
         

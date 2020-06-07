@@ -26,9 +26,10 @@ def get_project_settings():
 
     #initialize default settings from settings.default_settings
     settings = Settings()
-    return
 
     settings_module_path = os.environ.get(ENVVAR)
+    print('get_project_settings')
+    return
     if settings_module_path:
         settings.setmodule(settings_module_path, priority='project')
     
