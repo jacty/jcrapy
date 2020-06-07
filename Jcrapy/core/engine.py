@@ -15,8 +15,10 @@ from Jcrapy.utils.reactor import CallLaterOnce
 class Slot:
 
     def __init__(self, start_requests, close_if_idle, nextcall):
+        self.start_requests = iter(start_requests)
+        self.close_if_idle = close_if_idle
         self.nextcall = nextcall
-        self.heartbeat = task.LoopingCall(nextcall.schedule)
+        # self.heartbeat = task.LoopingCall(nextcall.schedule)
 
 class ExecutionEngine:
 
@@ -25,6 +27,7 @@ class ExecutionEngine:
         self._spider_closed_callback = spider_closed_callback
         self.slot = None
         self.running = False
+        self.paused = False
         self.scheduler_cls=load_object('Jcrapy.core.scheduler.Scheduler')
         self.scraper = Scraper(crawler)
 
@@ -40,16 +43,42 @@ class ExecutionEngine:
 
     def _next_request(self, spider):
         slot = self.slot
-        print('ExecutionEngine._next_request')
 
-    def has_capacity(self):
-        """Does the engine have capacity to handle more spiders"""
-        return not bool(self.slot)
+        if self.paused:
+            return
+
+        if slot.start_requests and not self._needs_backout(spider):
+            try:
+                request = next(slot.start_requests)
+            except StopIteration:
+                slot.start_requests = None
+            else:
+                self.crawl(request, spider)
+        
+        if self.spider_is_idle(spider) and slot.close_if_idle:
+            self._spider_idle(spider)
+
+    def _needs_backout(self, spider):
+        slot = self.slot
+        return not self.running
+
+    def spider_is_idle(self, spider):
+        if self.slot.start_requests is not None:
+            return False
+
+    # @property
+    # def open_spiders(self):
+    #     return [self.spider] if self.spider else []
+    
+    def crawl(self, request, spider):
+        # if spider not in self.open_spiders:
+        #     raise RuntimeError("Spider %r not opened when crawling: %s" % (spider.name, request))
+        print(111)
+        # self.schedule(request, spider)
+        # self.slot.nextcall.schedule()        
 
     @defer.inlineCallbacks
     def open_spider(self, spider, start_requests=(), close_if_idle=True):
-        if not self.has_capacity():
-            raise RuntimeError("No free spider slot when opening %r" % spider.name)
         nextcall = CallLaterOnce(self._next_request, spider)
         # scheduler = self.scheduler_cls.from_crawler(self.crawler)
         start_requests = yield self.scraper.spidermw.process_start_requests(start_requests, spider)
@@ -58,5 +87,7 @@ class ExecutionEngine:
         # yield scheduler.open(spider)
         yield self.scraper.open_spider(spider)
         self.slot.nextcall.schedule()
-        self.slot.heartbeat.start(5)  
-              
+        # self.slot.heartbeat.start(5)  
+    
+    def _spider_idle(self, spider):
+        print('_spider_idle')

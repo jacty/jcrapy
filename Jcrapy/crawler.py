@@ -59,6 +59,7 @@ class CrawlerRunner:
         self.spider_loader = self._get_spider_loader(settings)
         self._crawlers = set()
         self._active = set()
+        self.bootstrap_failed = False
         self._handle_twisted_reactor()
 
     def crawl(self, spidername):
@@ -79,7 +80,10 @@ class CrawlerRunner:
         self._active.add(d)
         
         def _done(result):
-            print('_done')
+            self.crawlers.discard(crawler)
+            self._active.discard(d)
+            self.bootstrap_failed |= not getattr(crawler, 'spider', None)
+            return result
 
         return d.addBoth(_done)
 

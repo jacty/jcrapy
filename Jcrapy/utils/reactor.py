@@ -10,9 +10,10 @@ class CallLaterOnce:
         self._a = a
         self._call = None
         
-    def __call__(self):
-        print('CallLaterOnce.__call__')
-
     def schedule(self, delay=0):
         if self._call is None:
             self._call = reactor.callLater(delay, self)
+
+    def __call__(self):
+        self._call = None
+        return self._func(*self._a)
