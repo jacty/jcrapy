@@ -47,20 +47,21 @@ def _print_header(settings, inproject):
 def execute():
     argv = sys.argv
     settings = get_project_settings()
-    # inproject = inside_project()
-    # _print_header(settings, inproject)
-    # cmds = _get_commands_dict(settings, inproject)
-    # cmdname = _pop_command_name(argv)
+    return
+    inproject = inside_project()
+    _print_header(settings, inproject)
+    cmds = _get_commands_dict(settings, inproject)
+    cmdname = _pop_command_name(argv)
 
 
-    # cmd = cmds[cmdname]    
-    # cmd.settings = settings
-    # args=argv[1:]   
+    cmd = cmds[cmdname]    
+    cmd.settings = settings
+    args=argv[1:]   
     # Assign CrawlerProcess to Base Class of commands in __init__.py 
-    # cmd.crawler_process = CrawlerProcess(settings)
-    #Invoke CrawlerProcess.crawl() through cmd.run()
-    # cmd.run(args)
-    # sys.exit(0)
+    cmd.crawler_process = CrawlerProcess(settings)
+    # Invoke CrawlerProcess.crawl() through cmd.run()
+    cmd.run(args)
+    sys.exit(0)
 
 
 
