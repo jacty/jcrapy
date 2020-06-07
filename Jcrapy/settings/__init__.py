@@ -14,6 +14,9 @@ class SettingsAttribute:
     def __init__(self, value):
         self.value = value
 
+    def set(self, value):
+        self.value = value
+
     def __str__(self):
         return "<SettingsAttribute value={self.value!r} ".format(self=self)
 
@@ -34,7 +37,6 @@ class BaseSettings:
         return self.attributes[opt_name].value
  
     def __contains__(self, name):
-        print('BaseSettings.__contains__')
         return name in self.attributes
 
     def __setitem__(self, name, value):
@@ -51,8 +53,12 @@ class BaseSettings:
 
         :param value: the value to associate with the setting
         :type value: any
-        """      
-        self.attributes[name] = SettingsAttribute(value)
+        """  
+        if name not in self:    
+            self.attributes[name] = SettingsAttribute(value)
+        else:
+            #custom settings replace relevant default settings.
+            self.attributes[name].set(value)
 
     def setdict(self, values, priority='project'):
         self.update(values, priority)

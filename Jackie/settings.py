@@ -10,7 +10,7 @@
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
 BOT_NAME = 'Jackie'
-
+AJAXCRAWL_ENABLED = True
 SPIDER_MODULES = ['Jackie.spiders']
 # NEWSPIDER_MODULE = 'Jackie.spiders'
 LOG_LEVEL = 'ERROR'
