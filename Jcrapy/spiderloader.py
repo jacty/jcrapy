@@ -4,7 +4,7 @@ from Jcrapy.utils.spider import iter_spider_classes
 
 class SpiderLoader:
     def __init__(self, settings):
-        self.spider_modules = settings.getlist('SPIDER_MODULES')
+        self.spider_modules = settings.get('SPIDER_MODULES')
         self._spiders = {}
         self._load_all_spiders()
 
