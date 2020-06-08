@@ -2,7 +2,7 @@ from twisted.internet import defer, reactor
 
 from Jcrapy import Spider
 from Jcrapy.spiderloader import SpiderLoader
-from Jcrapy.core.engine import ExecutionEngine
+# from Jcrapy.core.engine import ExecutionEngine
 from Jcrapy.signalmanager import SignalManager
 
 from Jcrapy.utils.ossignal import install_shutdown_handlers
@@ -50,13 +50,11 @@ class CrawlerRunner:
         lambda self: self._crawlers
     )
 
-
-    def _get_spider_loader(self,settings):        
-        return SpiderLoader(settings.frozencopy())
-
     def __init__(self, settings=None):
         self.settings = settings
-        self.spider_loader = self._get_spider_loader(settings)
+        self.spider_loader = SpiderLoader(settings)
+        print('CrawlerRunner.__init__', settings)
+        return
         self._crawlers = set()
         self._active = set()
         self.bootstrap_failed = False
@@ -131,6 +129,8 @@ class CrawlerProcess(CrawlerRunner):
 
     def __init__(self, settings=None, install_root_handler=True):
         super(CrawlerProcess, self).__init__(settings)
+        print('CrawlerProcess.__init__')
+        return
         install_shutdown_handlers(self._signal_shutdown)
 
     def _signal_shutdown(self, signum, _):
