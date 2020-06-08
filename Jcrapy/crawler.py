@@ -53,12 +53,8 @@ class CrawlerRunner:
     def __init__(self, settings=None):
         self.settings = settings
         self.spider_loader = SpiderLoader(settings)
-        print('CrawlerRunner.__init__', settings)
-        return
-        self._crawlers = set()
         self._active = set()
         self.bootstrap_failed = False
-        self._handle_twisted_reactor()
 
     def crawl(self, spidername):
         """
@@ -99,10 +95,6 @@ class CrawlerRunner:
         while self._active:
             yield defer.DeferredList(self._active)
         
-    def _handle_twisted_reactor(self):
-        pass
-
-
 class CrawlerProcess(CrawlerRunner):
     """
     A class to run multiple Jcrapy crawlers in a process simultaneously.
@@ -129,9 +121,9 @@ class CrawlerProcess(CrawlerRunner):
 
     def __init__(self, settings=None, install_root_handler=True):
         super(CrawlerProcess, self).__init__(settings)
+        install_shutdown_handlers(self._signal_shutdown)
         print('CrawlerProcess.__init__')
         return
-        install_shutdown_handlers(self._signal_shutdown)
 
     def _signal_shutdown(self, signum, _):
         print('CrawlerProcess._signal_shutdown')
