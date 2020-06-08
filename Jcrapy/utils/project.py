@@ -1,5 +1,4 @@
 import os
-import warnings
 
 from importlib import import_module
 
@@ -9,15 +8,13 @@ from Jcrapy.settings import Settings
 
 def inside_project():
     jcrapy_module = os.environ.get(ENVVAR)
-    if jcrapy_module is not None:
-        try:
-            import_module(jcrapy_module)
-        except ImportError as exc:
-            warnings.warn("Cannot import jcrapy settings module %s: %s" % (jcrapy_module, exc))
-        else:
-            return True
+    try:
+        import_module(jcrapy_module)
+    except ImportError as exc:
+        print("Cannot import jcrapy settings module %s: %s" % (jcrapy_module, exc))
+    else:
+        return True
             
-    return bool(closest_file())
 
 
 def get_project_settings():
