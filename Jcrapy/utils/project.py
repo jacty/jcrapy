@@ -22,6 +22,8 @@ def inside_project():
 
 def get_project_settings():
     if ENVVAR not in os.environ:
+        #TD: try to use variables instead of environment to store
+        #custom settings' path
         init_env()
 
     #initialize default settings from settings.default_settings
