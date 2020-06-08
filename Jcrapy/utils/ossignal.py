@@ -1,13 +1,6 @@
 import signal
 from twisted.internet import reactor
 
-signal_names = {}
-for signame in dir(signal):
-    if signame.startswith('SIG') and not signame.startswith('SIG_'):
-        signum = getattr(signal, signame)
-        if isinstance(signum, int):
-            signal_names[signum] = signame
-
 def install_shutdown_handlers(function):
     """Install the given function as a signal handler for all common shutdown
     signals (such as SIGINT, SIGTERM, etc). If override_sigint is ``False`` the
@@ -15,3 +8,5 @@ def install_shutdown_handlers(function):
     (e.g.  Pdb)
     """
     reactor._handleSignals()
+    #TD:Need to check how this part works and what is the target here.
+    signal.signal(signal.SIGTERM, function)
