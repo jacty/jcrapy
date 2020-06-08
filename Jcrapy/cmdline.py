@@ -37,7 +37,6 @@ def _pop_command_name(argv):
         i += 1
 
 def _print_header(settings, inproject):
-    #TD: Print active spiders' names
     if inproject:
         print('-'*20 + " Jcrapy %s - project: %s " % (Jcrapy.__version__,settings['BOT_NAME'])+'-'*20)
     else:
@@ -47,9 +46,9 @@ def _print_header(settings, inproject):
 def execute():
     argv = sys.argv
     settings = get_project_settings()
-    return
     inproject = inside_project()
     _print_header(settings, inproject)
+    return
     cmds = _get_commands_dict(settings, inproject)
     cmdname = _pop_command_name(argv)
 

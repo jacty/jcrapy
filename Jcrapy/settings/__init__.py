@@ -31,7 +31,6 @@ class BaseSettings:
             self.update(values, priority)
     
     def __getitem__(self, opt_name):
-        print('BaseSettings.__getitem__')
         if opt_name not in self:
             return None
         return self.attributes[opt_name].value
