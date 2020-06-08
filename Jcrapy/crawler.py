@@ -4,7 +4,6 @@ from Jcrapy import Spider
 from Jcrapy.spiderloader import SpiderLoader
 # from Jcrapy.core.engine import ExecutionEngine
 from Jcrapy.signalmanager import SignalManager
-
 from Jcrapy.utils.ossignal import install_shutdown_handlers
 
 class Crawler:
@@ -122,8 +121,6 @@ class CrawlerProcess(CrawlerRunner):
     def __init__(self, settings=None, install_root_handler=True):
         super(CrawlerProcess, self).__init__(settings)
         install_shutdown_handlers(self._signal_shutdown)
-        print('CrawlerProcess.__init__')
-        return
 
     def _signal_shutdown(self, signum, _):
         print('CrawlerProcess._signal_shutdown')
