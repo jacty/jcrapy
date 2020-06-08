@@ -15,8 +15,9 @@ def load_object(path):
 def walk_modules(path):
     mods = []
     mod = import_module(path)
-    mods .append(mod)
+    mods.append(mod)
     if hasattr(mod, '__path__'):
+        #__path__ is a symbol of package
         for _, subpath, ispkg in iter_modules(mod.__path__):
             fullpath = path + '.' + subpath
             if ispkg:

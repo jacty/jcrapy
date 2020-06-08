@@ -19,7 +19,7 @@ def _iter_command_classes(module_name):
 def _get_commands_from_module(module, inproject):
     d = {}
     for cmd in _iter_command_classes(module):
-        if inproject or not cmd.requires_project:
+        if inproject:
             cmdname = cmd.__module__.split('.')[-1]
             d[cmdname] = cmd()
     return d
@@ -48,8 +48,8 @@ def execute():
     settings = get_project_settings()
     inproject = inside_project()
     _print_header(settings, inproject)
-    return
     cmds = _get_commands_dict(settings, inproject)
+    return
     cmdname = _pop_command_name(argv)
 
 
