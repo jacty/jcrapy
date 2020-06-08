@@ -2,16 +2,6 @@
 from importlib import import_module
 from pkgutil import iter_modules
 
-def load_object(path):
-
-    dot = path.rindex('.')
-    module, name = path[:dot], path[dot+1:]
-    mod = import_module(module)
-    
-    obj = getattr(mod, name)
-    
-    return obj
-
 def walk_modules(path):
     mods = []
     mod = import_module(path)
