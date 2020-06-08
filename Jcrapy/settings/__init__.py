@@ -38,6 +38,9 @@ class BaseSettings:
     def __contains__(self, name):
         return name in self.attributes
 
+    def get(self, name, default=None):
+        return self[name] if self[name] is not None else default
+
     def __setitem__(self, name, value):
         print('BaseSettings.__setitem__')
 
