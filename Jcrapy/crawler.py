@@ -3,7 +3,6 @@ from twisted.internet import defer, reactor
 from Jcrapy import Spider
 from Jcrapy.spiderloader import SpiderLoader
 # from Jcrapy.core.engine import ExecutionEngine
-from Jcrapy.signalmanager import SignalManager
 from Jcrapy.utils.ossignal import install_shutdown_handlers
 
 class Crawler:
@@ -11,17 +10,17 @@ class Crawler:
     def __init__(self, spidercls, settings=None):
         self.spidercls = spidercls
         self.settings = settings
-        self.signals = SignalManager(self)
-        self.crawling = False
 
-    @defer.inlineCallbacks
+    # @defer.inlineCallbacks
     def crawl(self, *args):
         #initiate spiderclass from crawler
         self.spider = self.spidercls.from_crawler(self)
-        self.engine = ExecutionEngine(self, lambda _: self.stop())
-        start_requests = self.spider.start_requests()
-        yield self.engine.open_spider(self.spider, start_requests)
-        yield defer.maybeDeferred(self.engine.start)
+        print('Crawler.crawl')
+        return
+        # self.engine = ExecutionEngine(self, lambda _: self.stop())
+        # start_requests = self.spider.start_requests()
+        # yield self.engine.open_spider(self.spider, start_requests)
+        # yield defer.maybeDeferred(self.engine.start)
 
     @defer.inlineCallbacks
     def stop(self):
@@ -69,9 +68,9 @@ class CrawlerRunner:
 
     def _crawl(self, crawler):
         self._crawlers.add(crawler)
-        print('CrawlerRunner._crawl')
-        return
         d = crawler.crawl()
+        print('CrawlerRunner._crawl',crawler)
+        return
         self._active.add(d)
         
         def _done(result):
@@ -95,7 +94,8 @@ class CrawlerRunner:
         """
         while self._active:
             yield defer.DeferredList(self._active)
-        
+   
+
 class CrawlerProcess(CrawlerRunner):
     """
     A class to run multiple Jcrapy crawlers in a process simultaneously.
