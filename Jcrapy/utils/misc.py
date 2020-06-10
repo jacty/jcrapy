@@ -16,12 +16,3 @@ def walk_modules(path):
                 submod = import_module(fullpath)
                 mods.append(submod)
     return mods
-
-def create_instance(objcls, settings, crawler):
-    
-    if crawler and hasattr(objcls, 'from_crawler'):
-        instance = objcls.from_crawler(crawler)
-    elif hasattr(objcls, 'from_settings'):
-        instance = objcls.from_settings(settings)
-
-    return instance
