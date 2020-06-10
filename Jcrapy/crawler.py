@@ -45,13 +45,10 @@ class CrawlerRunner:
     process. See :ref:`run-from-script` for an example.
     """
 
-    crawlers = property(
-        lambda self: self._crawlers
-    )
-
     def __init__(self, settings=None):
         self.settings = settings
         self.spider_loader = SpiderLoader(settings)
+        self._crawlers = set()
         self._active = set()
         self.bootstrap_failed = False
 
@@ -62,13 +59,18 @@ class CrawlerRunner:
         It will call the given Crawler's :meth:`~Crawler.crawl` method, while
         keeping track of it so it can be stopped later.
         
-        """               
+        """    
+        #spidername is from user input which means it is indeed necessary to check it.
+        if isinstance(spidername, Spider):
+            raise ValueError('The spidername argument must be a spider class rather than instance.')           
         spidercls = self.spider_loader.load(spidername)
         crawler = Crawler(spidercls, self.settings)
         return self._crawl(crawler)
 
     def _crawl(self, crawler):
         self._crawlers.add(crawler)
+        print('CrawlerRunner._crawl')
+        return
         d = crawler.crawl()
         self._active.add(d)
         

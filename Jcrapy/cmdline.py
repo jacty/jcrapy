@@ -49,9 +49,7 @@ def execute():
     inproject = inside_project()
     _print_header(settings, inproject)
     cmds = _get_commands_dict(settings, inproject)
-    return
     cmdname = _pop_command_name(argv)
-
 
     cmd = cmds[cmdname]    
     cmd.settings = settings
@@ -60,6 +58,8 @@ def execute():
     cmd.crawler_process = CrawlerProcess(settings)
     # Invoke CrawlerProcess.crawl() through cmd.run()
     cmd.run(args)
+    print('execute', cmd)
+    return
     sys.exit(0)
 
 
