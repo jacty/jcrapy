@@ -1,7 +1,8 @@
 import json
 import copy
-
+from collections.abc import MutableMapping #for iteration from items()
 from importlib import import_module
+
 from Jcrapy.settings import default_settings
 
 class SettingsAttribute:
@@ -22,7 +23,7 @@ class SettingsAttribute:
 
     __repr__ = __str__
 
-class BaseSettings:
+class BaseSettings(MutableMapping):
     def __init__(self, values=None):
         self.frozen = False
         self.attributes = {}
@@ -40,6 +41,18 @@ class BaseSettings:
 
     def get(self, name, default=None):
         return self[name] if self[name] is not None else default
+
+    def getwithbase(self, name):
+        """Get a composition of a dictionary-like setting and its `_BASE`
+        counterpart.
+
+        :param name: name of the dictionary-like setting
+        :type name: string
+        """
+        compbs = BaseSettings()
+        compbs.update(self[name + '_BASE'])
+        compbs.update(self[name])   
+        return compbs     
 
     def __setitem__(self, name, value):
         print('BaseSettings.__setitem__')

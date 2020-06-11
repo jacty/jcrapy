@@ -6,11 +6,10 @@ See documentation in docs/topics/request-response.rst
 """
 from w3lib.url import safe_url_string
 
-from Jcrapy.utils.python import to_bytes
 
 class Request:
     def __init__(self, url, callback=None, method='GET', headers=None, body=None, cookies=None, meta=None, encoding='utf-8', priority=0, dont_filter=False):
-
+        print('Request.__init__')
         self._encoding = encoding #must be set first
         self.method = str(method).upper()
         self._set_url(url)

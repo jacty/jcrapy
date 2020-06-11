@@ -10,12 +10,10 @@ class Spider:
     """Base class for Jcrapy spiders. All spiders must inherit from this
     class.
     """    
-    name = None
-    custom_settings = None
-
     def __init__(self):
         #get spider name
         self.name = getattr(self, 'name')
+
         #self.crawler and self.settings will be set in self._set_crawler
     @classmethod
     def from_crawler(cls, crawler):
@@ -29,11 +27,6 @@ class Spider:
 
     def start_requests(self):
         cls = self.__class__
-        if not self.start_urls and hasattr(self, 'start_url'):
-            raise AttributeError(
-                "Crawling could not start: 'start_urls' not found "
-                "or empty (but found 'start_url' attribute instead, "
-                "did you miss an 's'?)")
         for url in self.start_urls:
             yield Request(url)
 

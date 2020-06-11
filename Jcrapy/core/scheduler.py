@@ -1,15 +1,8 @@
-from Jcrapy.utils.misc import load_object, create_instance
+from Jcrapy.dupefilters import RFPDupeFilter
 
 class Scheduler:
     """
-    Jcrapy Scheduler. It allows to enqueue requests and then get
-    a next request to download. Scheduler is also handling duplication
-    filtering, via dupefilter.
-
-    Prioritization and queueing is not performed by the Scheduler.
-    User sets ``priority`` field for each Request, and a PriorityQueue
-    (defined by :setting:`SCHEDULER_PRIORITY_QUEUE`) uses these priorities
-    to dequeue requests in a desired order.
+    Jcrapy Scheduler.
 
     Scheduler uses two PriorityQueue instances, configured to work in-memory
     and on-disk (optional). When on-disk queue is present, it is used by
@@ -25,15 +18,15 @@ class Scheduler:
     (in-memory and on-disk) and implements fallback logic for them.
     Also, it handles dupefilters.
     """
-    def __init__(self, dupefilter):
+    def __init__(self, dupefilter, crawler=None):
         self.df = dupefilter
+        self.crawler = crawler
 
     @classmethod
     def from_crawler(cls, crawler):
         settings = crawler.settings
-        dupefilter_cls = load_object('Jcrapy.dupefilters.RFPDupeFilter')
-        dupefilter = create_instance(dupefilter_cls, settings, crawler)
-        return cls(dupefilter)
+        dupefilter = RFPDupeFilter.from_settings(settings)
+        return cls(dupefilter, crawler=crawler)
 
     def open(self, spider):
         self.spider = spider

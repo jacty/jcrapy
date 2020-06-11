@@ -1,8 +1,8 @@
 
 from twisted.internet import defer
-
-from Jcrapy.core.spidermw import SpiderMiddlewareManager
 from Jcrapy.utils.misc import load_object
+from Jcrapy.core.spidermw import SpiderMiddlewareManager
+
 
 class Scraper:
 

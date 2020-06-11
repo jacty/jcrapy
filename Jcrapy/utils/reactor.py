@@ -5,7 +5,7 @@ class CallLaterOnce:
     it hasn't been already scheduled since the last time it ran.
     """
 
-    def __init__(self, func, *a, **kw):
+    def __init__(self, func, *a):
         self._func = func
         self._a = a
         self._call = None

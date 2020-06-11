@@ -7,17 +7,18 @@ For more information see docs/topics/architecture.rst
 from time import time
 
 from twisted.internet import defer, task
-
+from Jcrapy.core.scheduler import Scheduler
+from Jcrapy.core.downloader import Downloader
 from Jcrapy.core.scraper import Scraper
-from Jcrapy.utils.misc import load_object
 from Jcrapy.utils.reactor import CallLaterOnce
 
 class Slot:
 
-    def __init__(self, start_requests, close_if_idle, nextcall):
-        self.start_requests = iter(start_requests)
+    def __init__(self, start_requests, close_if_idle, nextcall, scheduler):
+        self.start_requests = start_requests
         self.close_if_idle = close_if_idle
         self.nextcall = nextcall
+        self.scheduler = scheduler
         self.heartbeat = task.LoopingCall(nextcall.schedule)
 
 class ExecutionEngine:
@@ -25,23 +26,21 @@ class ExecutionEngine:
     def __init__(self, crawler, spider_closed_callback):
         self.crawler = crawler
         self._spider_closed_callback = spider_closed_callback
-        self.slot = None
-        self.running = False
-        self.paused = False
-        self.scheduler_cls=load_object('Jcrapy.core.scheduler.Scheduler')
+        self.scheduler_cls= Scheduler
+        self.downloader = Downloader
         self.scraper = Scraper(crawler)
+        self._spider_closed_callback = spider_closed_callback
 
     @defer.inlineCallbacks
     def start(self):
         """Start the execution engine"""
-        if self.running:
-            raise RuntimeError("Engine already running")
         self.start_time = time()
-        self.running = True
         self._closewait = defer.Deferred()
         yield self._closewait
 
     def _next_request(self, spider):
+        print('self._next_request')
+        return
         slot = self.slot
 
         if self.paused:
@@ -79,13 +78,15 @@ class ExecutionEngine:
     def open_spider(self, spider, start_requests=(), close_if_idle=True):
         nextcall = CallLaterOnce(self._next_request, spider)
         scheduler = self.scheduler_cls.from_crawler(self.crawler)
+
         start_requests = yield self.scraper.spidermw.process_start_requests(start_requests, spider)
-        self.slot = Slot(start_requests, close_if_idle, nextcall)
+        slot = Slot(start_requests, close_if_idle, nextcall, scheduler)
+        self.slot = slot
         self.spider = spider
         yield scheduler.open(spider)
         yield self.scraper.open_spider(spider)
-        self.slot.nextcall.schedule()
-        self.slot.heartbeat.start(5)  
+        slot.nextcall.schedule()
+        slot.heartbeat.start(5)  
     
     def _spider_idle(self, spider):
         print('_spider_idle')

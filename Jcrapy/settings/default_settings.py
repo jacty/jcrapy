@@ -17,7 +17,7 @@ if you add a setting here remember to:
 # from importlib import import_module
 # from os.path import join, abspath, dirname
 
-AJAXCRAWL_ENABLED = False
+# AJAXCRAWL_ENABLED = False
 
 # AUTOTHROTTLE_ENABLED = False
 # AUTOTHROTTLE_DEBUG = False
@@ -45,10 +45,10 @@ AJAXCRAWL_ENABLED = False
 
 # DEFAULT_ITEM_CLASS = 'scrapy.item.Item'
 
-DEFAULT_REQUEST_HEADERS = {
-    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-    'Accept-Language': 'en',
-}
+# DEFAULT_REQUEST_HEADERS = {
+#     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+#     'Accept-Language': 'en',
+# }
 
 # DEPTH_LIMIT = 0
 # DEPTH_STATS_VERBOSE = False
@@ -187,8 +187,8 @@ DEFAULT_REQUEST_HEADERS = {
 
 # ITEM_PROCESSOR = 'scrapy.pipelines.ItemPipelineManager'
 
-# ITEM_PIPELINES = {}
-# ITEM_PIPELINES_BASE = {}
+ITEM_PIPELINES = {}
+ITEM_PIPELINES_BASE = {}
 
 # LOG_ENABLED = True
 # LOG_ENCODING = 'utf-8'
@@ -255,6 +255,19 @@ DEFAULT_REQUEST_HEADERS = {
 # SPIDER_LOADER_CLASS = 'scrapy.spiderloader.SpiderLoader'
 # SPIDER_LOADER_WARN_ONLY = False
 
+
+
+SPIDER_MIDDLEWARES = {}
+
+SPIDER_MIDDLEWARES_BASE = {
+    # Engine side
+    'Jcrapy.spidermiddlewares.httperror.HttpErrorMiddleware': 50,
+    # 'scrapy.spidermiddlewares.offsite.OffsiteMiddleware': 500,
+    # 'scrapy.spidermiddlewares.referer.RefererMiddleware': 700,
+    # 'scrapy.spidermiddlewares.urllength.UrlLengthMiddleware': 800,
+    # 'scrapy.spidermiddlewares.depth.DepthMiddleware': 900,
+    # Spider side
+}
 # SPIDER_MODULES = []
 
 # STATS_CLASS = 'scrapy.statscollectors.MemoryStatsCollector'

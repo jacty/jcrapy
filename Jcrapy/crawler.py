@@ -2,7 +2,7 @@ from twisted.internet import defer, reactor
 
 from Jcrapy import Spider
 from Jcrapy.spiderloader import SpiderLoader
-# from Jcrapy.core.engine import ExecutionEngine
+from Jcrapy.core.engine import ExecutionEngine
 from Jcrapy.utils.ossignal import install_shutdown_handlers
 
 class Crawler:
@@ -11,16 +11,15 @@ class Crawler:
         self.spidercls = spidercls
         self.settings = settings
 
-    # @defer.inlineCallbacks
+    @defer.inlineCallbacks
     def crawl(self, *args):
         #initiate spiderclass from crawler
         self.spider = self.spidercls.from_crawler(self)
-        print('Crawler.crawl')
-        return
-        # self.engine = ExecutionEngine(self, lambda _: self.stop())
-        # start_requests = self.spider.start_requests()
-        # yield self.engine.open_spider(self.spider, start_requests)
-        # yield defer.maybeDeferred(self.engine.start)
+        self.engine = ExecutionEngine(self, lambda _: self.stop())
+        
+        start_requests = self.spider.start_requests()
+        yield self.engine.open_spider(self.spider, start_requests)
+        yield defer.maybeDeferred(self.engine.start)
 
     @defer.inlineCallbacks
     def stop(self):
@@ -69,8 +68,6 @@ class CrawlerRunner:
     def _crawl(self, crawler):
         self._crawlers.add(crawler)
         d = crawler.crawl()
-        print('CrawlerRunner._crawl',crawler)
-        return
         self._active.add(d)
         
         def _done(result):

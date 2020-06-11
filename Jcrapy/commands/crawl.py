@@ -10,7 +10,5 @@ class Command(JcrapyCommand):
         spname = args[0]
         #running CrawlerProcess.crawl(spname)
         crawl_defer = self.crawler_process.crawl(spname)
-        print('crawl.py')
-        return
         self.crawler_process.start()
 
