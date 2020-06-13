@@ -7,8 +7,7 @@ For more information see docs/topics/architecture.rst
 from time import time
 
 from twisted.internet import defer, task
-from Jcrapy.core.scheduler import Scheduler
-from Jcrapy.core.downloader import Downloader
+from Jcrapy.utils.misc import load_object
 from Jcrapy.core.scraper import Scraper
 from Jcrapy.utils.reactor import CallLaterOnce
 
@@ -25,9 +24,10 @@ class ExecutionEngine:
 
     def __init__(self, crawler, spider_closed_callback):
         self.crawler = crawler
+        self.settings = crawler.settings
         self._spider_closed_callback = spider_closed_callback
-        self.scheduler_cls= Scheduler
-        self.downloader = Downloader
+        self.scheduler_cls= load_object(self.settings['SCHEDULER'])
+        self.downloader = load_object(self.settings['DOWNLOADER'])
         self.scraper = Scraper(crawler)
         self._spider_closed_callback = spider_closed_callback
 
