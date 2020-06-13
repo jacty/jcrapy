@@ -10,6 +10,7 @@ class Crawler:
     def __init__(self, spidercls, settings=None):
         self.spidercls = spidercls
         self.settings = settings
+        self.crawling = False
 
     @defer.inlineCallbacks
     def crawl(self, *args):
@@ -23,8 +24,6 @@ class Crawler:
 
     @defer.inlineCallbacks
     def stop(self):
-        """Starts a graceful stop of the crawler and returns a deferred that is
-        fired when the crawler is stopped."""
         if self.crawling:
             self.crawling = False
             yield defer.maybeDeferred(self.engine.stop)        
@@ -46,7 +45,7 @@ class CrawlerRunner:
     def __init__(self, settings=None):
         self.settings = settings
         self.spider_loader = SpiderLoader(settings)
-        self._crawlers = set()
+        self.crawlers = set()
         self._active = set()
         self.bootstrap_failed = False
 
@@ -66,7 +65,7 @@ class CrawlerRunner:
         return self._crawl(crawler)
 
     def _crawl(self, crawler):
-        self._crawlers.add(crawler)
+        self.crawlers.add(crawler)
         d = crawler.crawl()
         self._active.add(d)
         

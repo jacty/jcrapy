@@ -16,8 +16,8 @@ SPIDER_MODULES = ['Jackie.spiders']
 SPIDER_MIDDLEWARES = {
    'Jackie.middlewares.JackieSpiderMiddleware': 543,
 }
-
-
+SCHEDULER = 'Jcrapy.core.scheduler.Scheduler'
+DOWNLOADER = 'Jcrapy.core.downloader.Downloader'
 
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
