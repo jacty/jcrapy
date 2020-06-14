@@ -58,8 +58,6 @@ def execute():
     cmd.crawler_process = CrawlerProcess(settings)
     # Invoke CrawlerProcess.crawl() through cmd.run()
     cmd.run(args)
-    print('execute', cmd)
-    return
     sys.exit(0)
 
 
