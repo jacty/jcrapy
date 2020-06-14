@@ -25,7 +25,8 @@ class ExecutionEngine:
     def __init__(self, crawler, spider_closed_callback):
         self.crawler = crawler
         self.settings = crawler.settings
-        self._spider_closed_callback = spider_closed_callback
+        self.running = False
+        self.paused = False
         self.scheduler_cls= load_object(self.settings['SCHEDULER'])
         self.downloader = load_object(self.settings['DOWNLOADER'])
         self.scraper = Scraper(crawler)
@@ -39,14 +40,17 @@ class ExecutionEngine:
         yield self._closewait
 
     def _next_request(self, spider):
-        print('self._next_request')
-        return
         slot = self.slot
 
         if self.paused:
             return
 
+        while not self._needs_backout(spider):
+            if not self._next_request_from_scheduler(spider):
+                break
+
         if slot.start_requests and not self._needs_backout(spider):
+            print('ExecutionEngine._next_request')
             try:
                 request = next(slot.start_requests)
             except StopIteration:
@@ -60,6 +64,12 @@ class ExecutionEngine:
     def _needs_backout(self, spider):
         slot = self.slot
         return not self.running
+
+    def _next_request_from_scheduler(self, spider):
+        slot = self.slot
+        request = slot.scheduler.next_request()
+        print('ExecutionEngine._next_request_from_scheduler')
+        return
 
     def spider_is_idle(self, spider):
         if self.slot.start_requests is not None:
