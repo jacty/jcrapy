@@ -4,6 +4,16 @@ from collections.abc import MutableMapping #for iteration from items()
 from importlib import import_module
 
 from Jcrapy.settings import default_settings
+###
+# Setting priorities mapping. In this version, priorities must be a number.
+# SETTINGS_PRIORITIES = {
+#     'default': 0,
+#     'command': 10,
+#     'project': 20,
+#     'spider': 30,
+#     'cmdline': 40,
+# }
+###
 
 class SettingsAttribute:
 
@@ -12,11 +22,17 @@ class SettingsAttribute:
     This class is intended for internal usage, you should try Settings class
     for settings configuration, not this one.
     """
-    def __init__(self, value):
+    def __init__(self, value, priority):
         self.value = value
+        if isinstance(self.value, BaseSettings):
+            print('SettingsAttribute.__init__')
+        else:
+            self.priority = priority
 
-    def set(self, value):
+    def set(self, value, priority):
         self.value = value
+        if priority >= self.priority:
+            print('SettingsAttribute.set', priority, self.priority)
 
     def __str__(self):
         return "<SettingsAttribute value={self.value!r} ".format(self=self)
@@ -24,11 +40,10 @@ class SettingsAttribute:
     __repr__ = __str__
 
 class BaseSettings(MutableMapping):
-    def __init__(self, values=None):
+    def __init__(self, values=None, priority=20):
         self.frozen = False
         self.attributes = {}
         if values:
-            print('BaseSettings.__init__.update()')
             self.update(values, priority)
     
     def __getitem__(self, opt_name):
@@ -57,7 +72,7 @@ class BaseSettings(MutableMapping):
     def __setitem__(self, name, value):
         print('BaseSettings.__setitem__')
 
-    def set(self, name, value):
+    def set(self, name, value, priority=20):
         """
         Settings should be populated *before* configuring the Crawler object
         (through the :meth:`~Jcrapy.crawler.Crawler.configure` method),
@@ -69,13 +84,16 @@ class BaseSettings(MutableMapping):
         :param value: the value to associate with the setting
         :type value: any
         """  
-        if name not in self:    
-            self.attributes[name] = SettingsAttribute(value)
+        if name not in self: 
+            if isinstance(value, SettingsAttribute):
+                print('BaseSettings.set()')
+            else:   
+                self.attributes[name] = SettingsAttribute(value, priority)
         else:
             #custom settings replace relevant default settings.
-            self.attributes[name].set(value)
+            self.attributes[name].set(value, priority)
 
-    def setmodule(self, module):
+    def setmodule(self, module, priority=20):
         """
         Deliver uppercased settings to self.set().
         """ 
@@ -84,9 +102,9 @@ class BaseSettings(MutableMapping):
 
         for key in dir(module):
             if key.isupper():
-                self.set(key, getattr(module, key))
+                self.set(key, getattr(module, key), priority)
 
-    def update(self, values):
+    def update(self, values, priority=20):
         """
         :param values: the settings names and values
         :type values: dict or string or :class:`~Jcrapy.settings.BaseSettings`
@@ -115,6 +133,15 @@ class Settings(BaseSettings):
         
         # Assign default settings to Settings
         if values is None:
-            self.setmodule(default_settings)        
+            self.setmodule(default_settings) 
+
+        for name, val in self.items():
+            if isinstance(val, dict):
+                self.set(name, BaseSettings(val, 0), 0)
+
+                
+
+    
+    
 
         
