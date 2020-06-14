@@ -46,7 +46,7 @@ class ExecutionEngine:
 
         if self.paused:
             return
-        print('_next_request',self._needs_backout(spider))
+
         while not self._needs_backout(spider):
             if not self._next_request_from_scheduler(spider):
                 break
@@ -69,7 +69,7 @@ class ExecutionEngine:
 
     def _next_request_from_scheduler(self, spider):
         slot = self.slot
-        # request = slot.scheduler.next_request()
+        request = slot.scheduler.next_request()
         print('ExecutionEngine._next_request_from_scheduler')
         return
 

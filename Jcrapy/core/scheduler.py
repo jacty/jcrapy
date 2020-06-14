@@ -18,8 +18,9 @@ class Scheduler:
     (in-memory and on-disk) and implements fallback logic for them.
     Also, it handles dupefilters.
     """
-    def __init__(self, dupefilter, mqclass=None, pqclass=None, crawler=None):
+    def __init__(self, dupefilter, jobdir=None, mqclass=None, pqclass=None, crawler=None):
         self.df = dupefilter
+        self.dqdir = self._dqdir(jobdir)
         self.pqclass = pqclass
         self.mqclass = mqclass
         self.crawler = crawler
@@ -32,19 +33,29 @@ class Scheduler:
         dupefilter = create_instance(dupefilter_cls, settings, crawler)
         pqclass = load_object(settings['SCHEDULER_PRIORITY_QUEUE'])
         mqclass = load_object(settings['SCHEDULER_MEMORY_QUEUE'])
-        return cls(dupefilter, pqclass=pqclass, mqclass=mqclass, crawler=crawler)
+        return cls(dupefilter, jobdir=None, pqclass=pqclass, mqclass=mqclass, crawler=crawler)
 
     def open(self, spider):
         self.spider = spider
         self.mqs = self._mq()
+        self.dqs = self._dq() if self.dqdir else None
         return self.df.open()
     def next_request(self):
         request = self.mqs.pop()
-        print('Scheduler.next_request')
-        return
+        if request:
+            print('Scheduler.next_request')
+        else:
+            request = self._dqpop()
+            
+        return request
+        
 
     def __len__(self):
         print('Scheduler.__len__')
+
+    def _dqpop(self):
+        if self.dqs:
+            return self.dqs.pop()
 
     def _mq(self):
         """ Create a new priority queue instance, with in-memory storage """
@@ -53,3 +64,8 @@ class Scheduler:
                                crawler=self.crawler,
                                downstream_queue_cls=self.mqclass,
                                key='')        
+
+    def _dqdir(self, jobdir):
+        """ Return a folder name to keep disk queue state at """
+        if jobdir:
+            print('Scheduler._dqdir')        

@@ -30,10 +30,11 @@ class JcrapyPriorityQueue:
         self.key = key
         self.queues = {}
         self.curprio = None
-        # self.init_prios(startprios)
+        self.init_prios(startprios)
 
     def init_prios(self, startprios):
-        print('JcrapyPriorityQueue.init_prios') 
+        if not startprios:
+            return 
 
     def pop(self):
         if self.curprio is None:
