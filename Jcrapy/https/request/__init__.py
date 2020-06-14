@@ -6,24 +6,44 @@ See documentation in docs/topics/request-response.rst
 """
 from w3lib.url import safe_url_string
 
+from Jcrapy.https.headers import Headers
+from Jcrapy.utils.python import to_bytes
+from Jcrapy.utils.url import escape_ajax
 
 class Request:
-    def __init__(self, url, callback=None, method='GET', headers=None, body=None, cookies=None, meta=None, encoding='utf-8', priority=0, dont_filter=False):
-        print('Request.__init__')
+    def __init__(self, url, callback=None, method='GET', headers=None, body=None, cookies=None, meta=None, encoding='utf-8', priority=0, dont_filter=False, errback=None, flags=None, cb_kwargs=None):
         self._encoding = encoding #must be set first
         self.method = str(method).upper()
         self._set_url(url)
-        # self._set_body(body)
+        self._set_body(body)
+        if not isinstance(priority, int):
+            raise TypeError("Request priority not an integer: %r" % priority)
+        self.priority = priority
 
+        if callback is not None and not callable(callback):
+            raise TypeError('callback must be a callable, got %s' % type(callback).__name__)
+        if errback is not None and not callable(errback):
+            raise TypeError('errback must be a callable, got %s' % type(errback).__name__)
+        self.callback = callback
+        self.errback = errback
+
+        self.cookies = cookies or {}
+        self.headers = Headers(headers or {}, encoding=encoding)
+        self.dont_filter = dont_filter
+
+        self._meta = dict(meta) if meta else None
+        self._cb_kwargs = dict(cb_kwargs) if cb_kwargs else None
+        self.flags = [] if flags is None else list(flags)
 
     def _set_url(self, url):
         if not isinstance(url, str):
             raise TypeError('Request url must be str or unicode, got %s:' % type(url).__name__)
-        s = safe_url_string(url, self.encoding)
         
-        if ('://' not in s) and (not s.startswith('data:')):
-            raise ValueError('Missing scheme in request url: %s' % s)        
+        s = safe_url_string(url, self.encoding)
+        self._url = escape_ajax(s)
 
+        if ('://' not in self._url) and (not self._url.startswith('data:')):
+            raise ValueError('Missing scheme in request url: %s' % self._url)        
     def _set_body(self, body):
         if body is None:
             self._body = b''

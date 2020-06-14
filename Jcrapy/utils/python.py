@@ -8,3 +8,8 @@ def without_none_values(iterable):
         return {k: v for k, v in iterable.items() if v is not None}
     except AttributeError:
         print('Something wrong in without_none_values')
+
+def to_bytes(text, encoding=None, errors='strict'):
+    """Return the binary representation of ``text``. If ``text``
+    is already a bytes object, return it as-is."""
+    print('to_bytes', text, encoding, errors)    

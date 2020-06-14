@@ -52,7 +52,6 @@ class ExecutionEngine:
                 break
 
         if slot.start_requests and not self._needs_backout(spider):
-            print('ExecutionEngine._next_request')
             try:
                 request = next(slot.start_requests)
             except StopIteration:
@@ -70,9 +69,10 @@ class ExecutionEngine:
     def _next_request_from_scheduler(self, spider):
         slot = self.slot
         request = slot.scheduler.next_request()
-        print('ExecutionEngine._next_request_from_scheduler')
-        return
-
+        if not request:
+            return
+        print('ExecutionEngine._next_request_from_scheduler', request)
+        
     def spider_is_idle(self, spider):
         if self.slot.start_requests is not None:
             return False
@@ -84,7 +84,11 @@ class ExecutionEngine:
     def crawl(self, request, spider):
         if spider not in self.open_spiders:
             raise RuntimeError("Spider %r not opened when crawling: %s" % (spider.name, request))
-        self.slot.nextcall.schedule()        
+        self.schedule(request, spider)
+        self.slot.nextcall.schedule()
+
+    def schedule(self, request, spider):
+        pass        
 
     @defer.inlineCallbacks
     def open_spider(self, spider, start_requests=(), close_if_idle=True):
