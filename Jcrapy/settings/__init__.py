@@ -32,7 +32,10 @@ class SettingsAttribute:
     def set(self, value, priority):
         self.value = value
         if priority >= self.priority:
-            print('SettingsAttribute.set', priority, self.priority)
+            if isinstance(self.value, BaseSettings):
+                print('SettingsAttribute.set',value, priority, self.priority)
+            self.value = value
+            self.priority = priority
 
     def __str__(self):
         return "<SettingsAttribute value={self.value!r} ".format(self=self)
