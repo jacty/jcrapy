@@ -3,6 +3,7 @@ from twisted.internet import defer, reactor
 from Jcrapy import Spider
 from Jcrapy.spiderloader import SpiderLoader
 from Jcrapy.core.engine import ExecutionEngine
+from Jcrapy.utils.misc import create_instance, load_object
 from Jcrapy.utils.ossignal import install_shutdown_handlers
 
 class Crawler:
@@ -42,12 +43,19 @@ class CrawlerRunner:
     process. See :ref:`run-from-script` for an example.
     """
 
+    @staticmethod
+    def _get_spider_loader(settings):
+        cls_path = settings.get('SPIDER_LOADER_CLASS')
+        loader_cls = load_object(cls_path)
+        return loader_cls.from_settings(settings)
+
     def __init__(self, settings=None):
         self.settings = settings
-        self.spider_loader = SpiderLoader(settings)
+        self.spider_loader = self._get_spider_loader(settings)
         self.crawlers = set()
         self._active = set()
         self.bootstrap_failed = False
+        self._handle_twisted_reactor()
 
     def crawl(self, spidername):
         """
@@ -90,6 +98,10 @@ class CrawlerRunner:
         """
         while self._active:
             yield defer.DeferredList(self._active)
+
+    def _handle_twisted_reactor(self):
+        if self.settings.get("TWISTED_REACTOR"):
+            print('CrawlerRunner._handle_twisted_reactor')
    
 
 class CrawlerProcess(CrawlerRunner):
