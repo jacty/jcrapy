@@ -25,10 +25,14 @@ class ExecutionEngine:
     def __init__(self, crawler, spider_closed_callback):
         self.crawler = crawler
         self.settings = crawler.settings
+        self.slot = None
+        self.spider = None
         self.running = False
         self.paused = False
         self.scheduler_cls= load_object(self.settings['SCHEDULER'])
-        self.downloader = load_object(self.settings['DOWNLOADER'])
+        downloader_cls = load_object(self.settings['DOWNLOADER'])
+        self.downloader = downloader_cls(crawler)
+        print('ExecutionEngine.__init__', downloader_cls)
         self.scraper = Scraper(crawler)
         self._spider_closed_callback = spider_closed_callback
 

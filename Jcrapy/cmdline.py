@@ -57,8 +57,6 @@ def execute():
     # Assign CrawlerProcess to Base Class of commands in __init__.py 
     cmd.crawler_process = CrawlerProcess(settings)
     # Invoke CrawlerProcess.crawl() through cmd.run()
-    print('execute')
-    return
     cmd.run(args)
     sys.exit(0)
 

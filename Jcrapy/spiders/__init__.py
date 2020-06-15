@@ -13,7 +13,6 @@ class Spider:
     def __init__(self):
         #get spider name
         self.name = getattr(self, 'name')
-
         #self.crawler and self.settings will be set in self._set_crawler
     @classmethod
     def from_crawler(cls, crawler):

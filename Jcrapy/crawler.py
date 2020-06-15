@@ -12,16 +12,27 @@ class Crawler:
         self.spidercls = spidercls
         self.settings = settings
         self.crawling = False
+        self.spider = None
+        self.engine = None
 
     @defer.inlineCallbacks
     def crawl(self, *args):
-        #initiate spiderclass from crawler
-        self.spider = self.spidercls.from_crawler(self)
-        self.engine = ExecutionEngine(self, lambda _: self.stop())
-        
-        start_requests = self.spider.start_requests()
-        yield self.engine.open_spider(self.spider, start_requests)
-        yield defer.maybeDeferred(self.engine.start)
+        if self.crawling:
+            raise RuntimeError("Crawling already taking place")
+        self.crawling = True
+        try:
+            #initiate spiderclass from crawler
+            self.spider = self.spidercls.from_crawler(self)
+            self.engine = ExecutionEngine(self, lambda _: self.stop())
+            print('Crawler.crawl', self.spidercls.from_crawler)
+            start_requests = self.spider.start_requests()
+            yield self.engine.open_spider(self.spider, start_requests)
+            yield defer.maybeDeferred(self.engine.start)
+        except Exception:
+            self.crawling = False
+            if self.engine is not None:
+                yield self.engine.close()
+            raise
 
     @defer.inlineCallbacks
     def stop(self):
