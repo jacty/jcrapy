@@ -36,9 +36,9 @@ if you add a setting here remember to:
 
 # CONCURRENT_ITEMS = 100
 
-# CONCURRENT_REQUESTS = 16
-# CONCURRENT_REQUESTS_PER_DOMAIN = 8
-# CONCURRENT_REQUESTS_PER_IP = 0
+CONCURRENT_REQUESTS = 16
+CONCURRENT_REQUESTS_PER_DOMAIN = 8
+CONCURRENT_REQUESTS_PER_IP = 0
 
 # COOKIES_ENABLED = True
 # COOKIES_DEBUG = False
@@ -61,15 +61,15 @@ if you add a setting here remember to:
 
 # DOWNLOAD_DELAY = 0
 
-# DOWNLOAD_HANDLERS = {}
-# DOWNLOAD_HANDLERS_BASE = {
-#     'data': 'scrapy.core.downloader.handlers.datauri.DataURIDownloadHandler',
-#     'file': 'scrapy.core.downloader.handlers.file.FileDownloadHandler',
-#     'http': 'scrapy.core.downloader.handlers.http.HTTPDownloadHandler',
-#     'https': 'scrapy.core.downloader.handlers.http.HTTPDownloadHandler',
-#     's3': 'scrapy.core.downloader.handlers.s3.S3DownloadHandler',
-#     'ftp': 'scrapy.core.downloader.handlers.ftp.FTPDownloadHandler',
-# }
+DOWNLOAD_HANDLERS = {}
+DOWNLOAD_HANDLERS_BASE = {
+    # 'data': 'scrapy.core.downloader.handlers.datauri.DataURIDownloadHandler',
+    # 'file': 'scrapy.core.downloader.handlers.file.FileDownloadHandler',
+    'http': 'Jcrapy.core.downloader.handlers.http.HTTPDownloadHandler',
+    # 'https': 'scrapy.core.downloader.handlers.http.HTTPDownloadHandler',
+    # 's3': 'scrapy.core.downloader.handlers.s3.S3DownloadHandler',
+    # 'ftp': 'scrapy.core.downloader.handlers.ftp.FTPDownloadHandler',
+}
 
 # DOWNLOAD_TIMEOUT = 180      # 3mins
 
