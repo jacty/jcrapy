@@ -43,6 +43,7 @@ class SettingsAttribute:
     __repr__ = __str__
 
 class BaseSettings(MutableMapping):
+    
     def __init__(self, values=None, priority=20):
         self.frozen = False
         self.attributes = {}
@@ -59,6 +60,11 @@ class BaseSettings(MutableMapping):
 
     def get(self, name, default=None):
         return self[name] if self[name] is not None else default
+
+    def getlist(self, name, default=None):
+        
+        value = self.get(name, default or [])
+        return list(value)
 
     def getwithbase(self, name):
         """Get a composition of a dictionary-like setting and its `_BASE`

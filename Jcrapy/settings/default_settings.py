@@ -252,7 +252,7 @@ SCHEDULER_PRIORITY_QUEUE = 'Jcrapy.pqueues.JcrapyPriorityQueue'
 
 # SCRAPER_SLOT_MAX_ACTIVE_SIZE = 5000000
 
-# SPIDER_LOADER_CLASS = 'scrapy.spiderloader.SpiderLoader'
+SPIDER_LOADER_CLASS = 'Jcrapy.spiderloader.SpiderLoader'
 # SPIDER_LOADER_WARN_ONLY = False
 
 
