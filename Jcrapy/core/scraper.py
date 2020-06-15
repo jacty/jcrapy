@@ -11,7 +11,8 @@ class Scraper:
         self.spidermw = SpiderMiddlewareManager.from_settings(crawler)
         itemproc_cls = load_object(crawler.settings['ITEM_PROCESSOR'])
         self.itemproc = itemproc_cls.from_settings(crawler)
-        print('Scraper.__init__')
+        self.concurrent_items = crawler.settings.getint('CONCURRENT_ITEMS')
+        self.crawler = crawler
 
     @defer.inlineCallbacks
     def open_spider(self, spider):

@@ -33,7 +33,6 @@ class ExecutionEngine:
         downloader_cls = load_object(self.settings['DOWNLOADER'])
         self.downloader = downloader_cls(crawler)
         self.scraper = Scraper(crawler)
-        print('ExecutionEngine.__init__', downloader_cls)
         self._spider_closed_callback = spider_closed_callback
 
     @defer.inlineCallbacks
