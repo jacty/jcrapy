@@ -91,20 +91,20 @@ DOWNLOADER_MIDDLEWARES = {}
 
 DOWNLOADER_MIDDLEWARES_BASE = {
     # Engine side
-    'Jcrapy.downloadermiddlewares.robotstxt.RobotsTxtMiddleware': 100,
-    'Jcrapy.downloadermiddlewares.httpauth.HttpAuthMiddleware': 300,
-    'Jcrapy.downloadermiddlewares.downloadtimeout.DownloadTimeoutMiddleware': 350,
+    # 'Jcrapy.downloadermiddlewares.robotstxt.RobotsTxtMiddleware': 100,
+    # 'Jcrapy.downloadermiddlewares.httpauth.HttpAuthMiddleware': 300,
+    # 'Jcrapy.downloadermiddlewares.downloadtimeout.DownloadTimeoutMiddleware': 350,
     'Jcrapy.downloadermiddlewares.defaultheaders.DefaultHeadersMiddleware': 400,
-    'Jcrapy.downloadermiddlewares.useragent.UserAgentMiddleware': 500,
-    'Jcrapy.downloadermiddlewares.retry.RetryMiddleware': 550,
-    'Jcrapy.downloadermiddlewares.ajaxcrawl.AjaxCrawlMiddleware': 560,
-    'Jcrapy.downloadermiddlewares.redirect.MetaRefreshMiddleware': 580,
-    'Jcrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware': 590,
-    'Jcrapy.downloadermiddlewares.redirect.RedirectMiddleware': 600,
-    'Jcrapy.downloadermiddlewares.cookies.CookiesMiddleware': 700,
-    'Jcrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 750,
-    'Jcrapy.downloadermiddlewares.stats.DownloaderStats': 850,
-    'Jcrapy.downloadermiddlewares.httpcache.HttpCacheMiddleware': 900,
+    # 'Jcrapy.downloadermiddlewares.useragent.UserAgentMiddleware': 500,
+    # 'Jcrapy.downloadermiddlewares.retry.RetryMiddleware': 550,
+    # 'Jcrapy.downloadermiddlewares.ajaxcrawl.AjaxCrawlMiddleware': 560,
+    # 'Jcrapy.downloadermiddlewares.redirect.MetaRefreshMiddleware': 580,
+    # 'Jcrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware': 590,
+    # 'Jcrapy.downloadermiddlewares.redirect.RedirectMiddleware': 600,
+    # 'Jcrapy.downloadermiddlewares.cookies.CookiesMiddleware': 700,
+    # 'Jcrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 750,
+    # 'Jcrapy.downloadermiddlewares.stats.DownloaderStats': 850,
+    # 'Jcrapy.downloadermiddlewares.httpcache.HttpCacheMiddleware': 900,
     # Downloader side
 }
 

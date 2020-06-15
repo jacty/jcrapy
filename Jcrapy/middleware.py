@@ -22,8 +22,8 @@ class MiddlewareManager:
                 mwcls = load_object(clspath)
                 mw = create_instance(mwcls, crawler.settings, crawler)
                 middlewares.append(mw)
-            except NotConfigure as e:
-                print('Error in middleware.from_settings')
+            except:
+                print('Error in middleware.from_settings', clspath)
         return cls(*middlewares)
 
     def _add_middleware(self, mw):
