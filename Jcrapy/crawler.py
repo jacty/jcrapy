@@ -23,7 +23,7 @@ class Crawler:
         try:
             #initiate spiderclass from crawler
             self.spider = self.spidercls.from_crawler(self)
-            self.engine = ExecutionEngine(self, lambda _: self.stop())
+            self.engine = ExecutionEngine(self, self.stop())
             start_requests = self.spider.start_requests()
             yield self.engine.open_spider(self.spider, start_requests)
             yield defer.maybeDeferred(self.engine.start)

@@ -41,6 +41,11 @@ class ExecutionEngine:
     def __init__(self, crawler, spider_closed_callback):
         self.crawler = crawler
         self.settings = crawler.settings
+        ###
+        # TD: Log related
+        # self.signals = crawler.signals
+        # self.logformatter = crawler.logformatter
+        ###
         self.slot = None
         self.spider = None
         self.running = False
