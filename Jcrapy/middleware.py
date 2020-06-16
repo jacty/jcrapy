@@ -37,3 +37,6 @@ class MiddlewareManager:
 
     def open_spider(self, spider):
         return process_parallel(self.methods['open_spider'], spider)
+
+    def close_spider(self, spider):
+        return process_parallel(self.methods['close_spider'], spider)

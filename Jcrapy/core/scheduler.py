@@ -40,6 +40,12 @@ class Scheduler:
         self.mqs = self._mq()
         self.dqs = self._dq() if self.dqdir else None
         return self.df.open()
+
+    def close(self, reason):
+        if self.dqs:
+            print('Scheduler.close', self.dqs)
+        return self.df.close(reason)
+
     def next_request(self):
         request = self.mqs.pop()
         if request:

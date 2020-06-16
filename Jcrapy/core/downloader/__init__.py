@@ -18,8 +18,15 @@ class Downloader:
         self._slot_gc_loop = task.LoopingCall(self._slot_gc)
         self._slot_gc_loop.start(60)
 
+    
+    def close(self):
+        self._slot_gc_loop.stop()
+        for slot in self.slots.values():
+            slot.close()
+
     def _slot_gc(self, age=60):
         mintime = time() - age
         for key, slot in list(self.slots.items()):
+            print('Downloader._slot_gc', key, slot)
             if not slot.active and slot.lastseen + slot.delay < mintime:
                 self.slots.pop(key).close()        

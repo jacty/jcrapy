@@ -10,15 +10,31 @@ from twisted.internet import defer, task
 from Jcrapy.utils.misc import load_object
 from Jcrapy.core.scraper import Scraper
 from Jcrapy.utils.reactor import CallLaterOnce
+from Jcrapy.utils.log import failure_to_exc_info
 
 class Slot:
 
     def __init__(self, start_requests, close_if_idle, nextcall, scheduler):
+        self.closing = False
+        self.inprogress = set()
         self.start_requests = start_requests
         self.close_if_idle = close_if_idle
         self.nextcall = nextcall
         self.scheduler = scheduler
         self.heartbeat = task.LoopingCall(nextcall.schedule)
+
+    def close(self):
+        self.closing = defer.Deferred() #self.closing turned True
+        self._maybe_fire_closing()
+        return self.closing
+
+    def _maybe_fire_closing(self):
+        if self.closing and not self.inprogress:
+            if self.nextcall:
+                self.nextcall.cancel()
+                if self.heartbeat.running:
+                    self.heartbeat.stop()
+            self.closing.callback(None)
 
 class ExecutionEngine:
 
@@ -43,6 +59,14 @@ class ExecutionEngine:
         self.running = True
         self._closewait = defer.Deferred()
         yield self._closewait
+
+    def stop(self):
+        if not self.running:
+            raise RuntimeError('Engine not running')
+        self.running = False
+        dfd = self._close_all_spiders()
+        return dfd
+        # return dfd.addBoth(lambda _: self._finish_stopping_engine())
 
     def _next_request(self, spider):
         slot = self.slot
@@ -109,3 +133,44 @@ class ExecutionEngine:
     
     def _spider_idle(self, spider):
         print('_spider_idle')
+
+    def close_spider(self, spider, reason='canceled'):
+        """Close (cancel) spider and clear all its outstanding requests"""
+        slot = self.slot
+        if slot.closing:
+            return slot.closing
+
+        dfd = slot.close()
+
+        def log_failure(msg):
+            def errback(failure):
+                print(failure)
+            return errback
+
+        dfd.addBoth(lambda _: self.downloader.close())
+        dfd.addErrback(log_failure('Downloader close failure'))
+
+        dfd.addBoth(lambda _: self.scraper.close_spider(spider))
+        dfd.addErrback(log_failure('Scraper close failure'))
+
+        dfd.addBoth(lambda _: slot.scheduler.close(reason))
+        dfd.addErrback(log_failure('Scheduler close failure'))
+
+        dfd.addBoth(lambda _: setattr(self, 'slot', None))
+        dfd.addErrback(log_failure('Error while unassigning slot'))
+
+        dfd.addBoth(lambda _: setattr(self, 'spider', None))
+        dfd.addErrback(log_failure('Error while unassigning spider'))
+
+        dfd.addBoth(lambda _: self._spider_closed_callback(spider))
+
+        return dfd
+
+    def _close_all_spiders(self):
+        dfds = [self.close_spider(s, reason='shutdown') for s in self.open_spiders]
+        dlist = defer.DeferredList(dfds)
+        return dlist
+
+    # @defer.inlineCallbacks
+    # def _finish_stopping_engine(self):
+    #     yield self._closewait.callback(None)

@@ -11,8 +11,12 @@ class RFPDupeFilter(BaseDupeFilter):
     """Request Fingerprint duplicates filter"""
 
     def __init__(self, path=None, debug=False):
-        pass
+        self.file = None
 
     @classmethod
     def from_settings(cls, settings):
         return cls()
+
+    def close(self, reason):
+        if self.file:
+            self.file.close()
