@@ -71,7 +71,6 @@ class ExecutionEngine:
         self.running = False
         dfd = self._close_all_spiders()
         return dfd
-        # return dfd.addBoth(lambda _: self._finish_stopping_engine())
 
     def _next_request(self, spider):
         slot = self.slot
@@ -113,6 +112,9 @@ class ExecutionEngine:
     def open_spiders(self):
         return [self.spider] if self.spider else []
     
+    def has_capacity(self):
+        return not bool(self.slot)
+
     def crawl(self, request, spider):
         if spider not in self.open_spiders:
             raise RuntimeError("Spider %r not opened when crawling: %s" % (spider.name, request))
@@ -124,6 +126,8 @@ class ExecutionEngine:
 
     @defer.inlineCallbacks
     def open_spider(self, spider, start_requests=(), close_if_idle=True):
+        if not self.has_capacity():
+            raise RuntimeError("No free spider slot when opening %r" % spider.name)
         nextcall = CallLaterOnce(self._next_request, spider)
         scheduler = self.scheduler_cls.from_crawler(self.crawler)
 
@@ -175,7 +179,3 @@ class ExecutionEngine:
         dfds = [self.close_spider(s, reason='shutdown') for s in self.open_spiders]
         dlist = defer.DeferredList(dfds)
         return dlist
-
-    # @defer.inlineCallbacks
-    # def _finish_stopping_engine(self):
-    #     yield self._closewait.callback(None)
