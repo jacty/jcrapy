@@ -18,6 +18,8 @@ class Downloader:
         self._slot_gc_loop = task.LoopingCall(self._slot_gc)
         self._slot_gc_loop.start(60)
 
+    def needs_backout(self):
+        return len(self.active) >= self.total_concurrency
     
     def close(self):
         self._slot_gc_loop.stop()

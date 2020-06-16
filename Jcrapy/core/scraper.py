@@ -17,6 +17,9 @@ class Slot:
     def is_idle(self):
         return not (self.queue or self.active)
 
+    def needs_backout(self):
+        return self.active_size > self.max_active_size
+
 class Scraper:
 
     def __init__(self, crawler):

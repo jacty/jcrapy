@@ -74,15 +74,17 @@ class ExecutionEngine:
 
     def _next_request(self, spider):
         slot = self.slot
+        if not slot:
+            return 
 
         if self.paused:
             return
 
-        while not self._needs_backout(spider):
+        while not self._needs_backout():
             if not self._next_request_from_scheduler(spider):
                 break
 
-        if slot.start_requests and not self._needs_backout(spider):
+        if slot.start_requests and not self._needs_backout():
             try:
                 request = next(slot.start_requests)
             except StopIteration:
@@ -93,9 +95,12 @@ class ExecutionEngine:
         if self.spider_is_idle(spider) and slot.close_if_idle:
             self._spider_idle(spider)
 
-    def _needs_backout(self, spider):
+    def _needs_backout(self):
         slot = self.slot
-        return not self.running
+        return not self.running \
+            or slot.closing \
+            or self.downloader.needs_backout() \
+            or self.scraper.slot.needs_backout()
 
     def _next_request_from_scheduler(self, spider):
         slot = self.slot
