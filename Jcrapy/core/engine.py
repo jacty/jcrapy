@@ -72,7 +72,21 @@ class ExecutionEngine:
         dfd = self._close_all_spiders()
         return dfd
 
+    def close(self):
+        """Close the execution engine gracefully.
+
+        If it has already been started, stop it. In all cases, close all spiders
+        and the downloader.
+        """
+        if self.running:
+            return self.stop() 
+        elif self.open_spiders:
+            return self._close_all_spiders()
+        else:
+            return defer.succeed(self.downloader.close())       
+
     def _next_request(self, spider):
+
         slot = self.slot
         if not slot:
             return 
@@ -127,7 +141,7 @@ class ExecutionEngine:
         self.slot.nextcall.schedule()
 
     def schedule(self, request, spider):
-        pass        
+        self.slot.scheduler.enqueue_request(request)        
 
     @defer.inlineCallbacks
     def open_spider(self, spider, start_requests=(), close_if_idle=True):
