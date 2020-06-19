@@ -40,15 +40,15 @@ class Request:
             raise TypeError('Request url must be str or unicode, got %s:' % type(url).__name__)
         
         s = safe_url_string(url, self.encoding)
-        self._url = escape_ajax(s)
+        self.url = escape_ajax(s)
 
-        if ('://' not in self._url) and (not self._url.startswith('data:')):
-            raise ValueError('Missing scheme in request url: %s' % self._url)        
+        if ('://' not in self.url) and (not self.url.startswith('data:')):
+            raise ValueError('Missing scheme in request url: %s' % self.url)        
     def _set_body(self, body):
         if body is None:
-            self._body = b''
+            self.body = b''
         else:
-            self._body = to_bytes(body, self.encoding)
+            self.body = to_bytes(body, self.encoding)
 
     @property
     def encoding(self):

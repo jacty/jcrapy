@@ -1,3 +1,5 @@
+from Jcrapy.utils.request import request_fingerprint
+
 class BaseDupeFilter:
     
     @classmethod
@@ -12,10 +14,19 @@ class RFPDupeFilter(BaseDupeFilter):
 
     def __init__(self, path=None, debug=False):
         self.file = None
+        self.fingerprints = set()
 
     @classmethod
     def from_settings(cls, settings):
         return cls()
+
+    def request_seen(self, request):
+        fp = request_fingerprint(request)
+        if fp in self.fingerprints:
+            return True
+        self.fingerprints.add(fp)
+        if self.file:
+            self.file.write(fp + '\n')
 
     def close(self, reason):
         if self.file:

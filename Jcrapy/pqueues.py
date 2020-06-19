@@ -1,3 +1,5 @@
+
+from Jcrapy.utils.misc import create_instance
 class JcrapyPriorityQueue:
     """A priority queue implemented using multiple internal queues (typically,
     FIFO queues). It uses one internal queue for each priority value. The internal
@@ -39,7 +41,31 @@ class JcrapyPriorityQueue:
     def pop(self):
         if self.curprio is None:
             return
-        print('JcrapyPriorityQueue.pop')
+        q = self.queues[self.curprio]
+        m = q.pop()
+        if not q:
+            del self.queues[self.curprio]
+            q.close()
+            prios = [p for p, q in self.queues.items() if q]
+            self.curprio = min(prios) if prios else None
+        return m
 
+    def qfactory(self, key):
+        return create_instance(self.downstream_queue_cls,
+                                None,
+                                self.crawler,
+                                self.key + '/' +str(key))
+
+    def priority(self, request):
+        return -request.priority
+
+    def push(self, request):
+        priority = self.priority(request)
+        if priority not in self.queues:
+            self.queues[priority] = self.qfactory(priority)
+        q = self.queues[priority]
+        q.push(request) # this may fail(eg. serialization error)
+        if self.curprio is None or priority < self.curprio:
+            self.curprio = priority
 
 

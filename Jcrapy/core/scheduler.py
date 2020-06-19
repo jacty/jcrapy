@@ -46,10 +46,20 @@ class Scheduler:
             print('Scheduler.close', self.dqs)
         return self.df.close(reason)
 
+    def enqueue_request(self, request):
+        if not request.dont_filter and self.df.request_seen(request):
+            return False
+        dqok = self._dqpush(request)
+        if dqok:
+            print('Scheduler.enqueue_request',dqok)
+        else:
+            self.mqs.push(request)
+        return True            
+
     def next_request(self):
         request = self.mqs.pop()
         if request:
-            print('Scheduler.next_request')
+            pass
         else:
             request = self._dqpop()
             
@@ -58,6 +68,11 @@ class Scheduler:
 
     def __len__(self):
         print('Scheduler.__len__')
+
+    def _dqpush(self, request):
+        if self.dqs is None:
+            return
+        print('scheduler._dqpush')
 
     def _dqpop(self):
         if self.dqs:
