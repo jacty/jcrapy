@@ -34,7 +34,12 @@ class Request:
         self._meta = dict(meta) if meta else None
         self._cb_kwargs = dict(cb_kwargs) if cb_kwargs else None
         self.flags = [] if flags is None else list(flags)
-
+    @property
+    def meta(self):
+        if self._meta is None:
+            self._meta = {}
+        return self._meta
+        
     def _set_url(self, url):
         if not isinstance(url, str):
             raise TypeError('Request url must be str or unicode, got %s:' % type(url).__name__)

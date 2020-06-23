@@ -8,12 +8,13 @@ class JSpider(Jcrapy.Spider):
     name='Jackie'
     start_urls = [
                 'http://www.jackiechan.com/news/',
-                'http://jackiechan.com/blog/',
-                 'http://www.jackiechan.com/scrapbook/'
+                # 'http://jackiechan.com/blog/',
+                 # 'http://www.jackiechan.com/scrapbook/'
                 ]
     allowd_domains=['jackiechan.com']
     def parse(self, response):
         # follow links to article pages
+        print('JSpider.parse')
         for post in response.css('.post .title a'):
             yield response.follow(post, self.parse_post)
 

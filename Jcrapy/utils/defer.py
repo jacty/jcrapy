@@ -2,6 +2,26 @@
 Helper functions for dealing with Twisted deferreds
 """
 from twisted.internet import defer
+from twisted.python import failure
+
+def defer_succeed(result):
+    print('defer_succeed')
+
+def defer_result(result):
+    if isinstance(result, defer.Deferred):
+        return result
+    elif isinstance(result, failure.Failure):
+        return defer_fail(result)
+    else:
+        return defer_succeed(result)
+
+def mustbe_deferred(f, *args, **kw):
+    try:
+        result = f(*args, **kw)
+    except Exception as e:
+        print('error in mustbe_deferred', e)
+    else:
+        return defer_result(result)    
 
 def process_chain(cbs, input, *a):
     """Return a Deferred built by chaining the given callbacks"""
