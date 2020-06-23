@@ -1,10 +1,12 @@
 from time import time
+from io import BytesIO
 from urllib.parse import urldefrag
 
-from twisted.internet import reactor
+from twisted.internet import reactor, defer, protocol, ssl
 from twisted.web.client import Agent, HTTPConnectionPool
 
 from twisted.web.http_headers import Headers as TxHeaders
+from twisted.web.iweb import IBodyProducer, UNKNOWN_LENGTH
 from Jcrapy.core.downloader.tls import openssl_methods
 from Jcrapy.utils.misc import create_instance, load_object
 from Jcrapy.utils.python import to_bytes
@@ -124,7 +126,12 @@ class JcrapyAgent:
         return d
 
     def _cb_timeout(self, result, request, url, timeout):
-        print('_cb_timeout')
+        if self._timeout_cl.active():
+            self._timeout_cl.cancel()
+            return result
+        # if self._txresponse:
+
+        print('_cb_timeout', self._txresponse)
 
     def _cb_latency(self, result, request, start_time):
         request.meta['download_latency'] = time() - start_time
@@ -132,7 +139,53 @@ class JcrapyAgent:
 
     def _cb_bodyready(self, txresponse, request):
         # deliverBody hangs for responses without body
-        print('_cb_bodyready', txresponse)
+        if txresponse.length == 0:
+            print('_cb_bodyready', txresponse.length)
+
+        maxsize = request.meta.get('download_maxsize', self._maxsize)
+        warnsize = request.meta.get('download_warnsize', self._warnsize)
+        expected_size = txresponse.length if txresponse.length != UNKNOWN_LENGTH else -1
+        fail_on_dataloss = request.meta.get('download_fail_on_dataloss', self._fail_on_dataloss)
+
+        if maxsize and expected_size > maxsize:
+            err_msg = 'maxsize reached'
+            txresponse._transport._producer.loseConnection()
+            raise defer.CancelledError(err_msg)
+
+        def _cancel(_):
+            txresponse._transport._producer.abortConnection()
+
+        d = defer.Deferred(_cancel)
+        txresponse.deliverBody(
+            _ResponseReader(
+                finished=d,
+                txresponse=txresponse,
+                request=request,
+                maxsize=maxsize,
+                warnsize=warnsize,
+                fail_on_dataloss=fail_on_dataloss,
+                crawler=self._crawler,
+            )
+        )
+        self._txresponse = txresponse
+        return d
 
     def _cb_bodydone(self, result, request, url):
         print('_cb_bodydone', result)
+
+class _ResponseReader(protocol.Protocol):
+
+    def __init__(self, finished, txresponse, request, maxsize, warnsize, fail_on_dataloss, crawler):
+        self._finished = finished
+        self._txresponse = txresponse
+        self._request = request
+        self._bodybuf = BytesIO()
+        self._maxsize = maxsize
+        self._warnsize = warnsize
+        self._fail_on_dataloss = fail_on_dataloss
+        self._fail_on_dataloss_warned = False
+        self._reached_warnsize = False
+        self._bytes_received = 0
+        self._certificate = None
+        self._ip_address = None
+        self._crawler = crawler    

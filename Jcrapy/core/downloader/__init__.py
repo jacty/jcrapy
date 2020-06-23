@@ -92,7 +92,8 @@ class Downloader:
         key, slot = self._get_slot(request, spider)
         request.meta[self.DOWNLOAD_SLOT] = key
         def _deactivate(response):
-            print('_enqueue_request._deactivate')
+            slot.active.remove(request)
+            return response
 
         slot.active.add(request)
         deferred = defer.Deferred().addBoth(_deactivate)
@@ -127,7 +128,8 @@ class Downloader:
         dfd.addCallback(_downloaded)
         slot.transferring.add(request)
         def finish_transferring(_):
-            print('finish_transferring')
+            slot.transferring.remove(request)
+            self._process_queue(spider, slot)
             return _
         return dfd.addBoth(finish_transferring)
 
