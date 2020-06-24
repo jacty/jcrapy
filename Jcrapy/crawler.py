@@ -75,9 +75,7 @@ class CrawlerRunner:
         keeping track of it so it can be stopped later.
         
         """    
-        #spidername is from user input which means it is indeed necessary to check it.
-        if isinstance(spidername, Spider):
-            raise ValueError('The spidername argument must be a spider class rather than instance.')           
+          
         spidercls = self.spider_loader.load(spidername)
         crawler = Crawler(spidercls, self.settings)
         return self._crawl(crawler)
@@ -120,8 +118,7 @@ class CrawlerProcess(CrawlerRunner):
 
     This class extends :class:`~Jcrapy.crawler.CrawlerRunner` by adding support
     for starting a :mod:`~twisted.internet.reactor` and handling shutdown
-    signals, like the keyboard interrupt command Ctrl-C. It also configures
-    top-level logging.
+    signals, like the keyboard interrupt command Ctrl-C. 
 
     This utility should be a better fit than
     :class:`~Jcrapy.crawler.CrawlerRunner` if you aren't running another
@@ -130,15 +127,12 @@ class CrawlerProcess(CrawlerRunner):
     The CrawlerProcess object must be instantiated with a
     :class:`~Jcrapy.settings.Settings` object.
 
-    :param install_root_handler: whether to install root logging handler
-        (default: True)
-
     This class shouldn't be needed (since Jcrapy is responsible of using it
     accordingly) unless writing scripts that manually handle the crawling
     process. See :ref:`run-from-script` for an example.
     """
 
-    def __init__(self, settings=None, install_root_handler=True):
+    def __init__(self, settings=None):
         super(CrawlerProcess, self).__init__(settings)
         install_shutdown_handlers(self._signal_shutdown)
 
