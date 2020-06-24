@@ -143,5 +143,15 @@ class CrawlerProcess(CrawlerRunner):
         if d.called:
             return
         d.addBoth(self._stop_reactor)
+        resolver_class = load_object(self.settings["DNS_RESOLVER"])
+        print('CrawlerProcess',resolver_class)
         reactor.addSystemEventTrigger('before', 'shutdown', self.stop)
         reactor.run() #blocking call     
+
+    def _stop_reactor(self):
+        try:
+            print('_stop_reactor')
+            reactor.stop()
+        except RuntimeError:
+            pass
+        
