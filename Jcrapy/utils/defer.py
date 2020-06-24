@@ -27,7 +27,8 @@ def process_chain(cbs, input, *a):
     """Return a Deferred built by chaining the given callbacks"""
     d = defer.Deferred()
     for x in cbs:
-        print('process_chain', x)
+        print('process_chain',x)
+        d.addCallback(x, *a)
     d.callback(input)
     return d
 
