@@ -72,8 +72,7 @@ class ExecutionEngine:
         if self.running:
             raise RuntimeError("Engine already running")
         self.running = True
-        self._closewait = defer.Deferred()
-        yield self._closewait
+        yield defer.Deferred()
 
     def stop(self):
         print('Engine.stop')
