@@ -11,33 +11,26 @@ class Crawler:
     def __init__(self, spidercls, settings=None):
         self.spidercls = spidercls
         self.settings = settings
-        self.crawling = False
         self.spider = None
         self.engine = None
 
     @defer.inlineCallbacks
     def crawl(self, *args):
-        if self.crawling:
-            raise RuntimeError("Crawling already taking place")
-        self.crawling = True
         try:
             #initiate spiderclass from crawler
             self.spider = self.spidercls.from_crawler(self)
             self.engine = ExecutionEngine(self, self.stop())
-            start_requests = self.spider.start_requests()
+            start_requests = self.spider.start_requests() # yield Request()
             yield self.engine.open_spider(self.spider, start_requests)
             yield defer.maybeDeferred(self.engine.start)
         except Exception:
-            self.crawling = False
             if self.engine is not None:
                 yield self.engine.close()
             raise
 
     @defer.inlineCallbacks
     def stop(self):
-        if self.crawling:
-            self.crawling = False
-            yield defer.maybeDeferred(self.engine.stop)        
+        yield defer.maybeDeferred(self.engine.stop)        
         
 
 class CrawlerRunner:
@@ -53,8 +46,7 @@ class CrawlerRunner:
     process. See :ref:`run-from-script` for an example.
     """
 
-    @staticmethod
-    def _get_spider_loader(settings):
+    def _get_spider_loader(self, settings):
         cls_path = settings.get('SPIDER_LOADER_CLASS')
         loader_cls = load_object(cls_path)
         return loader_cls.from_settings(settings)
@@ -74,8 +66,7 @@ class CrawlerRunner:
         It will call the given Crawler's :meth:`~Crawler.crawl` method, while
         keeping track of it so it can be stopped later.
         
-        """    
-          
+        """              
         spidercls = self.spider_loader.load(spidername)
         crawler = Crawler(spidercls, self.settings)
         return self._crawl(crawler)
@@ -84,8 +75,8 @@ class CrawlerRunner:
         self.crawlers.add(crawler)
         d = crawler.crawl()
         self._active.add(d)
-        
         def _done(result):
+            print('CrawlerRunner._crawl._done')
             self.crawlers.discard(crawler)
             self._active.discard(d)
             self.bootstrap_failed |= not getattr(crawler, 'spider', None)
@@ -134,10 +125,7 @@ class CrawlerProcess(CrawlerRunner):
 
     def __init__(self, settings=None):
         super(CrawlerProcess, self).__init__(settings)
-        install_shutdown_handlers(self._signal_shutdown)
-
-    def _signal_shutdown(self, signum, _):
-        print('CrawlerProcess._signal_shutdown')
+        reactor._handleSignals()
 
     def start(self):
         """
@@ -156,10 +144,4 @@ class CrawlerProcess(CrawlerRunner):
             return
         d.addBoth(self._stop_reactor)
         reactor.addSystemEventTrigger('before', 'shutdown', self.stop)
-        reactor.run(installSignalHandlers=False) #blocking call     
-
-    def _stop_reactor(self):
-        print('_stop_reactor')
-
-    def _handle_twisted_reactor(self):
-        super()._handle_twisted_reactor()
+        reactor.run() #blocking call     
