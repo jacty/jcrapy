@@ -75,28 +75,15 @@ class ExecutionEngine:
         yield defer.Deferred()
 
     def stop(self):
-        print('Engine.stop')
         if not self.running:
             raise RuntimeError('Engine not running')
         self.running = False
         dfd = self._close_all_spiders()
         return dfd
 
-    def close(self):
-        print('Engine.close')
-        """Close the execution engine gracefully.
-
-        If it has already been started, stop it. In all cases, close all spiders
-        and the downloader.
-        """
-        if self.running:
-            return self.stop() 
-        elif self.open_spiders:
-            return self._close_all_spiders()
-        else:
-            return defer.succeed(self.downloader.close())       
-
     def _next_request(self, spider):
+        print('engine._next_request')
+        return
         slot = self.slot
         if not slot:
             return 
@@ -149,9 +136,6 @@ class ExecutionEngine:
     def open_spiders(self):
         return [self.spider] if self.spider else []
     
-    def has_capacity(self):
-        return not bool(self.slot)
-
     def crawl(self, request, spider):
         if spider not in self.open_spiders:
             raise RuntimeError("Spider %r not opened when crawling: %s" % (spider.name, request))
@@ -185,20 +169,15 @@ class ExecutionEngine:
         return dwld
 
     @defer.inlineCallbacks
-    def open_spider(self, spider, start_requests=(), close_if_idle=True):
-        if not self.has_capacity():
-            raise RuntimeError("No free spider slot when opening %r" % spider.name)
+    def open_spider(self, spider, start_requests, close_if_idle=True):
         nextcall = CallLaterOnce(self._next_request, spider)
         scheduler = self.scheduler_cls.from_crawler(self.crawler)
-
         start_requests = yield self.scraper.spidermw.process_start_requests(start_requests, spider)
-
         slot = Slot(start_requests, close_if_idle, nextcall, scheduler)
         self.slot = slot
         self.spider = spider
         yield scheduler.open(spider)
         yield self.scraper.open_spider(spider)
-        slot.nextcall.schedule()
         slot.heartbeat.start(5)  
     
     def _spider_idle(self, spider):
@@ -206,39 +185,17 @@ class ExecutionEngine:
 
     def close_spider(self, spider, reason='canceled'):
         """Close (cancel) spider and clear all its outstanding requests"""
-        print('Engine.close_spider')
+
         slot = self.slot
         if slot.closing:
             return slot.closing
 
         dfd = slot.close()
 
-        def log_failure(msg):
-            def errback(failure):
-                print(failure)
-            return errback
-
-        dfd.addBoth(lambda _: self.downloader.close())
-        dfd.addErrback(log_failure('Downloader close failure'))
-
-        dfd.addBoth(lambda _: self.scraper.close_spider(spider))
-        dfd.addErrback(log_failure('Scraper close failure'))
-
-        dfd.addBoth(lambda _: slot.scheduler.close(reason))
-        dfd.addErrback(log_failure('Scheduler close failure'))
-
-        dfd.addBoth(lambda _: setattr(self, 'slot', None))
-        dfd.addErrback(log_failure('Error while unassigning slot'))
-
-        dfd.addBoth(lambda _: setattr(self, 'spider', None))
-        dfd.addErrback(log_failure('Error while unassigning spider'))
-
-        dfd.addBoth(lambda _: self._spider_closed_callback(spider))
-
         return dfd
 
-    def _close_all_spiders(self):
-        print('engine._close_all_spiders')
+    def _close_all_spiders(self): 
         dfds = [self.close_spider(s, reason='shutdown') for s in self.open_spiders]
         dlist = defer.DeferredList(dfds)
         return dlist
+
