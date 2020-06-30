@@ -26,6 +26,8 @@ class Spider:
 
     def start_requests(self):
         cls = self.__class__
+        if not hasattr(self, 'start_urls') or not self.start_urls:
+            raise AttributeError("start_urls cannot be found or empty")
         for url in self.start_urls:
             yield Request(url)
 
