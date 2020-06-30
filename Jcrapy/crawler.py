@@ -26,6 +26,7 @@ class Crawler:
         except Exception:
             if self.engine is not None:
                 yield self.engine.stop()
+            raise
 
     @defer.inlineCallbacks
     def stop(self):
