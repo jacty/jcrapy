@@ -25,8 +25,7 @@ class Crawler:
             yield defer.maybeDeferred(self.engine.start)
         except Exception:
             if self.engine is not None:
-                yield self.engine.close()
-            raise
+                yield self.engine.stop()
 
     @defer.inlineCallbacks
     def stop(self):
@@ -76,7 +75,6 @@ class CrawlerRunner:
         d = crawler.crawl()
         self._active.add(d)
         def _done(result):
-            print('CrawlerRunner._crawl._done')
             self.crawlers.discard(crawler)
             self._active.discard(d)
             self.bootstrap_failed |= not getattr(crawler, 'spider', None)
