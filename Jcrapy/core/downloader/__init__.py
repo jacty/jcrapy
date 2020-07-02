@@ -1,5 +1,6 @@
 import random
 from time import time
+from datetime import datetime
 from collections import deque
 
 from twisted.internet import defer, task
@@ -29,6 +30,19 @@ class Slot:
         if self.randomize_delay:
             return random.uniform(0.5 * self.delay, 1.5 * self.delay)
         return self.delay
+
+    def __repr__(self):
+        print('Slot.__repr__')
+
+    def __str__(self):
+        return (
+            "<downloader.Slot concurrency=%r delay=%0.2f randomize_delay=%r "
+            "len(active)=%d len(queue)=%d len(transferring)=%d lastseen=%s>" % (
+                self.concurrency, self.delay, self.randomize_delay,
+                len(self.active), len(self.queue), len(self.transferring),
+                datetime.fromtimestamp(self.lastseen).isoformat()
+            )
+        )
 
 def _get_concurrency_delay(concurrency, spider, settings):
     delay = settings.getfloat('DOWNLOAD_DELAY')
@@ -65,7 +79,8 @@ class Downloader:
 
         self.active.add(request)
         dfd = self.middleware.download(self._enqueue_request, request, spider)
-        return dfd.addBoth(_deactivate)
+        print('fetch', dfd)
+        # return dfd.addBoth(_deactivate)
 
     def needs_backout(self):
         return len(self.active) >= self.total_concurrency
@@ -80,18 +95,17 @@ class Downloader:
         return key, self.slots[key]
 
     def _get_slot_key(self, request, spider):
-        if self.DOWNLOAD_SLOT in request.meta:
-            return request.meta[self.DOWNLOAD_SLOT]
-
         key = urlparse_cached(request).hostname or ''
         if self.ip_concurrency:
-            key = dnscache.get(key, key)
+            print('self.ip_concurrency is true')
         return key
 
     def _enqueue_request(self, request, spider):
         key, slot = self._get_slot(request, spider)
         request.meta[self.DOWNLOAD_SLOT] = key
+
         def _deactivate(response):
+            print('_deactivate')
             slot.active.remove(request)
             return response
 
@@ -103,35 +117,36 @@ class Downloader:
     
     def _process_queue(self, spider, slot):
         from twisted.internet import reactor
-        if slot.latercall and slot.latercall.active():
-            return 
-
         now = time()
         delay = slot.download_delay()
         if delay:
             print('_process_queue', not delay)
-
+        # Process enqueued requests if there are free slots to transfer for this slot
+        
         while slot.queue and slot.free_transfer_slots() > 0:
             slot.lastseen = now
             request, deferred = slot.queue.popleft()
             dfd = self._download(slot, request, spider)
-            dfd.chainDeferred(deferred)
-            if delay:
-                self._process_queue(spider, slot)
-                break
+            print('_process_queue')
+        #     dfd.chainDeferred(deferred)
+        #     if delay:
+        #         self._process_queue(spider, slot)
+        #         break
 
     def _download(self, slot, request, spider):
+        # The order is very important for the following deferreds. Do not change!
+        # 1. Create the download deferred
         dfd = mustbe_deferred(self.handlers.download_request, request, spider)
-        
-        def _downloaded(response):
-            return response
-        dfd.addCallback(_downloaded)
-        slot.transferring.add(request)
-        def finish_transferring(_):
-            slot.transferring.remove(request)
-            self._process_queue(spider, slot)
-            return _
-        return dfd.addBoth(finish_transferring)
+        print('_download', dfd)
+        # def _downloaded(response):
+        #     return response
+        # dfd.addCallback(_downloaded)
+        # slot.transferring.add(request)
+        # def finish_transferring(_):
+        #     slot.transferring.remove(request)
+        #     self._process_queue(spider, slot)
+        #     return _
+        # return dfd.addBoth(finish_transferring)
 
     def close(self):
         self._slot_gc_loop.stop()

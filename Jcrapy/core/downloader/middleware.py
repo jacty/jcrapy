@@ -22,6 +22,11 @@ class DownloaderMiddlewareManager(MiddlewareManager):
             print('DownloaderMiddlewareManager.process_response')
             return response
 
+        @defer.inlineCallbacks
+        def process_exception(failure):
+            print('DOWNLOADER_MIDDLEWARES.process_exception')
+
         deferred = mustbe_deferred(process_request, request)
-        deferred.addCallback(process_response)
+        # deferred.addErrback(process_exception)
+        # deferred.addCallback(process_response)
         return deferred

@@ -8,6 +8,8 @@ def defer_succeed(result):
     print('defer_succeed')
 
 def defer_result(result):
+    print('defer_result',result)
+    return
     if isinstance(result, defer.Deferred):
         return result
     elif isinstance(result, failure.Failure):

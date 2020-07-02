@@ -1,13 +1,18 @@
+import ipaddress
+from contextlib import suppress
 from time import time
 from io import BytesIO
 from urllib.parse import urldefrag
 
 from twisted.internet import reactor, defer, protocol, ssl
-from twisted.web.client import Agent, HTTPConnectionPool
+from twisted.web.client import Agent, HTTPConnectionPool, ResponseDone, ResponseFailed, URI
+from twisted.web.http import _DataLoss, PotentialDataLoss
 
 from twisted.web.http_headers import Headers as TxHeaders
 from twisted.web.iweb import IBodyProducer, UNKNOWN_LENGTH
 from Jcrapy.core.downloader.tls import openssl_methods
+from Jcrapy.https import Headers
+from Jcrapy.responsetypes import ResponseTypes
 from Jcrapy.utils.misc import create_instance, load_object
 from Jcrapy.utils.python import to_bytes
 
@@ -66,6 +71,7 @@ class TunnelingAgent(Agent):
         super(TunnelingAgent, self).__init__(reactor, contextFactory, connectTimeout, bindAddress, pool)
         self._proxyConf = proxyConf
         self._contextFactory = contextFactory
+
 class JcrapyAgent:
     _Agent = Agent
     _TunnelingAgent = TunnelingAgent
@@ -83,9 +89,9 @@ class JcrapyAgent:
         self._crawler = crawler
 
     def _get_agent(self, request, timeout):
-        from twisted.internet import reactor
         bindaddress = request.meta.get('bindaddress') or self._bindAddress
         proxy = request.meta.get('proxy')
+
         if proxy:
             print('_get_agent', bool(proxy))
 
@@ -98,7 +104,6 @@ class JcrapyAgent:
             )
 
     def download_request(self, request):
-        from twisted.internet import reactor
         timeout = request.meta.get('download_timeout') or self._connectTimeout
         agent = self._get_agent(request, timeout)
 
@@ -113,13 +118,17 @@ class JcrapyAgent:
             print('agent.download_request.request.body', request.body)
         else:
             bodyproducer = None
+
         start_time = time()
         d = agent.request(method, to_bytes(url, encoding='ascii'), headers, bodyproducer)
         # set download latency
         d.addCallback(self._cb_latency, request, start_time)
+
         # response body is ready to be consumed
         d.addCallback(self._cb_bodyready, request)
         d.addCallback(self._cb_bodydone, request, url)
+        print('download_request')
+        return
         # check download timeout
         self._timeout_cl = reactor.callLater(timeout, d.cancel)
         d.addBoth(self._cb_timeout, request, url, timeout)
@@ -139,6 +148,7 @@ class JcrapyAgent:
 
     def _cb_bodyready(self, txresponse, request):
         # deliverBody hangs for responses without body
+
         if txresponse.length == 0:
             print('_cb_bodyready', txresponse.length)
 
@@ -153,6 +163,7 @@ class JcrapyAgent:
             raise defer.CancelledError(err_msg)
 
         def _cancel(_):
+            print('_cancel')
             txresponse._transport._producer.abortConnection()
 
         d = defer.Deferred(_cancel)
@@ -171,7 +182,21 @@ class JcrapyAgent:
         return d
 
     def _cb_bodydone(self, result, request, url):
-        print('_cb_bodydone', result)
+        headers = Headers(result["txresponse"].headers.getAllRawHeaders())
+        respcls = ResponseTypes().from_args(headers=headers, url=url, body=result["body"])
+        response = respcls(
+            url=url,
+            status=int(result["txresponse"].code),
+            headers=headers,
+            body=result["body"],
+            flags=result["flags"],
+            certificate=result["certificate"],
+            ip_address=result["ip_address"],
+        )
+        if result.get("failure"):
+            result["failure"].value.response = response
+            return result["failure"]
+        return response
 
 class _ResponseReader(protocol.Protocol):
 
@@ -188,4 +213,56 @@ class _ResponseReader(protocol.Protocol):
         self._bytes_received = 0
         self._certificate = None
         self._ip_address = None
-        self._crawler = crawler    
+        self._crawler = crawler 
+
+    def _finish_response(self, flags=None, failure=None):
+        self._finished.callback({
+            "txresponse": self._txresponse,
+            "body": self._bodybuf.getvalue(),
+            "flags": flags,
+            "certificate": self._certificate,
+            "ip_address": self._ip_address,
+            "failure": failure,
+        })
+
+    def connectionMade(self):
+        if self._certificate is None:
+            with suppress(AttributeError):
+                print('connectionMade', self.transport._producer.getPeerCertificate())
+
+        if self._ip_address is None:
+            self._ip_address = ipaddress.ip_address(self.transport._producer.getPeer().host)
+
+    def dataReceived(self, bodyBytes):
+        # This maybe called several times after cancel was called with buffered data.
+        if self._finished.called:
+            return
+
+        self._bodybuf.write(bodyBytes)
+        self._bytes_received += len(bodyBytes)
+
+        if self._maxsize and self._bytes_received > self._maxsize:
+            print('Received bytes larger than download.')
+            # Clear buffer earlier to avoid keeping data in memory for a long time.
+            self._bodybuf.truncate(0)
+            self._finished.cancel()
+
+    def connectionLost(self, reason):
+        if self._finished.called:
+            return 
+
+        if reason.check(ResponseDone):
+            self._finish_response()
+            return
+
+        if reason.check(PotentialDataLoss):
+            self._finish_response(flags=["partial"])
+            return
+
+        if reason.check(ResponseFailed) and any(r.check(_DataLoss) for r in reason.value.reasons):
+            if not self._fail_on_dataloss:
+                self._finish_response(flags=["dataloss"])
+                return
+
+        self._finished.errback(reason)
+

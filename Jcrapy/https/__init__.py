@@ -7,3 +7,5 @@ Request and Response outside this module.
 from Jcrapy.https.headers import Headers
 
 from Jcrapy.https.request import Request
+from Jcrapy.https.response import Response
+from Jcrapy.https.response.html import HtmlResponse

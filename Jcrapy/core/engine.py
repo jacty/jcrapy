@@ -78,48 +78,29 @@ class ExecutionEngine:
         self.running = False
 
     def _next_request(self, spider):
-        print('engine._next_request',self.slot)
-        return
         slot = self.slot
-        if not slot:
-            return 
 
-        if self.paused:
-            return
+        self._next_request_from_scheduler(spider)
 
-        while not self._needs_backout():
-            if not self._next_request_from_scheduler(spider):
-                break
 
-        if slot.start_requests and not self._needs_backout():
+        if slot.start_requests:
             try:
                 request = next(slot.start_requests)
-            except StopIteration:
+            except StopIteration as e:
                 slot.start_requests = None
+            except Exception as e:
+                slot.start_requests = None
+                print('Error in Engine._next_request')
             else:
                 self.crawl(request, spider)
-        
-        if self.spider_is_idle(spider) and slot.close_if_idle:
-            self._spider_idle(spider)
-
-    def _needs_backout(self):
-        slot = self.slot
-        return not self.running \
-            or slot.closing \
-            or self.downloader.needs_backout() \
-            or self.scraper.slot.needs_backout()
 
     def _next_request_from_scheduler(self, spider):
         slot = self.slot
-        # fetch request from queues
         request = slot.scheduler.next_request()
         if not request:
             return
         d = self._download(request, spider)
-        d.addBoth(self._handle_downloader_output, request, spider)
-        d.addBoth(lambda _: slot.remove_request(request))
-        d.addBoth(lambda _: slot.nextcall.schedule())
-        return d
+        print('_next_request_from_scheduler')
     
     @defer.inlineCallbacks
     def open_spider(self, spider, start_requests, close_if_idle=True):
@@ -132,6 +113,25 @@ class ExecutionEngine:
         yield self.scraper.open_spider(spider)
         self.slot.heartbeat.start(5)  
     
+    def crawl(self, request, spider):
+        self.schedule(request, spider)
+
+    def schedule(self, request, spider):
+        self.slot.scheduler.enqueue_request(request)
+
+    def _download(self, request, spider):
+        self.slot.add_request(request)
+
+        def _on_success(response):
+            print('_on_success')
+
+        def _on_complete(_):
+            print('_on_complete')
+
+        dwld = self.downloader.fetch(request, spider)
+        # dwld.addCallbacks(_on_success)
+        # dwld.addBoth(_on_complete)
+        print('_download', dwld)
 
 
 

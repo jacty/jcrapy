@@ -25,9 +25,10 @@ class RFPDupeFilter(BaseDupeFilter):
         if fp in self.fingerprints:
             return True
         self.fingerprints.add(fp)
-        if self.file:
-            self.file.write(fp + '\n')
-
+        
     def close(self, reason):
         if self.file:
             self.file.close()
+
+    def log(self, request, spider):
+        print('RFPDupeFilter.log')

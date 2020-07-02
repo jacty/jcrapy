@@ -8,8 +8,8 @@ class JSpider(Jcrapy.Spider):
     name='Jackie'
     start_urls = [
                 'http://www.jackiechan.com/news/',
-                # 'http://jackiechan.com/blog/',
-                 # 'http://www.jackiechan.com/scrapbook/'
+    #             # 'http://jackiechan.com/blog/',
+    #              # 'http://www.jackiechan.com/scrapbook/'
                 ]
     allowd_domains=['jackiechan.com']
     def parse(self, response):

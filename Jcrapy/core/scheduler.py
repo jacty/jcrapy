@@ -25,7 +25,6 @@ class Scheduler:
         self.mqclass = mqclass
         self.crawler = crawler
 
-
     @classmethod
     def from_crawler(cls, crawler):
         settings = crawler.settings
@@ -41,30 +40,21 @@ class Scheduler:
         self.dqs = self._dq() if self.dqdir else None
         return self.df.open()
 
-    def close(self, reason):
-        if self.dqs:
-            print('Scheduler.close', self.dqs)
-        return self.df.close(reason)
-
     def enqueue_request(self, request):
-        if not request.dont_filter and self.df.request_seen(request):
+        # check duplicated requests
+        if self.df.request_seen(request):
             return False
         dqok = self._dqpush(request)
         if dqok:
-            print('Scheduler.enqueue_request',dqok)
+            print('dqok')
         else:
-            self.mqs.push(request)
-        return True            
-
+            self._mqpush(request)
+        
+        return True
+   
     def next_request(self):
         request = self.mqs.pop()
-        if request:
-            pass
-        else:
-            request = self._dqpop()
-            
         return request
-        
 
     def __len__(self):
         print('Scheduler.__len__')
@@ -72,11 +62,10 @@ class Scheduler:
     def _dqpush(self, request):
         if self.dqs is None:
             return
-        print('scheduler._dqpush')
+        print('_dqpush')
 
-    def _dqpop(self):
-        if self.dqs:
-            return self.dqs.pop()
+    def _mqpush(self, request):
+        self.mqs.push(request)
 
     def _mq(self):
         """ Create a new priority queue instance, with in-memory storage """
