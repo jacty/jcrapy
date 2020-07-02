@@ -279,7 +279,7 @@ TEMPLATES_DIR = abspath(join(dirname(__file__), '..', 'templates'))
 
 URLLENGTH_LIMIT = 2083
 
-USER_AGENT = 'Jcrapy/%s (+https://Jcrapy.org)' % import_module('Jcrapy').__version__
+USER_AGENT = 'Jacty0219@qq.com'
 
 TELNETCONSOLE_ENABLED = 1
 TELNETCONSOLE_PORT = [6023, 6073]
