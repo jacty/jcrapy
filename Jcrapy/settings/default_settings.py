@@ -94,8 +94,8 @@ DOWNLOADER_MIDDLEWARES_BASE = {
     # 'Jcrapy.downloadermiddlewares.robotstxt.RobotsTxtMiddleware': 100,
     # 'Jcrapy.downloadermiddlewares.httpauth.HttpAuthMiddleware': 300,
     # 'Jcrapy.downloadermiddlewares.downloadtimeout.DownloadTimeoutMiddleware': 350,
-    'Jcrapy.downloadermiddlewares.defaultheaders.DefaultHeadersMiddleware': 400,
-    # 'Jcrapy.downloadermiddlewares.useragent.UserAgentMiddleware': 500,
+    # 'Jcrapy.downloadermiddlewares.defaultheaders.DefaultHeadersMiddleware': 400,
+    'Jcrapy.downloadermiddlewares.useragent.UserAgentMiddleware': 500,
     # 'Jcrapy.downloadermiddlewares.retry.RetryMiddleware': 550,
     # 'Jcrapy.downloadermiddlewares.ajaxcrawl.AjaxCrawlMiddleware': 560,
     # 'Jcrapy.downloadermiddlewares.redirect.MetaRefreshMiddleware': 580,
@@ -261,7 +261,7 @@ SPIDER_MIDDLEWARES = {}
 
 SPIDER_MIDDLEWARES_BASE = {
     # Engine side
-    'Jcrapy.spidermiddlewares.httperror.HttpErrorMiddleware': 50,
+    # 'Jcrapy.spidermiddlewares.httperror.HttpErrorMiddleware': 50,
     # 'Jcrapy.spidermiddlewares.offsite.OffsiteMiddleware': 500,
     # 'Jcrapy.spidermiddlewares.referer.RefererMiddleware': 700,
     # 'Jcrapy.spidermiddlewares.urllength.UrlLengthMiddleware': 800,

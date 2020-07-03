@@ -6,12 +6,8 @@ import Jcrapy
 
 class JSpider(Jcrapy.Spider):
     name='Jackie'
-    start_urls = [
-                'http://www.jackiechan.com/news/',
-    #             # 'http://jackiechan.com/blog/',
-    #              # 'http://www.jackiechan.com/scrapbook/'
-                ]
-    allowd_domains=['jackiechan.com']
+    start_urls = ['https://web.archive.org/cdx/search/cdx?url=jackiechan.com']
+
     def parse(self, response):
         # follow links to article pages
         print('JSpider.parse')

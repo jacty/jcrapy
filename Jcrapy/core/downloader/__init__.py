@@ -78,8 +78,8 @@ class Downloader:
             return response
 
         self.active.add(request)
-        dfd = self.middleware.download(self._enqueue_request, request, spider)
-        print('fetch', dfd)
+        # dfd = self.middleware.download(self._enqueue_request, request, spider)
+        print('fetch')
         # return dfd.addBoth(_deactivate)
 
     def needs_backout(self):
@@ -134,7 +134,7 @@ class Downloader:
         #         break
 
     def _download(self, slot, request, spider):
-        # The order is very important for the following deferreds. Do not change!
+        # The order is very important for the following deferreds. Do not change!   
         # 1. Create the download deferred
         dfd = mustbe_deferred(self.handlers.download_request, request, spider)
         print('_download', dfd)

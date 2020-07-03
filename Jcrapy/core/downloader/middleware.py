@@ -10,6 +10,14 @@ class DownloaderMiddlewareManager(MiddlewareManager):
     def _get_mwlist_from_settings(cls, settings):
         return build_component_list(settings.getwithbase('DOWNLOADER_MIDDLEWARES'))
 
+    def _add_middleware(self, mw):
+        if hasattr(mw, 'process_request'):
+            self.methods['process_request'].append(mw.process_request)
+        if hasattr(mw, 'process_response'):
+            print('DownloaderMiddlewareManager._add_middleware')
+        if hasattr(mw, 'process_exception'):
+            print('DownloaderMiddlewareManager._add_middleware')
+
     def download(self, download_func, request, spider):
         @defer.inlineCallbacks
         def process_request(request):
