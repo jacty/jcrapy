@@ -1,3 +1,4 @@
+from Jcrapy.exceptions import NotConfigured, NotSupported
 from Jcrapy.utils.httpobj import urlparse_cached
 from Jcrapy.utils.misc import load_object, create_instance
 
@@ -35,7 +36,7 @@ class DownloadHandlers:
         scheme = urlparse_cached(request).scheme
         handler = self._get_handler(scheme)
         if not handler:
-            print('DownloadHandlers.download_request', handler)
+            raise NotSupported("Unsupported URL scheme '%s': %s" % (scheme, self._notconfigured[scheme]))
         return handler.download_request(request, spider)
 
     def _load_handler(self, scheme, skip_lazy=False):

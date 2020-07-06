@@ -66,7 +66,7 @@ DOWNLOAD_HANDLERS_BASE = {
     # 'data': 'Jcrapy.core.downloader.handlers.datauri.DataURIDownloadHandler',
     # 'file': 'Jcrapy.core.downloader.handlers.file.FileDownloadHandler',
     'http': 'Jcrapy.core.downloader.handlers.http.HTTPDownloadHandler',
-    # 'https': 'Jcrapy.core.downloader.handlers.http.HTTPDownloadHandler',
+    'https': 'Jcrapy.core.downloader.handlers.http.HTTPDownloadHandler',
     # 's3': 'Jcrapy.core.downloader.handlers.s3.S3DownloadHandler',
     # 'ftp': 'Jcrapy.core.downloader.handlers.ftp.FTPDownloadHandler',
 }

@@ -78,8 +78,8 @@ class Downloader:
             return response
 
         self.active.add(request)
-        # dfd = self.middleware.download(self._enqueue_request, request, spider)
-        print('fetch')
+        dfd = self.middleware.download(self._enqueue_request, request, spider)
+        print('fetch', dfd)
         # return dfd.addBoth(_deactivate)
 
     def needs_backout(self):
@@ -95,6 +95,9 @@ class Downloader:
         return key, self.slots[key]
 
     def _get_slot_key(self, request, spider):
+        if self.DOWNLOAD_SLOT in request.meta:
+            return request.meta[self.DOWNLOAD_SLOT]
+
         key = urlparse_cached(request).hostname or ''
         if self.ip_concurrency:
             print('self.ip_concurrency is true')
@@ -137,7 +140,7 @@ class Downloader:
         # The order is very important for the following deferreds. Do not change!   
         # 1. Create the download deferred
         dfd = mustbe_deferred(self.handlers.download_request, request, spider)
-        print('_download', dfd)
+        print('_download', self.handlers)
         # def _downloaded(response):
         #     return response
         # dfd.addCallback(_downloaded)

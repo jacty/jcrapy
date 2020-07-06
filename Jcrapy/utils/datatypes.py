@@ -36,7 +36,7 @@ class CaselessDict(dict):
         return dict.get(self, self.normkey(key), self.normvalue(def_val))      
 
     def setdefault(self, key, def_val=None):
-        print('datatypes.setdefault')
+        return dict.setdefault(self, self.normkey(key), self.normvalue(def_val))
 
     def update(self, seq):
         seq = seq.items() if isinstance(seq, Mapping) else seq

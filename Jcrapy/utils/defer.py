@@ -12,8 +12,6 @@ def defer_succeed(result):
     print('defer_succeed')
 
 def defer_result(result):
-    print('defer_result',result)
-    return
     if isinstance(result, defer.Deferred):
         return result
     elif isinstance(result, failure.Failure):
@@ -49,6 +47,7 @@ def process_parallel(callbacks, input, *a, **kw):
 
 def deferred_from_coro(o):
     """Converts a coroutine into a Deferred, or returns the object as is if it isn't a coroutine"""
+
     if isinstance(o, defer.Deferred):
         return o
     if asyncio.isfuture(o) or inspect.isawaitable(o):

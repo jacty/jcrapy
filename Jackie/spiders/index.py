@@ -6,7 +6,7 @@ import Jcrapy
 
 class JSpider(Jcrapy.Spider):
     name='Jackie'
-    start_urls = ['https://web.archive.org/cdx/search/cdx?url=jackiechan.com']
+    start_urls = ['http://web.archive.org/cdx/search/cdx?url=jackiechan.com&output=json']
 
     def parse(self, response):
         # follow links to article pages

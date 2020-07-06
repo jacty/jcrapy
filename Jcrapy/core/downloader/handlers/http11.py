@@ -112,18 +112,18 @@ class JcrapyAgent:
         method = to_bytes(request.method)
         headers = TxHeaders(request.headers)
         if isinstance(agent, self._TunnelingAgent):
-            print('download_request')
-
+            headers.removeHeader(b'Proxy-Authorization')
         if request.body:
             print('agent.download_request.request.body', request.body)
         else:
             bodyproducer = None
 
         start_time = time()
+        print(1, headers)
         d = agent.request(method, to_bytes(url, encoding='ascii'), headers, bodyproducer)
+
         # set download latency
         d.addCallback(self._cb_latency, request, start_time)
-
         # response body is ready to be consumed
         d.addCallback(self._cb_bodyready, request)
         d.addCallback(self._cb_bodydone, request, url)
@@ -148,7 +148,8 @@ class JcrapyAgent:
 
     def _cb_bodyready(self, txresponse, request):
         # deliverBody hangs for responses without body
-
+        print('_cb_bodyready', txresponse)
+        return
         if txresponse.length == 0:
             print('_cb_bodyready', txresponse.length)
 
@@ -182,6 +183,7 @@ class JcrapyAgent:
         return d
 
     def _cb_bodydone(self, result, request, url):
+        print('_cb_bodydone')
         headers = Headers(result["txresponse"].headers.getAllRawHeaders())
         respcls = ResponseTypes().from_args(headers=headers, url=url, body=result["body"])
         response = respcls(
