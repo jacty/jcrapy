@@ -10,11 +10,13 @@ from twisted.web.http import _DataLoss, PotentialDataLoss
 
 from twisted.web.http_headers import Headers as TxHeaders
 from twisted.web.iweb import IBodyProducer, UNKNOWN_LENGTH
+
 from Jcrapy.core.downloader.tls import openssl_methods
+from Jcrapy.core.downloader.webclient import _parse
 from Jcrapy.https import Headers
 from Jcrapy.responsetypes import ResponseTypes
 from Jcrapy.utils.misc import create_instance, load_object
-from Jcrapy.utils.python import to_bytes
+from Jcrapy.utils.python import to_bytes, to_unicode
 
 class HTTP11DownloadHandler:
     lazy = False
@@ -93,7 +95,22 @@ class JcrapyAgent:
         proxy = request.meta.get('proxy')
 
         if proxy:
-            print('_get_agent', bool(proxy))
+            _, _, proxyHost, proxyPort, proxyParams = _parse(proxy)
+            scheme = _parse(request.url)[0]
+            proxyHost = to_unicode(proxyHost)
+            if scheme == b'https':
+                proxyAuth = request.headers.get(b'Proxy-Authorization', None)
+                proxyConf = (proxyHost, proxyPort, proxyAuth)
+                return self._TunnelingAgent(
+                    reactor=reactor,
+                    proxyConf=proxyConf,
+                    contextFactory=self._contextFactory,
+                    connectTimeout=timeout,
+                    bindAddress=bindaddress,
+                    pool=self._pool,
+                )
+            else:
+                print('_get_agent', scheme)
 
         return self._Agent(
             reactor=reactor,
