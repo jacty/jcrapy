@@ -136,7 +136,7 @@ class JcrapyAgent:
             bodyproducer = None
 
         start_time = time()
-        print(1, headers)
+
         d = agent.request(method, to_bytes(url, encoding='ascii'), headers, bodyproducer)
 
         # set download latency
@@ -144,8 +144,7 @@ class JcrapyAgent:
         # response body is ready to be consumed
         d.addCallback(self._cb_bodyready, request)
         d.addCallback(self._cb_bodydone, request, url)
-        print('download_request')
-        return
+
         # check download timeout
         self._timeout_cl = reactor.callLater(timeout, d.cancel)
         d.addBoth(self._cb_timeout, request, url, timeout)
