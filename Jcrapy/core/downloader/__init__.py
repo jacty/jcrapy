@@ -79,8 +79,7 @@ class Downloader:
 
         self.active.add(request)
         dfd = self.middleware.download(self._enqueue_request, request, spider)
-        print('fetch', dfd)
-        # return dfd.addBoth(_deactivate)
+        return dfd.addBoth(_deactivate)
 
     def needs_backout(self):
         return len(self.active) >= self.total_concurrency
@@ -130,26 +129,25 @@ class Downloader:
             slot.lastseen = now
             request, deferred = slot.queue.popleft()
             dfd = self._download(slot, request, spider)
-            print('_process_queue')
-        #     dfd.chainDeferred(deferred)
-        #     if delay:
-        #         self._process_queue(spider, slot)
-        #         break
+            dfd.chainDeferred(deferred)
+            if delay:
+                self._process_queue(spider, slot)
+                break
 
     def _download(self, slot, request, spider):
         # The order is very important for the following deferreds. Do not change!   
         # 1. Create the download deferred
         dfd = mustbe_deferred(self.handlers.download_request, request, spider)
-        print('_download', self.handlers)
-        # def _downloaded(response):
-        #     return response
-        # dfd.addCallback(_downloaded)
-        # slot.transferring.add(request)
-        # def finish_transferring(_):
-        #     slot.transferring.remove(request)
-        #     self._process_queue(spider, slot)
-        #     return _
-        # return dfd.addBoth(finish_transferring)
+
+        def _downloaded(response):
+            return response
+        dfd.addCallback(_downloaded)
+        slot.transferring.add(request)
+        def finish_transferring(_):
+            slot.transferring.remove(request)
+            self._process_queue(spider, slot)
+            return _
+        return dfd.addBoth(finish_transferring)
 
     def close(self):
         self._slot_gc_loop.stop()
