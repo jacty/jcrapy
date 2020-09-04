@@ -5,9 +5,9 @@ from io import BytesIO
 from urllib.parse import urldefrag
 
 from twisted.internet import reactor, defer, protocol, ssl
+from twisted.internet.error import TimeoutError
 from twisted.web.client import Agent, HTTPConnectionPool, ResponseDone, ResponseFailed, URI
 from twisted.web.http import _DataLoss, PotentialDataLoss
-
 from twisted.web.http_headers import Headers as TxHeaders
 from twisted.web.iweb import IBodyProducer, UNKNOWN_LENGTH
 
@@ -154,9 +154,11 @@ class JcrapyAgent:
         if self._timeout_cl.active():
             self._timeout_cl.cancel()
             return result
-        # if self._txresponse:
 
-        print('_cb_timeout', self._txresponse)
+        if self._txresponse:
+            print('_cb_timeout', result, request, url, self._txresponse)
+
+        raise TimeoutError(f"Getting {url} took longer than {timeout} seconds.")
 
     def _cb_latency(self, result, request, start_time):
         request.meta['download_latency'] = time() - start_time

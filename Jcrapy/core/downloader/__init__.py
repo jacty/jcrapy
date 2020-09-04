@@ -107,7 +107,6 @@ class Downloader:
         request.meta[self.DOWNLOAD_SLOT] = key
 
         def _deactivate(response):
-            print('_deactivate')
             slot.active.remove(request)
             return response
 

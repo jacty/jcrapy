@@ -106,7 +106,7 @@ class ExecutionEngine:
         return d
 
     def _handle_downloader_output(self, response, request, spider):
-        print('engine._handler_downloader_output')
+        print('engine._handler_downloader_output', response, request, spider)
     
     @defer.inlineCallbacks
     def open_spider(self, spider, start_requests, close_if_idle=True):
@@ -132,7 +132,8 @@ class ExecutionEngine:
             print('_on_success')
 
         def _on_complete(_):
-            print('_on_complete')
+            self.slot.nextcall.schedule()
+            return _
 
         dwld = self.downloader.fetch(request, spider)
         dwld.addCallbacks(_on_success)
