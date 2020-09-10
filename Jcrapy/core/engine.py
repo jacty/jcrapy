@@ -4,6 +4,7 @@ This is the Jcrapy engine which controls the Scheduler, Downloader and Spiders.
 For more information see docs/topics/architecture.rst
 
 """
+
 from time import time
 
 from twisted.internet import defer, task
@@ -102,8 +103,13 @@ class ExecutionEngine:
         d = self._download(request, spider)
         print('_next_request_from_scheduler')
     
+    def has_capacity(self):
+        return not bool(self.slot)
+
     @defer.inlineCallbacks
-    def open_spider(self, spider, start_requests, close_if_idle=True):
+    def open_spider(self, spider, start_requests=（）, close_if_idle=True):
+        if not self.has_capacity():
+            raise RuntimeError(f"No free spider slot when opening {spider.name !r}")
         nextcall = CallLaterOnce(self._next_request, spider)
         scheduler = self.scheduler_cls.from_crawler(self.crawler)
         start_requests = yield self.scraper.spidermw.process_start_requests(start_requests, spider)
