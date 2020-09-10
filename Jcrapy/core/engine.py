@@ -4,9 +4,6 @@ This is the Jcrapy engine which controls the Scheduler, Downloader and Spiders.
 For more information see docs/topics/architecture.rst
 
 """
-
-from time import time
-
 from twisted.internet import defer, task
 from twisted.python.failure import Failure
 
