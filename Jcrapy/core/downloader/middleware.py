@@ -16,7 +16,7 @@ class DownloaderMiddlewareManager(MiddlewareManager):
         if hasattr(mw, 'process_request'):
             self.methods['process_request'].append(mw.process_request)
         if hasattr(mw, 'process_response'):
-            print('DownloaderMiddlewareManager._add_middleware')
+            self.methods['process_response'].appendleft(mw.process_response)
         if hasattr(mw, 'process_exception'):
             print('DownloaderMiddlewareManager._add_middleware')
 
