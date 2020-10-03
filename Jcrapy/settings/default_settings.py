@@ -99,7 +99,7 @@ DOWNLOADER_MIDDLEWARES_BASE = {
     # 'Jcrapy.downloadermiddlewares.retry.RetryMiddleware': 550,
     # 'Jcrapy.downloadermiddlewares.ajaxcrawl.AjaxCrawlMiddleware': 560,
     # 'Jcrapy.downloadermiddlewares.redirect.MetaRefreshMiddleware': 580,
-    # 'Jcrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware': 590,
+    'Jcrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware': 590,
     # 'Jcrapy.downloadermiddlewares.redirect.RedirectMiddleware': 600,
     # 'Jcrapy.downloadermiddlewares.cookies.CookiesMiddleware': 700,
     # 'Jcrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 750,
