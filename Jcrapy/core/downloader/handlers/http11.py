@@ -119,6 +119,7 @@ class JcrapyAgent:
             bodyproducer = None
 
         start_time = time()
+
         print(1, headers)
         d = agent.request(method, to_bytes(url, encoding='ascii'), headers, bodyproducer)
 

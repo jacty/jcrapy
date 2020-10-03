@@ -94,7 +94,7 @@ DOWNLOADER_MIDDLEWARES_BASE = {
     # 'Jcrapy.downloadermiddlewares.robotstxt.RobotsTxtMiddleware': 100,
     # 'Jcrapy.downloadermiddlewares.httpauth.HttpAuthMiddleware': 300,
     # 'Jcrapy.downloadermiddlewares.downloadtimeout.DownloadTimeoutMiddleware': 350,
-    # 'Jcrapy.downloadermiddlewares.defaultheaders.DefaultHeadersMiddleware': 400,
+    'Jcrapy.downloadermiddlewares.defaultheaders.DefaultHeadersMiddleware': 400,
     'Jcrapy.downloadermiddlewares.useragent.UserAgentMiddleware': 500,
     # 'Jcrapy.downloadermiddlewares.retry.RetryMiddleware': 550,
     # 'Jcrapy.downloadermiddlewares.ajaxcrawl.AjaxCrawlMiddleware': 560,

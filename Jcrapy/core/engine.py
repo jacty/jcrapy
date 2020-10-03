@@ -104,7 +104,7 @@ class ExecutionEngine:
         return not bool(self.slot)
 
     @defer.inlineCallbacks
-    def open_spider(self, spider, start_requests=（）, close_if_idle=True):
+    def open_spider(self, spider, start_requests=(), close_if_idle=True):
         if not self.has_capacity():
             raise RuntimeError(f"No free spider slot when opening {spider.name !r}")
         nextcall = CallLaterOnce(self._next_request, spider)

@@ -8,3 +8,7 @@ class DefaultHeadersMiddleware:
     def from_crawler(cls, crawler):
         headers = without_none_values(crawler.settings['DEFAULT_REQUEST_HEADERS'])
         return cls(headers.items())
+
+    def process_request(self, request, spider):
+        for k, v in self._headers:
+            request.headers.setdefault(k, v)

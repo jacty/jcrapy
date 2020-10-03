@@ -28,7 +28,6 @@ class Request:
         self.errback = errback
 
         self.cookies = cookies or {}
-        
         self.headers = Headers(headers or {}, encoding=encoding)
         self.dont_filter = dont_filter
 
