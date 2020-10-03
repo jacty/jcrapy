@@ -171,8 +171,7 @@ class JcrapyAgent:
         # response body is ready to be consumed
         d.addCallback(self._cb_bodyready, request)
         d.addCallback(self._cb_bodydone, request, url)
-        print('download_request')
-        return
+
         # check download timeout
         self._timeout_cl = reactor.callLater(timeout, d.cancel)
         d.addBoth(self._cb_timeout, request, url, timeout)
