@@ -102,7 +102,7 @@ DOWNLOADER_MIDDLEWARES_BASE = {
     'Jcrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware': 590,
     # 'Jcrapy.downloadermiddlewares.redirect.RedirectMiddleware': 600,
     # 'Jcrapy.downloadermiddlewares.cookies.CookiesMiddleware': 700,
-    # 'Jcrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 750,
+    'Jcrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 750,
     # 'Jcrapy.downloadermiddlewares.stats.DownloaderStats': 850,
     # 'Jcrapy.downloadermiddlewares.httpcache.HttpCacheMiddleware': 900,
     # Downloader side

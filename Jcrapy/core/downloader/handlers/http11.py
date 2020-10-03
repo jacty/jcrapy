@@ -120,7 +120,6 @@ class JcrapyAgent:
 
         start_time = time()
 
-        print(1, headers)
         d = agent.request(method, to_bytes(url, encoding='ascii'), headers, bodyproducer)
 
         # set download latency
