@@ -11,10 +11,11 @@ from twisted.web.http import _DataLoss, PotentialDataLoss
 from twisted.web.http_headers import Headers as TxHeaders
 from twisted.web.iweb import IBodyProducer, UNKNOWN_LENGTH
 from Jcrapy.core.downloader.tls import openssl_methods
+from Jcrapy.core.downloader.webclient import _parse
 from Jcrapy.https import Headers
 from Jcrapy.responsetypes import ResponseTypes
 from Jcrapy.utils.misc import create_instance, load_object
-from Jcrapy.utils.python import to_bytes
+from Jcrapy.utils.python import to_bytes, to_unicode
 
 class HTTP11DownloadHandler:
     lazy = False
@@ -72,8 +73,36 @@ class TunnelingAgent(Agent):
         self._proxyConf = proxyConf
         self._contextFactory = contextFactory
 
+class JcrapyProxyAgent(Agent):
+
+    def __init__(self, reactor, proxyURI, connectTimeout=None, bindAddress=None, pool=None):
+        super(JcrapyProxyAgent, self).__init__(
+            reactor=reactor,
+            connectTimeout=connectTimeout,
+            bindAddress=bindAddress,
+            pool=pool,
+        )
+        self._proxyURI=URI.fromBytes(proxyURI)
+
+    def request(self, method, uri, headers=None, bodyProducer=None):
+        """
+        Issue a new request via the configured proxy.
+        """
+        # Cache *all* connections under the same key, since we are only
+        # connecting to a single destination, the proxy:
+        return self._requestWithEndpoint(
+            key=("http-proxy", self._proxyURI.host, self._proxyURI.port),
+            endpoint=self._getEndpoint(self._proxyURI),
+            method=method,
+            parsedURI=URI.fromBytes(uri),
+            headers=headers,
+            bodyProducer=bodyProducer,
+            requestPath=uri,
+        )
+
 class JcrapyAgent:
     _Agent = Agent
+    _ProxyAgent = JcrapyProxyAgent
     _TunnelingAgent = TunnelingAgent
 
     def __init__(self, contextFactory=None, connectTimeout=10, bindAddress=None, pool=None,
@@ -93,7 +122,22 @@ class JcrapyAgent:
         proxy = request.meta.get('proxy')
 
         if proxy:
-            print('_get_agent', bool(proxy))
+            _, _, proxyHost, proxyPort, proxyParams = _parse(proxy)
+            scheme = _parse(request.url)[0]
+            proxyHost = to_unicode(proxyHost)
+            omitConnectTunnel = b'noconnect' in proxyParams
+            if omitConnectTunnel:
+                print('_get_agent', proxyParams)
+            if scheme == b'https' and not omitConnectTunnel:
+                print('_get_agent', scheme)
+            else:
+                return self._ProxyAgent(
+                    reactor=reactor,
+                    proxyURI=to_bytes(proxy, encoding='ascii'),
+                    connectTimeout=timeout,
+                    bindAddress=bindaddress,
+                    pool=self._pool,
+                )
 
         return self._Agent(
             reactor=reactor,
